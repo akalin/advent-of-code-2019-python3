@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 
-def compute_closest_intersection_helper(input, distance_fn):
+def compute_closest_intersection(input):
     lines = [x.strip() for x in input.strip().split('\n')]
     paths = [line.split(',') for line in lines]
 
@@ -27,7 +27,7 @@ def compute_closest_intersection_helper(input, distance_fn):
                 dx = 1
                 dy = 0
             else:
-                raise Exception(f'Unknown direction {direct}')
+                raise Exception(f'Unknown direction {direction}')
 
             for _ in range(steps):
                 x += dx
@@ -37,18 +37,12 @@ def compute_closest_intersection_helper(input, distance_fn):
                 if len(grid[(x, y)]) > 1:
                     intersections.append((x, y, grid[(x, y)]))
 
-    return min([distance_fn(x, y, steps) for x, y, steps in intersections])
+    min_manhattan_distance = min([abs(x) + abs(y) for x, y, _ in intersections])
+    min_step_count = min([sum(steps.values()) for _, _, steps in intersections])
+    return min_manhattan_distance, min_step_count
 
-def compute_closest_intersection(input, part):
-    if part == 1:
-        def manhattan_distance(x, y, steps):
-            return abs(x) + abs(y)
-
-        return compute_closest_intersection_helper(input, manhattan_distance)
-    elif part == 2:
-        def step_count(x, y, steps):
-            return sum(steps.values())
-
-        return compute_closest_intersection_helper(input, step_count)
-    else:
-        raise Exception(f'Unknown part {part}')
+if __name__ == '__main__':
+    with open('day03.input', 'r') as input_file:
+        input = input_file.read()
+        min_manhattan_distance, min_step_count = compute_closest_intersection(input)
+        print(f'min manhattan distance: {min_manhattan_distance}, min step count: {min_step_count}')

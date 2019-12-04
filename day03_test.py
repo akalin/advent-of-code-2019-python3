@@ -18,15 +18,11 @@ test_cases = [
 ]
 
 class TestDay03(unittest.TestCase):
-    def test_part1(self):
-        for input, expected_output, _ in test_cases:
-            output = compute_closest_intersection(input, 1)
-            self.assertEqual(output, expected_output)
-
-    def test_part2(self):
-        for input, _, expected_output in test_cases:
-            output = compute_closest_intersection(input, 2)
-            self.assertEqual(output, expected_output)
+    def test(self):
+        for input, expected_min_manhattan_distance, expected_min_step_count in test_cases:
+            min_manhattan_distance, min_step_count = compute_closest_intersection(input)
+            self.assertEqual(min_manhattan_distance, expected_min_manhattan_distance)
+            self.assertEqual(min_step_count, expected_min_step_count)
 
 if __name__ == '__main__':
     unittest.main()
