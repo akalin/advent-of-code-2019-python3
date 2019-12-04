@@ -1,5 +1,3 @@
-#!/Users/akalin/homebrew/bin/python3
-
 def run_prog(program, noun, verb):
     memory = program[:]
     memory[1] = noun

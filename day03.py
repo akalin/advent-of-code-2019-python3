@@ -1,5 +1,3 @@
-#!/Users/akalin/homebrew/bin/python3
-
 from collections import defaultdict
 
 def compute_closest_intersection(input):

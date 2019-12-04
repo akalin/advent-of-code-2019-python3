@@ -1,5 +1,3 @@
-#!/Users/akalin/homebrew/bin/python3
-
 puzzleInput = '''103376
 137623
 68454
