@@ -7,7 +7,6 @@ def compute_closest_intersection(input):
     paths = [line.split(',') for line in lines]
 
     grid = defaultdict(dict)
-    intersections = []
 
     for wire_no, path in enumerate(paths):
         x, y, step_count = 0, 0, 0
@@ -33,9 +32,10 @@ def compute_closest_intersection(input):
                 x += dx
                 y += dy
                 step_count += 1
-                grid[(x, y)][wire_no] = step_count
-                if len(grid[(x, y)]) > 1:
-                    intersections.append((x, y, grid[(x, y)]))
+                if wire_no not in grid[(x, y)]:
+                    grid[(x, y)][wire_no] = step_count
+
+    intersections = [(x, y, steps) for (x, y), steps in grid.items() if len(steps) > 1]
 
     min_manhattan_distance = min([abs(x) + abs(y) for x, y, _ in intersections])
     min_step_count = min([sum(steps.values()) for _, _, steps in intersections])
