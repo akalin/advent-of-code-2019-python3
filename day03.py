@@ -10,7 +10,7 @@ def inc_grid(grid, intersections, wire_no, step_count, x, y):
         print(f'found {x} {y} {grid[x][y]}')
         intersections.append((x, y, grid[x][y]))
 
-def compute_closest_intersection(input):
+def compute_closest_intersection(input, part):
     lines = [x.strip() for x in input.strip().split('\n')]
     paths = [line.split(',') for line in lines]
 
@@ -37,19 +37,23 @@ def compute_closest_intersection(input):
                 dx = 1
                 dy = 0
             else:
-                raise Exception(f'unknown direction {direct}')
+                raise Exception(f'Unknown direction {direct}')
             for _ in range(leng):
                 x += dx
                 y += dy
                 step_count += 1
                 inc_grid(grid, intersections, wire_no, step_count, x, y)
 
-    def calc_steps(x, y, steps):
-        print(f'steps is {steps}')
-        return abs(x) + abs(y)
-#        return sum(steps.values())
+    def calc_steps(part, x, y, steps):
+        if part == 1:
+            return abs(x) + abs(y)
+        elif part == 2:
+            return sum(steps.values())
+        else:
+            raise Exception(f'Unknown part {part}')
 
-    dists = [calc_steps(x, y, steps) for x, y, steps in intersections]
+
+    dists = [calc_steps(part, x, y, steps) for x, y, steps in intersections]
 
     return min(dists)
 
@@ -59,4 +63,4 @@ L993,U121,L882,U500,L740,D222,R574,U947,L541,U949,L219,D492,R108,D621,L875,D715,
 #puzzleInput = '''R75,D30,R83,U83,L12,D49,R71,U7,L72
 #U62,R66,U55,R34,D71,R55,D58,R83'''
 
-compute_closest_intersection(puzzleInput)
+# compute_closest_intersection(puzzleInput, 1)
