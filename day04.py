@@ -1,25 +1,19 @@
 def can_be_password(n):
     digits = [int(d) for d in str(n)]
-    pairs = zip(digits, digits[1:])
     found_pair = False
     found_pair_or_greater = False
-    curr_pair = 1
-    for x, y in pairs:
-        if x == y:
-            curr_pair += 1
-        else:
-            if curr_pair >= 2:
-                found_pair_or_greater = True
-                if curr_pair == 2:
-                    found_pair = True
-            curr_pair = 1
+    run_length = 1
+    for x, y in zip(digits, digits[1:] + [10]):
         if y < x:
             return False, False
-
-    if curr_pair >= 2:
-        found_pair_or_greater = True
-        if curr_pair == 2:
-            found_pair = True
+        elif y == x:
+            run_length += 1
+        else:
+            if run_length >= 2:
+                found_pair_or_greater = True
+                if run_length == 2:
+                    found_pair = True
+            run_length = 1
 
     return found_pair_or_greater, found_pair
 
