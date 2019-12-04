@@ -3,7 +3,6 @@ def can_be_password(n):
     pairs = zip(digits, digits[1:])
     found_pair = False
     found_pair_or_greater = False
-    found_decrease = False
     curr_pair = 1
     for x, y in pairs:
         if x == y:
@@ -15,15 +14,14 @@ def can_be_password(n):
                     found_pair = True
             curr_pair = 1
         if y < x:
-            found_decrease = True
-#        print(x, y, found_pair, found_decrease)
+            return False, False
 
     if curr_pair >= 2:
         found_pair_or_greater = True
         if curr_pair == 2:
             found_pair = True
-#    print(curr_pair, found_pair)
-    return found_pair_or_greater and not found_decrease, found_pair and not found_decrease
+
+    return found_pair_or_greater, found_pair
 
 def compute_day04(input):
     min_n, max_n = [int(x) for x in input.split('-')][0:2]
