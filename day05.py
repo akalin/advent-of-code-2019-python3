@@ -80,12 +80,12 @@ def run_prog(program, input):
 
         else:
             raise Exception(f'Unknown opcode {opcode}')
-    return output
+    return memory, output
 
 def compute_day05(input):
     program = [int(x) for x in input.split(',')]
-    part1 = run_prog(program, [1])
-    part2 = run_prog(program, [5])
+    _, part1 = run_prog(program, [1])
+    _, part2 = run_prog(program, [5])
     return part1, part2
 
 if __name__ == '__main__':
