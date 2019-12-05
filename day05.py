@@ -5,9 +5,12 @@ def run_prog(program, input):
     np = 0
     output = []
 
+    def compute_mode(i):
+        return (memory[ip] // (10**(i+2))) % 10
+
     def getp(i):
         p = memory[ip+i+1]
-        mode = (memory[ip] // (10**(i+2))) % 10
+        mode = compute_mode(i)
         if mode == 0:
             # position mode
             return memory[p]
@@ -17,7 +20,9 @@ def run_prog(program, input):
         raise Exception(f'Unknown mode {mode}')
 
     def setp(i, v):
-        # TODO: Assert mode is position.
+        mode = compute_mode(i)
+        if mode != 0:
+            raise Exception(f'Unexpected mode {mode} for setp')
         p = memory[ip+i+1]
         memory[p] = v
 
