@@ -17,6 +17,7 @@ def run_prog(program, input):
         raise Exception(f'Unknown mode {mode}')
 
     def setp(i, v):
+        # TODO: Assert mode is position.
         p = memory[ip+i+1]
         memory[p] = v
 
