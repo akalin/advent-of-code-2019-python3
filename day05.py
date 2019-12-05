@@ -27,43 +27,52 @@ def run_prog(program, input):
         opcode = memory[ip] % 100
 
         if opcode == 1:
+            # Add
             setp(2, getp(0) + getp(1))
             adv(3)
 
         elif opcode == 2:
+            # Multiply
             setp(2, getp(0) * getp(1))
             adv(3)
 
         elif opcode == 3:
+            # Consume input
             setp(0, input[np])
             np += 1
             adv(1)
 
         elif opcode == 4:
+            # Produce output
             output.append(getp(0))
             adv(1)
 
         elif opcode == 5:
+            # jne
             if getp(0) != 0:
                 ip = getp(1)
             else:
                 adv(2)
 
         elif opcode == 6:
+            # jeq
             if getp(0) == 0:
                 ip = getp(1)
             else:
                 adv(2)
 
         elif opcode == 7:
+            # lt
             setp(2, int(getp(0) < getp(1)))
             adv(3)
 
         elif opcode == 8:
+            # eq
             setp(2, int(getp(0) == getp(1)))
             adv(3)
 
         elif opcode == 99:
+            # halt
             break
 
         else:
