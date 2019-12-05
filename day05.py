@@ -9,8 +9,10 @@ def run_prog(program, input):
         p = memory[ip+i+1]
         mode = (memory[ip] // (10**(i+2))) % 10
         if mode == 0:
+            # position mode
             return memory[p]
         if mode == 1:
+            # immediate mode
             return p
         raise Exception(f'Unknown mode {mode}')
 
