@@ -59,5 +59,25 @@ class TestDay04(unittest.TestCase):
             _, output = run_prog(prog, [x])
             self.assertEqual(output, [0])
 
+    def test_jump_pos(self):
+        prog = [3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9]
+
+        _, output = run_prog(prog, [0])
+        self.assertEqual(output, [0])
+
+        for x in chain(range(-100, 0), range(1, 100)):
+            _, output = run_prog(prog, [x])
+            self.assertEqual(output, [1])
+
+    def test_jump_imm(self):
+        prog = [3,3,1105,-1,9,1101,0,0,12,4,12,99,1]
+
+        _, output = run_prog(prog, [0])
+        self.assertEqual(output, [0])
+
+        for x in chain(range(-100, 0), range(1, 100)):
+            _, output = run_prog(prog, [x])
+            self.assertEqual(output, [1])
+
 if __name__ == '__main__':
     unittest.main()
