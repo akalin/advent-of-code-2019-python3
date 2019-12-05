@@ -11,6 +11,7 @@ def run_prog(program, input):
             (memory[ip] // 1000) % 10,
             (memory[ip] // 10000) % 10,
         ]
+
         def get_param(i):
             p = memory[ip+i+1]
             if modes[i] == 0:
@@ -18,6 +19,7 @@ def run_prog(program, input):
             if modes[i] == 1:
                 return p
             raise Exception(f'Unknown mode {modes[i]}')
+
         if opcode == 1:
             p3 = memory[ip+3]
             memory[p3] = get_param(0) + get_param(1)
@@ -36,13 +38,11 @@ def run_prog(program, input):
             ip += 2
         elif opcode == 5:
             if get_param(0) != 0:
-                print(f'setting ip to {get_param(1)}')
                 ip = get_param(1)
             else:
                 ip += 3
         elif opcode == 6:
             if get_param(0) == 0:
-                print(f'setting ip to {get_param(1)}')
                 ip = get_param(1)
             else:
                 ip += 3
@@ -67,15 +67,13 @@ def run_prog(program, input):
     return output
 
 def compute_day05(input):
-    return run_prog(input, [5])
+    program = [int(x) for x in input.split(',')]
+    part1 = run_prog(program, [1])
+    part2 = run_prog(program, [5])
+    return part1, part2
 
 if __name__ == '__main__':
-    y = '3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9'
-    ints = [int(x) for x in y.split(',')]
-    x = run_prog(ints, [1])
-    print(f'x {x}')
     with open('day05.input', 'r') as input_file:
         input = input_file.read()
-        ints = [int(x) for x in input.split(',')]
-        output = compute_day05(ints)
-        print(f'output: {output}')
+        part1, part2 = compute_day05(input)
+        print(f'part 1: {part1}, part 2: {part2}')
