@@ -18,39 +18,54 @@ def run_prog(program, input):
         p = memory[ip+i+1]
         memory[p] = v
 
+    # np = parameter count
+    def adv(np):
+        nonlocal ip
+        ip += np + 1
+
     while True:
         opcode = memory[ip] % 100
+
         if opcode == 1:
             setp(2, getp(0) + getp(1))
-            ip += 4
+            adv(3)
+
         elif opcode == 2:
             setp(2, getp(0) * getp(1))
-            ip += 4
+            adv(3)
+
         elif opcode == 3:
             setp(0, input[np])
             np += 1
-            ip += 2
+            adv(1)
+
         elif opcode == 4:
             output.append(getp(0))
-            ip += 2
+            adv(1)
+
         elif opcode == 5:
             if getp(0) != 0:
                 ip = getp(1)
             else:
-                ip += 3
+                adv(2)
+
         elif opcode == 6:
             if getp(0) == 0:
                 ip = getp(1)
             else:
-                ip += 3
+                adv(2)
+
         elif opcode == 7:
             setp(2, int(getp(0) < getp(1)))
-            ip += 4
+            adv(3)
+
         elif opcode == 8:
             setp(2, int(getp(0) == getp(1)))
-            ip += 4
+            adv(3)
+
         elif opcode == 99:
             break
+
         else:
             raise Exception(f'Unknown opcode {opcode}')
     return output
