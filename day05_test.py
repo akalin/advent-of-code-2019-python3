@@ -79,5 +79,21 @@ class TestDay04(unittest.TestCase):
             _, output = run_prog(prog, [x])
             self.assertEqual(output, [1])
 
+    def test_jump_complex(self):
+        prog = [3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
+                1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
+                999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99]
+
+        for x in range(-100, 8):
+            _, output = run_prog(prog, [x])
+            self.assertEqual(output, [999])
+
+        _, output = run_prog(prog, [8])
+        self.assertEqual(output, [1000])
+
+        for x in range(9, 100):
+            _, output = run_prog(prog, [x])
+            self.assertEqual(output, [1001])
+
 if __name__ == '__main__':
     unittest.main()
