@@ -12,7 +12,7 @@ def run_prog(program, input):
             return memory[p]
         if mode == 1:
             return p
-        raise Exception(f'Unknown mode {modes[i]}')
+        raise Exception(f'Unknown mode {mode}')
 
     def setp(i, v):
         p = memory[ip+i+1]
