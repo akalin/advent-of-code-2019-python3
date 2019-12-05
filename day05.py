@@ -5,20 +5,16 @@ def run_prog(program, input):
     np = 0
     output = []
     while True:
-        opcode = memory[ip] % 100
-        modes = [
-            (memory[ip] // 100) % 10,
-            (memory[ip] // 1000) % 10,
-            (memory[ip] // 10000) % 10,
-        ]
-
         def get_param(i):
             p = memory[ip+i+1]
-            if modes[i] == 0:
+            mode = (memory[ip] // (10**(i+2))) % 10
+            if mode == 0:
                 return memory[p]
-            if modes[i] == 1:
+            if mode == 1:
                 return p
             raise Exception(f'Unknown mode {modes[i]}')
+
+        opcode = memory[ip] % 100
 
         if opcode == 1:
             p3 = memory[ip+3]
