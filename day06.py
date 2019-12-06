@@ -1,6 +1,10 @@
-def count_orbits(input):
+def make_parents(input):
     pairs = [ line.strip().split(')') for line in input.strip().split('\n') ]
     parents = { child: parent for parent, child in pairs }
+    return parents
+
+def count_orbits(input):
+    parents = make_parents(input)
 
     num_orbits = 0
     for child in parents.keys():
@@ -12,31 +16,26 @@ def count_orbits(input):
     return num_orbits
 
 def count_transfers(input):
-    lines = input.strip().split('\n')
-    orbits = {}
+    parents = make_parents(input)
 
-    for line in lines:
-        orbitee, orbiter = line.strip().split(')')
-        orbits[orbiter] = orbitee
+    hops_from_you = {}
 
-    hit = {}
     hops = 0
-    x = orbits['YOU']
-    while x in orbits:
-        hit[x] = hops
+    x = parents['YOU']
+    while x in parents:
+        hops_from_you[x] = hops
         hops += 1
-        x = orbits[x]
+        x = parents[x]
 
-    x = orbits['SAN']
-    total_hops = 0
-    while x in orbits:
-        if x in hit:
-            total_hops += hit[x]
-            break
-        total_hops += 1
-        x = orbits[x]
+    hops = 0
+    x = parents['SAN']
+    while x in parents:
+        if x in hops_from_you:
+            return hops + hops_from_you[x]
+        hops += 1
+        x = parents[x]
 
-    return total_hops
+    raise Error('not connected')
 
 if __name__ == '__main__':
     with open('day06.input', 'r') as input_file:
