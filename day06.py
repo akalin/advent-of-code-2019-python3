@@ -1,17 +1,13 @@
 def count_orbits(input):
-    lines = input.strip().split('\n')
-    orbits = {}
-
-    for line in lines:
-        orbitee, orbiter = line.strip().split(')')
-        orbits[orbiter] = orbitee
+    pairs = [ line.strip().split(')') for line in input.strip().split('\n') ]
+    parents = { child: parent for parent, child in pairs }
 
     num_orbits = 0
-    for orbiter, orbitee in orbits.items():
-        x = orbiter
-        while x in orbits:
+    for child in parents.keys():
+        x = child
+        while x in parents:
             num_orbits += 1
-            x = orbits[x]
+            x = parents[x]
 
     return num_orbits
 
