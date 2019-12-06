@@ -3,7 +3,7 @@ import unittest
 from day05 import run_prog
 from itertools import chain
 
-class TestDay04(unittest.TestCase):
+class TestDay05(unittest.TestCase):
     def test_io(self):
         for x in range(-100, 100):
             _, output = run_prog([3,0,4,0,99], [x])
