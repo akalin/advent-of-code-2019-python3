@@ -1,9 +1,9 @@
-def compute_day06(input):
+def count_orbits(input):
     lines = input.strip().split('\n')
     orbits = {}
 
     for line in lines:
-        orbitee, orbiter = line.split(')')
+        orbitee, orbiter = line.strip().split(')')
         orbits[orbiter] = orbitee
 
     num_orbits = 0
@@ -12,6 +12,16 @@ def compute_day06(input):
         while x in orbits:
             num_orbits += 1
             x = orbits[x]
+
+    return num_orbits
+
+def count_transfers(input):
+    lines = input.strip().split('\n')
+    orbits = {}
+
+    for line in lines:
+        orbitee, orbiter = line.strip().split(')')
+        orbits[orbiter] = orbitee
 
     hit = {}
     hops = 0
@@ -35,5 +45,6 @@ def compute_day06(input):
 if __name__ == '__main__':
     with open('day06.input', 'r') as input_file:
         input = input_file.read()
-        output = compute_day06(input)
-        print(f'output: {output}')
+        num_orbits = count_orbits(input)
+        total_hops = count_transfers(input)
+        print(f'num orbits: {num_orbits}, total hops: {total_hops}')
