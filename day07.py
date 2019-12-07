@@ -38,7 +38,6 @@ def run_prog(id, program, ip, input, output):
     while True:
         opcode = memory[ip] % 100
         modes = memory[ip] // 100
-        print(f'{id} is at ip {ip} opcode {opcode}')
 
         ip += 1
 
@@ -58,20 +57,16 @@ def run_prog(id, program, ip, input, output):
             # Consume input
             nargs = 1
             if len(input) == 0:
-                print(f'{id} need input, ip {ip-1}')
                 return 'need input', memory, ip-1
             v = input.pop(0)
-            print(f'{id} consuming input {v}, len={len(input)}')
             setp(0, v)
             adv()
-            print(f'{id} ip is now {ip}')
 
         elif opcode == 4:
             # Produce output
             nargs = 1
             v = getp(0)
             output.append(v)
-            print(f'{id} producing output {v}, len={len(output)}')
             adv()
 
         elif opcode == 5:
@@ -123,10 +118,8 @@ def run_prog_series2(program, phases):
 
     while any(running):
         for i in range(amp_count):
-            print(f'running {i} with ip {ips[i]} and input length {len(inputs[i])}')
             state, mem, ip = run_prog(i, programs[i], ips[i], inputs[i], inputs[(i+1)%amp_count])
             if state == 'need input':
-                print(f'{i} needs input, got ip {ip}')
                 programs[i] = mem
                 ips[i] = ip
             elif state == 'halt':
