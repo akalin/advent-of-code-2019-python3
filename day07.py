@@ -113,8 +113,6 @@ class IntcodeProgram(object):
                 raise Exception(f'Unknown opcode {opcode}')
 
 def run_prog_series2(program, phases):
-    signal = 0
-
     amp_count = len(phases)
     inputs = [[phases[i]] for i in range(amp_count)]
     inputs[0].append(0)
@@ -129,12 +127,8 @@ def run_prog_series2(program, phases):
 
 def compute_day07(input):
     program = [int(x) for x in input.split(',')]
-    max_output = 0
-    for p in itertools.permutations(range(5,10)):
-        output = run_prog_series2(program, p)
-        if output > max_output:
-            max_output = output
-    return max_output
+    return max(run_prog_series2(program, p)
+               for p in itertools.permutations(range(5, 10)))
 
 if __name__ == '__main__':
     with open('day07.input', 'r') as input_file:
