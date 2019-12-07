@@ -1,3 +1,5 @@
+import itertools
+
 def run_prog(id, program, ip, input, output):
     memory = program[:]
 
@@ -132,22 +134,10 @@ def run_prog_series2(program, phases):
 def compute_day07(input):
     program = [int(x) for x in input.split(',')]
     max_output = 0
-    for i1 in range(5,10):
-        for i2 in range(5,10):
-            if i2 == i1:
-                continue
-            for i3 in range(5,10):
-                if i3 == i1 or i3 == i2:
-                    continue
-                for i4 in range(5,10):
-                    if i4 == i1 or i4 == i2 or i4 == i3:
-                        continue
-                    for i5 in range(5,10):
-                        if i5 == i1 or i5 == i2 or i5 == i3 or i5 == i4:
-                            continue
-                        output = run_prog_series2(program, [i1, i2, i3, i4, i5])
-                        if output > max_output:
-                            max_output = output
+    for p in itertools.permutations(range(5,10)):
+        output = run_prog_series2(program, p)
+        if output > max_output:
+            max_output = output
     return max_output
 
 if __name__ == '__main__':
