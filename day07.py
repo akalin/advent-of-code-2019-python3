@@ -112,7 +112,20 @@ class IntcodeProgram(object):
             else:
                 raise Exception(f'Unknown opcode {opcode}')
 
-def run_prog_series2(program, phases):
+def run_serial_mode(program, phases):
+    amp_count = len(phases)
+    inputs = [[phases[i]] for i in range(amp_count)]
+    inputs[0].append(0)
+    inputs.append([])
+
+    programs = [IntcodeProgram(program) for i in range(amp_count)]
+
+    for i in range(amp_count):
+        programs[i].run(inputs[i], inputs[i+1])
+
+    return inputs[amp_count][0]
+
+def run_feedback_mode(program, phases):
     amp_count = len(phases)
     inputs = [[phases[i]] for i in range(amp_count)]
     inputs[0].append(0)
@@ -127,11 +140,16 @@ def run_prog_series2(program, phases):
 
 def compute_day07(input):
     program = [int(x) for x in input.split(',')]
-    return max(run_prog_series2(program, p)
-               for p in itertools.permutations(range(5, 10)))
+
+    max_serial = max(run_serial_mode(program, p)
+                       for p in itertools.permutations(range(5)))
+
+    max_feedback = max(run_feedback_mode(program, p)
+                       for p in itertools.permutations(range(5, 10)))
+    return max_serial, max_feedback
 
 if __name__ == '__main__':
     with open('day07.input', 'r') as input_file:
         input = input_file.read()
-        output = compute_day07(input)
-        print(f'output: {output}')
+        max_serial, max_feedback = compute_day07(input)
+        print(f'max serial: {max_serial}, max feedback: {max_feedback}')
