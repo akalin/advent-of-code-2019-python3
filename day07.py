@@ -1,12 +1,19 @@
 import itertools
 
-class IntcodeProgram(object):
+class Intputer(object):
     def __init__(self, program):
         self.memory = program[:]
         self.ip = 0
+        self.waiting_for_input = False
         self.halted = False
 
     def run(self, input, output):
+        if self.halted:
+            raise Exception('Called run when halted')
+
+        if self.waiting_for_input and len(input) == 0:
+            raise Exception('Called run with empty input while waiting for input')
+
         modes = 0
         nargs = 0
 
@@ -63,8 +70,10 @@ class IntcodeProgram(object):
                 # Consume input
                 nargs = 1
                 if len(input) == 0:
+                    self.waiting_for_input = True
                     self.ip -= 1
                     return
+                self.waiting_for_input = False
                 v = input.pop(0)
                 setp(0, v)
                 adv()
@@ -113,37 +122,31 @@ class IntcodeProgram(object):
                 raise Exception(f'Unknown opcode {opcode}')
 
 def run_serial_mode(program, phases):
-    amp_count = len(phases)
-    inputs = [[phases[i]] for i in range(amp_count)]
-    inputs[0].append(0)
-    inputs.append([])
+    pipes = [[p] for p in phases] + [[]]
+    pipes[0].append(0)
 
-    programs = [IntcodeProgram(program) for i in range(amp_count)]
+    for input, output in zip(pipes, pipes[1:]):
+        Intputer(program).run(input, output)
 
-    for i in range(amp_count):
-        programs[i].run(inputs[i], inputs[i+1])
-
-    return inputs[amp_count][0]
+    return pipes[-1][0]
 
 def run_feedback_mode(program, phases):
-    amp_count = len(phases)
-    inputs = [[phases[i]] for i in range(amp_count)]
-    inputs[0].append(0)
+    pipes = [[p] for p in phases]
+    pipes[0].append(0)
 
-    programs = [IntcodeProgram(program) for i in range(amp_count)]
+    intputers = [Intputer(program) for _ in range(len(phases))]
 
-    while any(not p.halted for p in programs):
-        for i in range(amp_count):
-            programs[i].run(inputs[i], inputs[(i+1)%amp_count])
+    while not intputers[-1].halted:
+        for i, intputer in enumerate(intputers):
+            intputer.run(pipes[i], pipes[(i+1)%len(pipes)])
 
-    return inputs[0][0]
+    return pipes[0][0]
 
 def compute_day07(input):
     program = [int(x) for x in input.split(',')]
 
     max_serial = max(run_serial_mode(program, p)
-                       for p in itertools.permutations(range(5)))
-
+                     for p in itertools.permutations(range(5)))
     max_feedback = max(run_feedback_mode(program, p)
                        for p in itertools.permutations(range(5, 10)))
     return max_serial, max_feedback
