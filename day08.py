@@ -1,8 +1,8 @@
 def chunked(l, n):
-    return [l[i*n:(i+1)*n] for i in range(len(l) // n)]
+    return [l[i:i+n] for i in range(0, len(l), n)]
 
 def compute_day08(input, m, n):
-    layers = chunked(input, m*n)
+    layers = chunked(input.strip(), m*n)
     min_layer = min(layers, key=lambda l: l.count('0'))
     part1 = min_layer.count('1') * min_layer.count('2')
 
