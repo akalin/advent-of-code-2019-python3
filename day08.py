@@ -14,11 +14,11 @@ def compute_day08(input, m, n):
 
     image = [get_pixel(layers, i) for i in range(m*n)]
     rows = chunked(image, m)
-    part2 = '\n'.join([''.join(r) for r in rows])
+    part2 = '\n'.join([''.join(r).replace('0', ' ').replace('1', '⋅') for r in rows])
     return part1, part2
 
 if __name__ == '__main__':
     with open('day08.input', 'r') as input_file:
         input = input_file.read()
         p1, p2 = compute_day08(input, 25, 6)
-        print(f'part 1: {p1}, part 2 (squint to read):\n{p2}')
+        print(f'part 1: {p1}, part 2:\n{p2}')
