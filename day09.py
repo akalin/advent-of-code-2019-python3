@@ -141,21 +141,21 @@ class Intputer(object):
             else:
                 raise Exception(f'Unknown opcode {opcode}')
 
-def run_serial_mode(program):
+def run(program, input):
     intputer = Intputer(program)
     output = []
-    intputer.run([2], output)
-    return output
+    intputer.run([input], output)
+    return output[0]
 
 def compute_day09(input):
     program = [int(x) for x in input.split(',')]
     #program = [109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99]
     #program = [1102,34915192,34915192,7,4,7,99,0]
     #program =[104,1125899906842624,99]
-    return run_serial_mode(program)
+    return run(program, 1), run(program, 2)
 
 if __name__ == '__main__':
     with open('day09.input', 'r') as input_file:
         input = input_file.read()
-        output = compute_day09(input)
-        print(f'output: {output}')
+        part1, part2 = compute_day09(input)
+        print(f'part1: {part1}, part2: {part2}')
