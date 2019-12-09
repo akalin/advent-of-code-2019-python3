@@ -16,11 +16,8 @@ class Intputer(object):
         if self.waiting_for_input and len(input) == 0:
             raise Exception('Called run with empty input while waiting for input')
 
-        modes = 0
+        modes = []
         nargs = 0
-
-        def compute_mode(i):
-            return (modes // (10**i)) % 10
 
         def check_i(i):
             if i >= nargs:
@@ -39,7 +36,7 @@ class Intputer(object):
         def getp(i):
             check_i(i)
             p = getmem(self.ip+i)
-            mode = compute_mode(i)
+            mode = modes[i]
             if mode == 0:
                 # position mode
                 return getmem(p)
@@ -53,7 +50,7 @@ class Intputer(object):
 
         def setp(i, v):
             check_i(i)
-            mode = compute_mode(i)
+            mode = modes[i]
             p = getmem(self.ip+i)
             if mode == 0:
                 # position mode
@@ -69,8 +66,13 @@ class Intputer(object):
             self.ip += nargs
 
         while True:
-            modes_opcode = getmem(self.ip)
-            modes, opcode = divmod(modes_opcode, 100)
+            modes_int, opcode = divmod(getmem(self.ip), 100)
+            modes = [0, 0, 0]
+            modes_int, modes[0] = divmod(modes_int, 10)
+            modes_int, modes[1] = divmod(modes_int, 10)
+            modes_int, modes[2] = divmod(modes_int, 10)
+            if modes_int != 0:
+                raise Exception(f'modes_int={modes_int} unexpectedly non-zero')
 
             self.ip += 1
 
