@@ -28,41 +28,50 @@ class Intputer(object):
             if i >= nargs:
                 raise Exception(f'i={i} >= nargs={nargs}')
 
+        def getmem(i):
+            if i < 0:
+                raise Exception(f'getmem: Invalid address {i}')
+            return self.memory[i]
+
+        def setmem(i, v):
+            if i < 0:
+                raise Exception(f'setmem: invalid address {i}')
+            self.memory[i] = v
+
         def getp(i):
             check_i(i)
-            p = self.memory[self.ip+i]
+            p = getmem(self.ip+i)
             mode = compute_mode(i)
             if mode == 0:
                 # position mode
-                return self.memory[p]
+                return getmem(p)
             if mode == 1:
                 # immediate mode
                 return p
             if mode == 2:
-                # rel base mode
-                return self.memory[self.rel_base + p]
-            raise Exception(f'Unknown mode {mode}')
+                # relative mode
+                return getmem(self.rel_base + p)
+            raise Exception(f'Unexpected mode {mode} for getp')
 
         def setp(i, v):
             check_i(i)
             mode = compute_mode(i)
-            p = self.memory[self.ip+i]
+            p = getmem(self.ip+i)
             if mode == 0:
                 # position mode
-                self.memory[p] = v
+                setmem(p, v)
                 return
             if mode == 2:
-                # rel base mode
-                self.memory[self.rel_base + p] = v
+                # relative mode
+                setmem(self.rel_base + p, v)
                 return
-
             raise Exception(f'Unexpected mode {mode} for setp')
 
         def adv():
             self.ip += nargs
 
         while True:
-            modes_opcode = self.memory[self.ip]
+            modes_opcode = getmem(self.ip)
             opcode = modes_opcode % 100
             modes = modes_opcode // 100
 
@@ -128,7 +137,7 @@ class Intputer(object):
                 adv()
 
             elif opcode == 9:
-                # relbase adjust
+                # Adjust relative base
                 nargs = 1
                 self.rel_base += getp(0)
                 adv()
