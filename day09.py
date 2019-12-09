@@ -3,9 +3,7 @@ import itertools
 
 class Intputer(object):
     def __init__(self, program):
-        self.memory = collections.defaultdict(int)
-        for i, x in enumerate(program):
-            self.memory[i] = x
+        self.memory = collections.defaultdict(int, enumerate(program))
         self.ip = 0
         self.rel_base = 0
         self.waiting_for_input = False
