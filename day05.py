@@ -39,8 +39,7 @@ def run_prog(program, input):
         ip += nargs
 
     while True:
-        opcode = memory[ip] % 100
-        modes = memory[ip] // 100
+        modes, opcode = divmod(memory[ip], 100)
         ip += 1
 
         if opcode == 1:

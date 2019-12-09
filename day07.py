@@ -48,9 +48,7 @@ class Intputer(object):
             self.ip += nargs
 
         while True:
-            modes_opcode = self.memory[self.ip]
-            opcode = modes_opcode % 100
-            modes = modes_opcode // 100
+            modes, opcode = divmod(self.memory[self.ip], 100)
 
             self.ip += 1
 
