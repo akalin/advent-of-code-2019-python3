@@ -70,8 +70,7 @@ class Intputer(object):
 
         while True:
             modes_opcode = getmem(self.ip)
-            opcode = modes_opcode % 100
-            modes = modes_opcode // 100
+            modes, opcode = divmod(modes_opcode, 100)
 
             self.ip += 1
 
