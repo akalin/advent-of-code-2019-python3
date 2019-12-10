@@ -1,6 +1,6 @@
 import unittest
 
-from day10 import compute_best_location
+from day10 import parse_asteroids, compute_best_location
 
 class TestDay10(unittest.TestCase):
     def test_part1(self):
@@ -65,8 +65,9 @@ class TestDay10(unittest.TestCase):
              ''', (11, 13), 210),
         ]
 
-        for map, expected_best_location, expected_detected_count in examples:
-            best_location, detected_count = compute_best_location(map)
+        for input, expected_best_location, expected_detected_count in examples:
+            asteroids = parse_asteroids(input)
+            best_location, detected_count = compute_best_location(asteroids)
             self.assertEqual(best_location, expected_best_location)
             self.assertEqual(detected_count, expected_detected_count)
 

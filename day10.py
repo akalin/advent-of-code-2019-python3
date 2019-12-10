@@ -1,5 +1,10 @@
 from math import gcd, atan2, pi
 
+def parse_asteroids(input):
+    rows = input.strip().split('\n')
+    return set((x, y) for y, row in enumerate(rows) for x, cell in enumerate(row.strip()) if cell == '#')
+
+
 def can_detect(asteroids, a1, a2):
     x1, y1 = a1
     x2, y2 = a2
@@ -23,20 +28,19 @@ def can_detect(asteroids, a1, a2):
 def count_detectable(a1, asteroids):
     return sum(1 for a2 in asteroids - set([a1]) if can_detect(asteroids, a1, a2))
 
-def compute_best_location(map):
-    rows = map.strip().split('\n')
-    asteroids = set((x, y) for y, row in enumerate(rows) for x, cell in enumerate(row.strip()) if cell == '#')
+def compute_best_location(asteroids):
     detected_counts = ((a, count_detectable(a, asteroids)) for a in asteroids)
     return max(detected_counts, key=lambda i: i[1])
 
-def find_next_asteroid(grid, asteroids, x, y, angle):
+def find_next_asteroid(asteroids, p, angle):
     mangle = -pi
     next_a = None
+    x, y = p
     for a in asteroids:
-        if a == (x, y):
+        if a == p:
             continue
         x2, y2 = a
-        if not can_detect(grid, x, y, x2, y2):
+        if not can_detect(asteroids, p, a):
             continue
         dx = x2 - x
         dy = y2 - y
@@ -52,47 +56,6 @@ def find_next_asteroid(grid, asteroids, x, y, angle):
     return None
 
 def compute_day10(input):
-    input = '''
-.#..#
-.....
-#####
-....#
-...##
-'''
-    input ='''
-......#.#.
-#..#.#....
-..#######.
-.#.#.###..
-.#..#.....
-..#....#.#
-#..#....#.
-.##.#..###
-##...#..#.
-.#....####
-'''
-    input='''
-.#..##.###...#######
-##.############..##.
-.#.######.########.#
-.###.#######.####.#.
-#####.##.#.##.###.##
-..#####..#.#########
-####################
-#.####....###.#.#.##
-##.#################
-#####.##.###..####..
-..######..##.#######
-####.##.####...##..#
-.#####..#.######.###
-##...#.##########...
-#.##########.#######
-.####.#.###.###.#.##
-....##.##.###..#####
-.#.#.###########.###
-#.#.#.#####.####.###
-###.##.####.##.#..##
-'''
     input='''
 #....#.....#...#.#.....#.#..#....#
 #..#..##...#......#.....#..###.#.#
@@ -130,51 +93,26 @@ def compute_day10(input):
 ....#...##.##.##......#..#..##....
 '''
 
-    input2 ='''
-.#....#####...#..
-##...##.#####..##
-##...#...#.#####.
-..#.....X...###..
-..#.#.....#....##
-'''
-    rows = input.strip().split('\n')
-    grid = [list(row.strip()) for row in rows]
-#    print(grid)
-    rows = len(grid)
-    cols = len(grid[0])
-    asteroids = []
-    for x in range(rows):
-        for y in range(cols):
-            if grid[x][y] == '#':
-                asteroids.append((x, y))
-
-    visibles = [count_detectable(a, asteroids, grid) for a in asteroids]
-
-#    for i, a in enumerate(asteroids):
-#        print('vis', i, a, visibles[i])
-
-    max_vis = max(range(len(visibles)), key=lambda i: visibles[i])
-    mx, my = asteroids[max_vis]
+    asteroids = parse_asteroids(input)
+    best, detected_count = compute_best_location(asteroids)
 
     n = 1
     angle = pi + 0.0001
-#    mx, my = (3, 8)
     while len(asteroids) > 1:
-        na = find_next_asteroid(grid, asteroids, mx, my, angle)
+        na = find_next_asteroid(asteroids, best, angle)
         if not na:
             angle = pi + 0.0001
             continue
         x, y, nangle = na
         print(f'{n}: ({y}, {x}) a={nangle*180/pi}, {100*y+x}')
-        grid[x][y] = '.'
         asteroids.remove((x, y))
         angle = nangle
         n += 1
 
-    return (my, mx, visibles[max_vis]), None
+    return detected_count, None
 
 if __name__ == '__main__':
     with open('day10.input', 'r') as input_file:
         input = input_file.read()
         p1, p2 = compute_day10(input)
-        print(f'part : {p1}, part 2: {p2}')
+        print(f'part 1: {p1}, part 2: {p2}')
