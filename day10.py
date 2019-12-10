@@ -1,53 +1,22 @@
 from math import gcd, atan2, pi
 
-def rangeto(n):
-    if n >= 0:
-        return range(1, n)
-    return range(-1, n, -1)
-
-def rangeto2(n, dn):
-    if n >= 0:
-        return range(dn, n, dn)
-    return range(dn, n, dn)
-
 def is_visible(asteroids, a1, a2):
     x1, y1 = a1
     x2, y2 = a2
     dx = x2 - x1
     dy = y2 - y1
 
-    if dx == 0:
-        for i in rangeto(dy):
-            y3 = y1 + i
-            if (x1, y3) in asteroids:
-                return False
-        return True
-
-    if dy == 0:
-        for i in rangeto(dx):
-            x3 = x1 + i
-            if (x3, y1) in asteroids:
-                return False
-        return True
-
     g = gcd(dx, dy)
-    if g == 1:
-        return True
+    sx = dx // g
+    sy = dy // g
 
-    ddx = dx // g
-    ddy = dy // g
-
-#    print(f'is_visible p1=({x1}, {y1}), p2=({x2}, {y2}), d=({dx}, {dy}) g={g} dd=({ddx}, {ddy})')
-
-    d3y = ddy
-    for d3x in range(ddx, dx, ddx):
-        x3 = x1 + d3x
-        y3 = y1 + d3y
-#        print(f'loop d3=({d3x}, {d3y}) p3=({x3}, {y3})')
-        if (x3, y3) in asteroids:
-#            print('found blocker')
+    x = x1 + sx
+    y = y1 + sy
+    while (x, y) != (x2, y2):
+        if (x, y) in asteroids:
             return False
-        d3y += ddy
+        x += sx
+        y += sy
 
     return True
 
