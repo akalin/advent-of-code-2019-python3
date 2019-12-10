@@ -34,7 +34,7 @@ def compute_best_location(asteroids):
 def compute_angle(a1, a2):
     dx, dy = vsub(a2, a1)
     angle = atan2(dy, dx)
-    # Convert from (-pi, +pi) (-pi/2, +3*pi/2)
+    # Convert from (-pi, +pi) to (-pi/2, +3*pi/2)
     if angle < -pi/2:
         angle += 2*pi
     return angle
