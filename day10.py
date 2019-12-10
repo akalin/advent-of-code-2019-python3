@@ -1,6 +1,6 @@
 from math import gcd, atan2, pi
 
-def is_visible(asteroids, a1, a2):
+def can_detect(asteroids, a1, a2):
     x1, y1 = a1
     x2, y2 = a2
     dx = x2 - x1
@@ -20,10 +20,10 @@ def is_visible(asteroids, a1, a2):
 
     return True
 
-def count_visible(a1, asteroids):
-    return sum(1 for a2 in asteroids - set([a1]) if is_visible(asteroids, a1, a2))
+def count_detectable(a1, asteroids):
+    return sum(1 for a2 in asteroids - set([a1]) if can_detect(asteroids, a1, a2))
 
-def compute_best_asteroid(map):
+def compute_best_location(map):
     rows = map.strip().split('\n')
     grid = [list(row.strip()) for row in rows]
     asteroids = set()
@@ -32,12 +32,9 @@ def compute_best_asteroid(map):
             if cell == '#':
                 asteroids.add((x, y))
 
-    visibles = {a: count_visible(a, asteroids) for a in asteroids}
+    detected_counts = {a: count_detectable(a, asteroids) for a in asteroids}
 
-#    for i, a in enumerate(asteroids):
-#        print('vis', i, a, visibles[i])
-
-    return max(visibles.items(), key=lambda i: i[1])
+    return max(detected_counts.items(), key=lambda i: i[1])
 
 def find_next_asteroid(grid, asteroids, x, y, angle):
     mangle = -pi
@@ -46,7 +43,7 @@ def find_next_asteroid(grid, asteroids, x, y, angle):
         if a == (x, y):
             continue
         x2, y2 = a
-        if not is_visible(grid, x, y, x2, y2):
+        if not can_detect(grid, x, y, x2, y2):
             continue
         dx = x2 - x
         dy = y2 - y
@@ -158,7 +155,7 @@ def compute_day10(input):
             if grid[x][y] == '#':
                 asteroids.append((x, y))
 
-    visibles = [count_visible(a, asteroids, grid) for a in asteroids]
+    visibles = [count_detectable(a, asteroids, grid) for a in asteroids]
 
 #    for i, a in enumerate(asteroids):
 #        print('vis', i, a, visibles[i])
