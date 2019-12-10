@@ -1,4 +1,4 @@
-from math import gcd
+from math import gcd, atan2, pi
 
 def rangeto(n):
     if n >= 0:
@@ -63,6 +63,28 @@ def count_visible(a1, asteroids, grid):
             visible += 1
 #    print('vis', visible)
     return visible
+
+def find_next_asteroid(grid, asteroids, x, y, angle):
+    mangle = -pi
+    next_a = None
+    for a in asteroids:
+        if a == (x, y):
+            continue
+        x2, y2 = a
+        if not is_visible(grid, x, y, x2, y2):
+            continue
+        dx = x2 - x
+        dy = y2 - y
+        nangle = atan2(dy, dx)
+        if nangle >= angle:
+            continue
+        if nangle > mangle:
+            mangle = nangle
+            next_a = a
+    if next_a:
+        x, y = next_a
+        return x, y, mangle
+    return None
 
 def compute_day10(input):
     input = '''
@@ -142,6 +164,14 @@ def compute_day10(input):
 .#.##.#.#.....#..#..#........##...
 ....#...##.##.##......#..#..##....
 '''
+
+    input2 ='''
+.#....#####...#..
+##...##.#####..##
+##...#...#.#####.
+..#.....X...###..
+..#.#.....#....##
+'''
     rows = input.strip().split('\n')
     grid = [list(row.strip()) for row in rows]
 #    print(grid)
@@ -160,6 +190,22 @@ def compute_day10(input):
 
     max_vis = max(range(len(visibles)), key=lambda i: visibles[i])
     mx, my = asteroids[max_vis]
+
+    n = 1
+    angle = pi + 0.0001
+#    mx, my = (3, 8)
+    while len(asteroids) > 1:
+        na = find_next_asteroid(grid, asteroids, mx, my, angle)
+        if not na:
+            angle = pi + 0.0001
+            continue
+        x, y, nangle = na
+        print(f'{n}: ({y}, {x}) a={nangle*180/pi}, {100*y+x}')
+        grid[x][y] = '.'
+        asteroids.remove((x, y))
+        angle = nangle
+        n += 1
+
     return (my, mx, visibles[max_vis]), None
 
 if __name__ == '__main__':
