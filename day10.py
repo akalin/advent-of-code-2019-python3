@@ -10,7 +10,9 @@ def rangeto2(n, dn):
         return range(dn, n, dn)
     return range(dn, n, dn)
 
-def is_visible(asteroids, x1, y1, x2, y2):
+def is_visible(asteroids, a1, a2):
+    x1, y1 = a1
+    x2, y2 = a2
     dx = x2 - x1
     dy = y2 - y1
 
@@ -50,19 +52,7 @@ def is_visible(asteroids, x1, y1, x2, y2):
     return True
 
 def count_visible(a1, asteroids):
-    visible = 0
-#    print('')
-    for a2 in asteroids:
-        if a1 == a2:
-            continue
-        x1, y1 = a1
-        x2, y2 = a2
-        v = is_visible(asteroids, x1, y1, x2, y2)
-#        print('count', x1, y1, x2, y2, v)
-        if v:
-            visible += 1
-#    print('vis', visible)
-    return visible
+    return sum(1 for a2 in asteroids - set([a1]) if is_visible(asteroids, a1, a2))
 
 def compute_best_asteroid(map):
     rows = map.strip().split('\n')
