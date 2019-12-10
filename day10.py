@@ -86,6 +86,27 @@ def find_next_asteroid(grid, asteroids, x, y, angle):
         return x, y, mangle
     return None
 
+def compute_best_asteroid(map):
+    rows = map.strip().split('\n')
+    grid = [list(row.strip()) for row in rows]
+#    print(grid)
+    rows = len(grid)
+    cols = len(grid[0])
+    asteroids = []
+    for x in range(rows):
+        for y in range(cols):
+            if grid[x][y] == '#':
+                asteroids.append((x, y))
+
+    visibles = [count_visible(a, asteroids, grid) for a in asteroids]
+
+#    for i, a in enumerate(asteroids):
+#        print('vis', i, a, visibles[i])
+
+    max_vis = max(range(len(visibles)), key=lambda i: visibles[i])
+    mx, my = asteroids[max_vis]
+    return (my, mx), visibles[max_vis]
+
 def compute_day10(input):
     input = '''
 .#..#
