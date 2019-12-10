@@ -25,16 +25,9 @@ def count_detectable(a1, asteroids):
 
 def compute_best_location(map):
     rows = map.strip().split('\n')
-    grid = [list(row.strip()) for row in rows]
-    asteroids = set()
-    for y, row in enumerate(grid):
-        for x, cell in enumerate(row):
-            if cell == '#':
-                asteroids.add((x, y))
-
-    detected_counts = {a: count_detectable(a, asteroids) for a in asteroids}
-
-    return max(detected_counts.items(), key=lambda i: i[1])
+    asteroids = set((x, y) for y, row in enumerate(rows) for x, cell in enumerate(row.strip()) if cell == '#')
+    detected_counts = ((a, count_detectable(a, asteroids)) for a in asteroids)
+    return max(detected_counts, key=lambda i: i[1])
 
 def find_next_asteroid(grid, asteroids, x, y, angle):
     mangle = -pi
