@@ -1,9 +1,9 @@
 from math import gcd, atan2, pi
+from itertools import dropwhile
 
 def parse_asteroids(input):
     rows = input.strip().split('\n')
     return set((x, y) for y, row in enumerate(rows) for x, cell in enumerate(row.strip()) if cell == '#')
-
 
 def can_detect(asteroids, a1, a2):
     x1, y1 = a1
@@ -64,13 +64,11 @@ def compute_day10(input):
     asteroids = parse_asteroids(input)
     best, detected_count = compute_best_location(asteroids)
 
-    n = 1
-    for a, angle in vaporize_asteroids(asteroids, best):
-        x, y = a
-        print(f'{n}: ({a}) (angle={angle*180/pi}) {100*x+y}')
-        n += 1
-
-    return detected_count, None
+    gen = vaporize_asteroids(asteroids, best)
+    for i in range(199):
+        next(gen)
+    (x200, y200), _ = next(gen)
+    return detected_count, x200*100+y200
 
 if __name__ == '__main__':
     with open('day10.input', 'r') as input_file:
