@@ -10,21 +10,21 @@ def rangeto2(n, dn):
         return range(dn, n, dn)
     return range(dn, n, dn)
 
-def is_visible(grid, x1, y1, x2, y2):
+def is_visible(asteroids, x1, y1, x2, y2):
     dx = x2 - x1
     dy = y2 - y1
 
     if dx == 0:
         for i in rangeto(dy):
             y3 = y1 + i
-            if grid[x1][y3] == '#':
+            if (x1, y3) in asteroids:
                 return False
         return True
 
     if dy == 0:
         for i in rangeto(dx):
             x3 = x1 + i
-            if grid[x3][y1] == '#':
+            if (x3, y1) in asteroids:
                 return False
         return True
 
@@ -42,14 +42,14 @@ def is_visible(grid, x1, y1, x2, y2):
         x3 = x1 + d3x
         y3 = y1 + d3y
 #        print(f'loop d3=({d3x}, {d3y}) p3=({x3}, {y3})')
-        if grid[x3][y3] == '#':
+        if (x3, y3) in asteroids:
 #            print('found blocker')
             return False
         d3y += ddy
 
     return True
 
-def count_visible(a1, asteroids, grid):
+def count_visible(a1, asteroids):
     visible = 0
 #    print('')
     for a2 in asteroids:
@@ -57,12 +57,28 @@ def count_visible(a1, asteroids, grid):
             continue
         x1, y1 = a1
         x2, y2 = a2
-        v = is_visible(grid, x1, y1, x2, y2)
+        v = is_visible(asteroids, x1, y1, x2, y2)
 #        print('count', x1, y1, x2, y2, v)
         if v:
             visible += 1
 #    print('vis', visible)
     return visible
+
+def compute_best_asteroid(map):
+    rows = map.strip().split('\n')
+    grid = [list(row.strip()) for row in rows]
+    asteroids = set()
+    for y, row in enumerate(grid):
+        for x, cell in enumerate(row):
+            if cell == '#':
+                asteroids.add((x, y))
+
+    visibles = {a: count_visible(a, asteroids) for a in asteroids}
+
+#    for i, a in enumerate(asteroids):
+#        print('vis', i, a, visibles[i])
+
+    return max(visibles.items(), key=lambda i: i[1])
 
 def find_next_asteroid(grid, asteroids, x, y, angle):
     mangle = -pi
@@ -85,27 +101,6 @@ def find_next_asteroid(grid, asteroids, x, y, angle):
         x, y = next_a
         return x, y, mangle
     return None
-
-def compute_best_asteroid(map):
-    rows = map.strip().split('\n')
-    grid = [list(row.strip()) for row in rows]
-#    print(grid)
-    rows = len(grid)
-    cols = len(grid[0])
-    asteroids = []
-    for x in range(rows):
-        for y in range(cols):
-            if grid[x][y] == '#':
-                asteroids.append((x, y))
-
-    visibles = [count_visible(a, asteroids, grid) for a in asteroids]
-
-#    for i, a in enumerate(asteroids):
-#        print('vis', i, a, visibles[i])
-
-    max_vis = max(range(len(visibles)), key=lambda i: visibles[i])
-    mx, my = asteroids[max_vis]
-    return (my, mx), visibles[max_vis]
 
 def compute_day10(input):
     input = '''
