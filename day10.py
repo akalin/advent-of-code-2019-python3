@@ -49,7 +49,7 @@ def vaporize_asteroids(asteroids, p):
         for a, angle in sorted_angles:
             if can_detect(asteroids_left, p, a):
                 to_remove.append(a)
-                yield a, angle
+                yield a
             else:
                 next_round.append((a, angle))
         if sorted_angles == next_round:
@@ -64,7 +64,7 @@ def compute_day10(input):
     gen = vaporize_asteroids(asteroids, best)
     for i in range(199):
         next(gen)
-    (x200, y200), _ = next(gen)
+    x200, y200 = next(gen)
     return detected_count, x200*100+y200
 
 if __name__ == '__main__':

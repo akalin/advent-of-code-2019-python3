@@ -121,8 +121,7 @@ class TestDay10(unittest.TestCase):
             (14, 3),
         ]
 
-        angles = list(vaporize_asteroids(asteroids, (8, 3)))
-        vaporized_asteroids = [p for p, _ in angles]
+        vaporized_asteroids = list(vaporize_asteroids(asteroids, (8, 3)))
         self.assertEqual(vaporized_asteroids, expected_vaporized_asteroids)
 
     def test_part2_big(self):
@@ -151,17 +150,16 @@ class TestDay10(unittest.TestCase):
 
         asteroids = parse_asteroids(input)
 
-        angles = list(vaporize_asteroids(asteroids, (11, 13)))
-        asteroids = [p for p, _ in angles]
-        self.assertEqual(asteroids[:3], [(11, 12), (12, 1), (12, 2)])
-        self.assertEqual(asteroids[9], (12, 8))
-        self.assertEqual(asteroids[19], (16, 0))
-        self.assertEqual(asteroids[49], (16, 9))
-        self.assertEqual(asteroids[99], (10, 16))
-        self.assertEqual(asteroids[198], (9, 6))
-        self.assertEqual(asteroids[199], (8, 2))
-        self.assertEqual(asteroids[200], (10, 9))
-        self.assertEqual(asteroids[298], (11, 1))
+        vaporized = list(vaporize_asteroids(asteroids, (11, 13)))
+        self.assertEqual(vaporized[:3], [(11, 12), (12, 1), (12, 2)])
+        self.assertEqual(vaporized[9], (12, 8))
+        self.assertEqual(vaporized[19], (16, 0))
+        self.assertEqual(vaporized[49], (16, 9))
+        self.assertEqual(vaporized[99], (10, 16))
+        self.assertEqual(vaporized[198], (9, 6))
+        self.assertEqual(vaporized[199], (8, 2))
+        self.assertEqual(vaporized[200], (10, 9))
+        self.assertEqual(vaporized[298], (11, 1))
 
 if __name__ == '__main__':
     unittest.main()
