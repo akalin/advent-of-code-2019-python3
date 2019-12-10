@@ -5,23 +5,22 @@ def parse_asteroids(input):
     rows = input.strip().split('\n')
     return set((x, y) for y, row in enumerate(rows) for x, cell in enumerate(row.strip()) if cell == '#')
 
+def vadd(v1, v2):
+    return (v1[0] + v2[0], v1[1] + v2[1])
+
+def vsub(v1, v2):
+    return (v1[0] - v2[0], v1[1] - v2[1])
+
 def can_detect(asteroids, a1, a2):
-    x1, y1 = a1
-    x2, y2 = a2
-    dx = x2 - x1
-    dy = y2 - y1
-
+    dx, dy = vsub(a2, a1)
     g = gcd(dx, dy)
-    sx = dx // g
-    sy = dy // g
+    s = (dx // g, dy // g)
 
-    x = x1 + sx
-    y = y1 + sy
-    while (x, y) != (x2, y2):
-        if (x, y) in asteroids:
+    v = vadd(a1, s)
+    while v != a2:
+        if v in asteroids:
             return False
-        x += sx
-        y += sy
+        v = vadd(v, s)
 
     return True
 
@@ -32,12 +31,10 @@ def compute_best_location(asteroids):
     detected_counts = ((a, count_detectable(a, asteroids)) for a in asteroids)
     return max(detected_counts, key=lambda x: x[1])
 
-def compute_angle(p1, p2):
-    x1, y1 = p1
-    x2, y2 = p2
-    dx = x2 - x1
-    dy = y2 - y1
+def compute_angle(a1, a2):
+    dx, dy = vsub(a2, a1)
     angle = atan2(dy, dx)
+    # Convert from (-pi, +pi) (-pi/2, +3*pi/2)
     if angle < -pi/2:
         angle += 2*pi
     return angle
