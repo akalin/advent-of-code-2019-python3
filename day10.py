@@ -30,46 +30,44 @@ def count_detectable(a1, asteroids):
 
 def compute_best_location(asteroids):
     detected_counts = ((a, count_detectable(a, asteroids)) for a in asteroids)
-    return max(detected_counts, key=lambda i: i[1])
+    return max(detected_counts, key=lambda x: x[1])
 
-def find_next_asteroid(asteroids, p, angle):
-    mangle = -pi
-    next_a = None
-    x, y = p
-    for a in asteroids:
-        if a == p:
-            continue
-        x2, y2 = a
-        if not can_detect(asteroids, p, a):
-            continue
-        dx = x2 - x
-        dy = y2 - y
-        nangle = atan2(dy, dx)
-        if nangle >= angle:
-            continue
-        if nangle > mangle:
-            mangle = nangle
-            next_a = a
-    if next_a:
-        x, y = next_a
-        return x, y, mangle
-    return None
+def compute_angle(p1, p2):
+    x1, y1 = p1
+    x2, y2 = p2
+    dx = x2 - x1
+    dy = y2 - y1
+    angle = atan2(dy, dx)
+    if angle < -pi/2:
+        angle += 2*pi
+    return angle
+
+def vaporize_asteroids(asteroids, p):
+    angles = [(a, compute_angle(p, a)) for a in asteroids - set([p])]
+    sorted_angles = sorted(angles, key=lambda x: x[1])
+    asteroids_left = asteroids.copy()
+    while sorted_angles:
+        next_round = []
+        to_remove = []
+        for a, angle in sorted_angles:
+            if can_detect(asteroids_left, p, a):
+                to_remove.append(a)
+                yield a, angle
+            else:
+                next_round.append((a, angle))
+        if sorted_angles == next_round:
+            raise Exception(f'sorted_angles stayed the same: {sorted_angles}')
+        sorted_angles = next_round
+        asteroids_left -= set(to_remove)
 
 def compute_day10(input):
     asteroids = parse_asteroids(input)
     best, detected_count = compute_best_location(asteroids)
 
     n = 1
-    angle = pi + 0.0001
-    while len(asteroids) > 1:
-        na = find_next_asteroid(asteroids, best, angle)
-        if not na:
-            angle = pi + 0.0001
-            continue
-        x, y, nangle = na
-        print(f'{n}: ({y}, {x}) a={nangle*180/pi}, {100*y+x}')
-        asteroids.remove((x, y))
-        angle = nangle
+    for a, angle in vaporize_asteroids(asteroids, best):
+        x, y = a
+        print(f'{n}: ({a}) (angle={angle*180/pi}) {100*x+y}')
         n += 1
 
     return detected_count, None
