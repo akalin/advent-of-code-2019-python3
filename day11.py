@@ -179,12 +179,11 @@ def move_forward(pos, dir):
     if dir == 'R':
         return (pos[0], pos[1] + 1)
 
-def compute_day11(input):
-    program = [int(x) for x in input.split(',')]
+def run_robot(program, initial_color):
     intputer = Intputer(program)
     grid = collections.defaultdict(int)
     pos = (0, 0)
-    grid[pos] = 1
+    grid[pos] = initial_color
     dir = 'U'
     while True:
         input = [grid[pos]]
@@ -196,19 +195,24 @@ def compute_day11(input):
         grid[pos] = color
         dir = do_turn(dir, turn)
         pos = move_forward(pos, dir)
-    print(grid)
-    min_x = min([x for x, y in grid.keys()])
-    max_x = max([x for x, y in grid.keys()])
-    min_y = min([y for x, y in grid.keys()])
-    max_y = max([y for x, y in grid.keys()])
-    grid2 = []
+    return grid
+
+def compute_day11(input):
+    program = [int(x) for x in input.split(',')]
+    grid1 = run_robot(program, 0)
+    grid2 = run_robot(program, 1)
+    min_x = min([x for x, y in grid2.keys()])
+    max_x = max([x for x, y in grid2.keys()])
+    min_y = min([y for x, y in grid2.keys()])
+    max_y = max([y for x, y in grid2.keys()])
+    grid3 = []
     for i in range(max_x - min_x + 1):
-        grid2.append([' '] * (max_y - min_y + 1))
-    for (x, y), c in grid.items():
+        grid3.append([' '] * (max_y - min_y + 1))
+    for (x, y), c in grid2.items():
         if c == 0:
-            grid2[x - min_x][y - min_y] = ' '
+            grid3[x - min_x][y - min_y] = ' '
         elif c == 1:
-            grid2[x - min_x][y - min_y] = '.'
+            grid3[x - min_x][y - min_y] = '.'
         else:
             raise
 #        print(f'printing {c} at {x - min_x} {y - min_y}')
@@ -217,11 +221,11 @@ def compute_day11(input):
 #    print(len(grid2), len(grid2[0]))
 #    print([''.join(row) for row in grid2])
 #    print(grid2[0] == grid2[3])
-    print('\n'.join(reversed([''.join(row) for row in grid2])))
-    return len(grid), None
+    img = '\n'.join(reversed([''.join(row) for row in grid3]))
+    return len(grid1), img
 
 if __name__ == '__main__':
     with open('day11.input', 'r') as input_file:
         input = input_file.read()
         part1, part2 = compute_day11(input)
-        print(f'part1: {part1}, part2: {part2}')
+        print(f'part1: {part1}, part2:\n{part2}')
