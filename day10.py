@@ -1,5 +1,4 @@
-from math import gcd, atan2, pi
-from itertools import dropwhile
+from math import gcd
 
 def parse_asteroids(input):
     rows = input.strip().split('\n')
@@ -33,15 +32,24 @@ def compute_best_location(asteroids):
 
 def compute_angle(a1, a2):
     dx, dy = vsub(a2, a1)
-    angle = atan2(dy, dx)
-    # Convert from (-pi, +pi) to (-pi/2, +3*pi/2)
-    if angle < -pi/2:
-        angle += 2*pi
-    return angle
+    if dx == 0:
+        if dy == 0:
+            raise Exception(f'a1 == a2 == {a1}')
+        if dy < 0:
+            # North
+            return (1, 0)
+        # South
+        return (3, 0)
+    if dx > 0:
+        # East
+        return (2, dy/dx)
+    # West
+    return (4, dy/dx)
 
 def vaporize_asteroids(asteroids, p):
     angles = [(a, compute_angle(p, a)) for a in asteroids - set([p])]
     sorted_angles = sorted(angles, key=lambda x: x[1])
+
     asteroids_left = asteroids.copy()
     while sorted_angles:
         next_round = []
