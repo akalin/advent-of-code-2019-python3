@@ -53,55 +53,43 @@ def copy_slice(sl):
     return [[s[0]] for s in sl]
 
 def compute_ith_period(ps, vs, i):
-    k = 0
     pz0 = ith_slice(ps, i)
     vz0 = ith_slice(vs, i)
 
-    seen = {}
-    pz = copy_slice(pz0)
-    vz = copy_slice(vz0)
+    pz = ith_slice(ps, i)
+    vz = ith_slice(vs, i)
     n_steps = 0
-    seen[str((pz, vz))] = 0
     while True:
         do_single_step(pz, vz)
         n_steps += 1
-        s = str((pz, vz))
-        if s in seen:
-            return seen[s], n_steps
-        seen[s] = n_steps
+        if (pz, vz) == (pz0, vz0) and n_steps > 0:
+            return n_steps
 
-def gcd_n(l):
-    g = l[0]
-    for n in l:
-        g = gcd(g, n)
-    return g
-
-def prod_n(l):
-    p = 1
-    for n in l:
-        p *= n
-    return p
+def lcm(x, y):
+    return x * y // gcd(x, y)
 
 def lcm_n(l):
-    return prod_n(l) // gcd_n(l)
+    res = l[0]
+    for n in l[1:]:
+        res = lcm(res, n) 
+    return res
 
 def compute_day12(input):
     lines = [line.strip() for line in input.strip().split('\n')]
-    ps0 = [parse_position(line) for line in lines]
-    vs0 = [[0, 0, 0] for line in lines]
+    ps = [parse_position(line) for line in lines]
+    vs = [[0, 0, 0] for line in lines]
+    for i in range(1000):
+        do_single_step(ps, vs)
 
-    n = len(ps0)
-    m = len(ps0[0])
+    part1 = compute_energy(ps, vs)
 
-    periods = []
-    for i in range(m):
-        per = compute_ith_period(ps0, vs0, i)
-        print(f'{i} period is {per}')
-        periods.append(per)
-    print(periods)
-    print(gcd_n(periods))
-    print(lcm_n(periods))
-    return None, None
+    ps = [parse_position(line) for line in lines]
+    vs = [[0, 0, 0] for line in lines]
+    m = len(ps[0])
+
+    periods = [compute_ith_period(ps, vs, i) for i in range(m)]
+    part2 = lcm_n(periods)
+    return part1, part2
 
 if __name__ == '__main__':
     with open('day12.input', 'r') as input_file:
