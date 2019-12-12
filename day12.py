@@ -1,5 +1,10 @@
 from math import gcd
 
+def parse_position(line):
+    t = line.strip()[1:-1]
+    vals = t.split(', ')
+    return [int(val.split('=')[1]) for val in vals]
+
 def do_single_step(ps, vs):
     n = len(ps)
     m = len(ps[0])
@@ -23,11 +28,6 @@ def do_single_step(ps, vs):
         for k in range(m):
             p[k] += v[k]
 
-def parse_position(line):
-    t = line.strip()[1:-1]
-    vals = t.split(', ')
-    return [int(val.split('=')[1]) for val in vals]
-
 def compute_energy(ps, vs):
     n = len(ps)
     m = len(ps[0])
@@ -48,9 +48,6 @@ def ith_slice(ps, i):
     for p in ps:
         s.append([p[i]])
     return s
-
-def copy_slice(sl):
-    return [[s[0]] for s in sl]
 
 def compute_ith_period(ps, vs, i):
     pz0 = ith_slice(ps, i)
@@ -86,7 +83,6 @@ def compute_day12(input):
     ps = [parse_position(line) for line in lines]
     vs = [[0, 0, 0] for line in lines]
     m = len(ps[0])
-
     periods = [compute_ith_period(ps, vs, i) for i in range(m)]
     part2 = lcm_n(periods)
     return part1, part2
