@@ -22,12 +22,12 @@ def compute_period(ps0, vs0):
     print(ps, vs)
     while True:
         ps, vs, acs = do_single_step(ps, vs)
-        print(ps, vs, acs)
+        print(n_steps, ps, vs, acs)
         n_steps += 1
         if (ps, vs) == (ps0, vs0):
             return n_steps
 
 if __name__ == '__main__':
-    ps0 = [4, 13, 17, 16]
+    ps0 = [-3, -2, 2, 3]
     vs0 = [0, 0, 0, 0]
     print(compute_period(ps0, vs0))
