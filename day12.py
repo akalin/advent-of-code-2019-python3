@@ -44,10 +44,7 @@ def compute_energy(ps, vs):
     return e
 
 def ith_slice(ps, i):
-    s = []
-    for p in ps:
-        s.append([p[i]])
-    return s
+    return [[p[i]] for p in ps]
 
 def compute_ith_period(ps, vs, i):
     pz0 = ith_slice(ps, i)
