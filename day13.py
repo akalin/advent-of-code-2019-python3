@@ -149,81 +149,99 @@ class Intputer(object):
             else:
                 raise Exception(f'Unknown opcode {opcode}')
 
-def do_turn(dir, turn):
-    if turn == 0:
-        if dir == 'U':
-            return 'L'
-        if dir == 'L':
-            return 'D'
-        if dir == 'D':
-            return 'R'
-        if dir == 'R':
-            return 'U'
-    else:
-        if dir == 'U':
-            return 'R'
-        if dir == 'R':
-            return 'D'
-        if dir == 'D':
-            return 'L'
-        if dir == 'L':
-            return 'U'
-
-def move_forward(pos, dir):
-    if dir == 'U':
-        return (pos[0] + 1, pos[1])
-    if dir == 'D':
-        return (pos[0] - 1, pos[1])
-    if dir == 'L':
-        return (pos[0], pos[1] - 1)
-    if dir == 'R':
-        return (pos[0], pos[1] + 1)
-
-def run_arcade(program, initial_color):
-    program[0] = 2
-    intputer = Intputer(program)
-    grid = collections.defaultdict(int)
-    pos = (0, 0)
-    grid[pos] = initial_color
+def run_game(intputer, next_input):
     output = []
-    intputer.run([0, 0, 0], output)
+    intputer.run(next_input, output)
+
+    empty_tiles = set()
+    walls = set()
+    blocks = set()
+    paddle = None
+    ball = None
+    score = None
+
+    max_x = 0
+    max_y = 0
     for i in range(0, len(output), 3):
         x = output[i]
         y = output[i+1]
-        btype = output[i+2]
-        grid[(x, y)] = btype
-    min_x = min([x for x, y in grid.keys()])
-    max_x = max([x for x, y in grid.keys()])
-    min_y = min([y for x, y in grid.keys()])
-    max_y = max([y for x, y in grid.keys()])
-    grid2 = []
-    xlen = max_x - min_x + 1
-    ylen = max_y - min_y + 1
-    for i in range(ylen):
-        grid2.append([' '] * xlen)
-    for (x, y), c in grid.items():
-        xx = x - min_x
-        yy = ylen - (y - min_y) - 1
-        if c == 0:
-            d = ' '
+        if x != -1:
+            max_x = max(max_x, x)
+        max_y = max(max_y, y)
+        c = output[i+2]
+        if x == -1:
+            score = c
+        elif c == 0:
+            empty_tiles.add((x, y))
         elif c == 1:
-            d = 'X'
+            walls.add((x, y))
         elif c == 2:
-            d = '.'
+            blocks.add((x, y))
         elif c == 3:
-            d = '*'
+            paddle = (x, y)
         elif c == 4:
-            d = 'o'
+            ball = (x, y)
         else:
-            raise Exception(f'what {c}')
-        grid2[yy][xx] = d
-    img = '\n'.join(reversed([''.join(row) for row in grid2]))
+            raise Exception(f'what, c={c}')
+
+    return walls, blocks, paddle, ball, score, max_x, max_y
+
+def dump_board(walls, blocks, paddle, ball, max_x, max_y):
+    grid = []
+    for i in range(max_y+1):
+        grid.append([' '] * (max_x+1))
+
+    for (x, y) in walls:
+        grid[max_y - y][x] = 'X'
+
+    for (x, y) in blocks:
+        grid[max_y - y][x] = '@'
+
+    (x, y) = paddle
+    grid[max_y - y][x] = '-'
+
+    (x, y) = ball
+    grid[max_y - y][x] = 'o'
+
+    img = '\n'.join(reversed([''.join(row) for row in grid]))
+    return img
+
+def run_arcade(program):
+    program[0] = 2
+    intputer = Intputer(program)
+    output = []
+
+    walls, blocks, paddle, ball, score, max_x, max_y = run_game(intputer, [])
+    img = dump_board(walls, blocks, paddle, ball, max_x, max_y)
+    print(f'score = {score}, remaining={len(blocks)}')
     print(img)
+
+    next_input = []
+    while ball != max_y and not intputer.halted:
+        next_move = 0
+        dx2 = ball[0] - paddle[0]
+        if dx2 > 0:
+            next_move = 1
+            paddle = (paddle[0] + 1, paddle[1])
+        elif dx2 < 0:
+            next_move = -1
+            paddle = (paddle[0] - 1, paddle[1])
+        _, _, _, ball2, score2, _, _ = run_game(intputer, [next_move])
+        if ball2:
+            if ball2 in blocks:
+                blocks.remove(ball2)
+            ball = ball2
+        if score2 is not None:
+            score = score2
+        img = dump_board(walls, blocks, paddle, ball, max_x, max_y)
+        print(f'score = {score}, remaining={len(blocks)}')
+        print(img)
+
     return None
 
 def compute_day13(input):
     program = [int(x) for x in input.split(',')]
-    output = run_arcade(program, 0)
+    output = run_arcade(program)
     return output, None
 
 if __name__ == '__main__':
