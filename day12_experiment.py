@@ -16,18 +16,28 @@ def do_single_step(ps, vs):
     ps_new = [ps[i] + vs_new[i] for i in range(n)]
     return ps_new, vs_new, acs
 
+def compute_energy(ps, vs):
+    n = len(ps)
+    pe = 0
+    for i, p1 in enumerate(ps):
+        for p2 in ps[i+1:]:
+            pe += 2*abs(p1 - p2)
+
+    ke = sum([v*v/2 for v in vs])
+    return pe, ke, ke + pe
+
 def compute_period(ps0, vs0):
     n_steps = 0
     ps, vs = ps0, vs0
-    print(ps, vs)
+    print(ps, vs, compute_energy(ps, vs))
     while True:
         ps, vs, acs = do_single_step(ps, vs)
-        print(n_steps, ps, vs, acs)
+        print(n_steps, ps, vs, acs, compute_energy(ps, vs))
         n_steps += 1
         if (ps, vs) == (ps0, vs0):
             return n_steps
 
 if __name__ == '__main__':
-    ps0 = [-3, -2, 2, 3]
+    ps0 = [-4, -2, 2, 4]
     vs0 = [0, 0, 0, 0]
     print(compute_period(ps0, vs0))
