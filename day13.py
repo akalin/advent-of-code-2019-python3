@@ -149,59 +149,64 @@ class Intputer(object):
             else:
                 raise Exception(f'Unknown opcode {opcode}')
 
-def run_game(intputer, next_input):
+def parse_intcode(s):
+    return [int(x.strip()) for x in s.strip().split(',')]
+
+def get_next_paint(intputer, next_input):
     output = []
     intputer.run(next_input, output)
 
-    empty_tiles = set()
-    walls = set()
-    blocks = set()
-    paddle = None
-    ball = None
-    score = None
-
-    max_x = 0
-    max_y = 0
+    paint = {}
     for i in range(0, len(output), 3):
         x = output[i]
         y = output[i+1]
-        if x != -1:
-            max_x = max(max_x, x)
-        max_y = max(max_y, y)
         c = output[i+2]
-        if x == -1:
-            score = c
+        paint[(x, y)] = c
+    return paint
+
+def update_game_data(paint, walls, blocks, paddle, ball, score):
+    next_walls = walls.copy()
+    next_blocks = blocks.copy()
+    next_paddle = paddle
+    next_ball = ball
+    next_score = score
+    for p, c in paint.items():
+        if p[0] == -1:
+            next_score = c
         elif c == 0:
-            empty_tiles.add((x, y))
+            next_walls.discard(p)
+            next_blocks.discard(p)
         elif c == 1:
-            walls.add((x, y))
+            next_walls.add(p)
+            next_blocks.discard(p)
         elif c == 2:
-            blocks.add((x, y))
+            next_walls.discard(p)
+            next_blocks.add(p)
         elif c == 3:
-            paddle = (x, y)
+            next_paddle = p
         elif c == 4:
-            ball = (x, y)
+            next_ball = p
         else:
-            raise Exception(f'what, c={c}')
+            raise Exception(f'unknown c={c}')
 
-    return walls, blocks, paddle, ball, score, max_x, max_y
+    return next_walls, next_blocks, next_paddle, next_ball, next_score
 
-def dump_board(walls, blocks, paddle, ball, max_x, max_y):
+def dump_board(walls, blocks, paddle, ball, width, height):
     grid = []
-    for i in range(max_y+1):
-        grid.append([' '] * (max_x+1))
+    for i in range(height):
+        grid.append([' '] * width)
 
     for (x, y) in walls:
-        grid[max_y - y][x] = 'X'
+        grid[height - y - 1][x] = 'X'
 
     for (x, y) in blocks:
-        grid[max_y - y][x] = '@'
+        grid[height - y - 1][x] = '@'
 
     (x, y) = paddle
-    grid[max_y - y][x] = '-'
+    grid[height - y - 1][x] = '-'
 
     (x, y) = ball
-    grid[max_y - y][x] = 'o'
+    grid[height - y - 1][x] = 'o'
 
     img = '\n'.join(reversed([''.join(row) for row in grid]))
     return img
@@ -211,13 +216,21 @@ def run_arcade(program):
     intputer = Intputer(program)
     output = []
 
-    walls, blocks, paddle, ball, score, max_x, max_y = run_game(intputer, [])
-    img = dump_board(walls, blocks, paddle, ball, max_x, max_y)
+    initial_paint = get_next_paint(intputer, [])
+    width = 1 + max([x for x, _ in initial_paint.keys()])
+    height = 1 + max([y for _, y in initial_paint.keys()])
+
+    walls = set()
+    blocks = set()
+    paddle = None
+    ball = None
+    score = None
+    walls, blocks, paddle, ball, score = update_game_data(initial_paint, walls, blocks, paddle, ball, score)
+    img = dump_board(walls, blocks, paddle, ball, width, height)
     print(f'score = {score}, remaining={len(blocks)}')
     print(img)
 
-    next_input = []
-    while ball != max_y and not intputer.halted:
+    while ball != height-1 and not intputer.halted:
         next_move = 0
         dx2 = ball[0] - paddle[0]
         if dx2 > 0:
@@ -226,21 +239,16 @@ def run_arcade(program):
         elif dx2 < 0:
             next_move = -1
             paddle = (paddle[0] - 1, paddle[1])
-        _, _, _, ball2, score2, _, _ = run_game(intputer, [next_move])
-        if ball2:
-            if ball2 in blocks:
-                blocks.remove(ball2)
-            ball = ball2
-        if score2 is not None:
-            score = score2
-        img = dump_board(walls, blocks, paddle, ball, max_x, max_y)
+        paint = get_next_paint(intputer, [next_move])
+        walls, blocks, paddle, ball, score = update_game_data(paint, walls, blocks, paddle, ball, score)
+        img = dump_board(walls, blocks, paddle, ball, width, height)
         print(f'score = {score}, remaining={len(blocks)}')
         print(img)
 
     return None
 
 def compute_day13(input):
-    program = [int(x) for x in input.split(',')]
+    program = parse_intcode(input)
     output = run_arcade(program)
     return output, None
 
