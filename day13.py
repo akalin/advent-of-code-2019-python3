@@ -2,9 +2,9 @@ from intcode import *
 from more_itertools import sliced
 
 def count_blocks(program):
-    intputer = Intputer(program)
-    initial_paint = get_next_paint(intputer, [])
-    return len([1 for c in initial_paint.values() if c == 2])
+    output = []
+    Intputer(program).run([], output)
+    return len([1 for _, _, c in sliced(output, 3) if c == 2])
 
 def get_next_paint(intputer, next_input):
     output = []
