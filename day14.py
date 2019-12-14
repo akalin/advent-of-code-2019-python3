@@ -9,17 +9,16 @@ def parse_reactions(input):
     lines = input.strip().split('\n')
     for line in lines:
         lhs, rhs = line.strip().split(' => ')
-        m, chem = parse_chem(rhs)
-        r_map = {}
-        for dchem in lhs.split(', '):
-            q, dchem = parse_chem(dchem)
-            r_map[dchem] = q
-        reactions[chem] = (m, r_map)
+        out_q, out_chem = parse_chem(rhs)
+        inputs = {}
+        for s in lhs.split(', '):
+            in_q, in_chem = parse_chem(s)
+            inputs[in_chem] = in_q
+        reactions[out_chem] = (out_q, inputs)
     return reactions
 
-def reduce_chem(reactions, start, nstart, need=None):
-    if not need:
-        need = collections.defaultdict(int)
+def compute_ore_req(reactions, start, nstart):
+    need = collections.defaultdict(int)
     need[start] = nstart
     while True:
         need_chems = [chem for chem, q in need.items() if chem != 'ORE' and q > 0]
@@ -38,18 +37,17 @@ def reduce_chem(reactions, start, nstart, need=None):
 #        print(f'now need {q - m*ratio} of {chem}')
         need[chem] = q - m*ratio
 #        print(need)
-    return need
+    return need['ORE']
 
 def compute_day14(input):
     reactions = parse_reactions(input)
-    need = reduce_chem(reactions, 'FUEL', 1)
-    part1 = need['ORE']
+    part1 = compute_ore_req(reactions, 'FUEL', 1)
 
     total_ore = 1000000000000
     fuel = 1
     while True:
-        need = reduce_chem(reactions, 'FUEL', fuel)
-        if need['ORE'] > total_ore:
+        ore_req = compute_ore_req(reactions, 'FUEL', fuel)
+        if ore_req > total_ore:
             fuel //= 2
             break
         fuel *= 2
@@ -57,15 +55,15 @@ def compute_day14(input):
     print(fuel)
 
     while True:
-        need = reduce_chem(reactions, 'FUEL', fuel)
-        if need['ORE'] > total_ore:
+        ore_req = compute_ore_req(reactions, 'FUEL', fuel)
+        if ore_req > total_ore:
             fuel -= 100
             break
         fuel += 100
 
     while True:
-        need = reduce_chem(reactions, 'FUEL', fuel)
-        if need['ORE'] > total_ore:
+        ore_req = compute_ore_req(reactions, 'FUEL', fuel)
+        if ore_req > total_ore:
             fuel -= 1
             break
         fuel += 1
