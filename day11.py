@@ -1,6 +1,7 @@
 import collections
 import itertools
 from intcode import *
+from vec2 import *
 
 def do_turn(dir, turn):
     if turn == 0:
@@ -24,18 +25,18 @@ def do_turn(dir, turn):
 
 def move_forward(pos, dir):
     if dir == 'U':
-        return (pos[0] + 1, pos[1])
+        return pos + (1, 0)
     if dir == 'D':
-        return (pos[0] - 1, pos[1])
+        return pos + (-1, 0)
     if dir == 'L':
-        return (pos[0], pos[1] - 1)
+        return pos + (0, -1)
     if dir == 'R':
-        return (pos[0], pos[1] + 1)
+        return pos + (0, 1)
 
 def run_robot(program, initial_color):
     intputer = Intputer(program)
     grid = collections.defaultdict(int)
-    pos = (0, 0)
+    pos = Vec2(0, 0)
     grid[pos] = initial_color
     dir = 'U'
     while True:
