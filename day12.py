@@ -95,8 +95,8 @@ def lcm(x, y):
     return x * y // gcd(x, y)
 
 def lcm_n(l):
-    res = l[0]
-    for n in l[1:]:
+    res = 1
+    for n in l:
         res = lcm(res, n) 
     return res
 
