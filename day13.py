@@ -5,7 +5,7 @@ import os
 def count_blocks(program):
     output = []
     Intputer(program).run([], output)
-    return len([1 for _, _, c in sliced(output, 3) if c == 2])
+    return len([c for _, _, c in sliced(output, 3) if c == 2])
 
 def dump_board(walls, blocks, paddle, ball, width, height):
     grid = []
