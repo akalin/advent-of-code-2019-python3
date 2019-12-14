@@ -230,7 +230,7 @@ def run_arcade(program):
     print(f'score = {score}, remaining={len(blocks)}')
     print(img)
 
-    while ball != height-1 and not intputer.halted:
+    while not intputer.halted:
         next_move = 0
         dx2 = ball[0] - paddle[0]
         if dx2 > 0:
@@ -245,12 +245,14 @@ def run_arcade(program):
         print(f'score = {score}, remaining={len(blocks)}')
         print(img)
 
-    return None
+    if blocks:
+        raise(f'blocks unexpectedly non-empty: {blocks}')
+    return score
 
 def compute_day13(input):
     program = parse_intcode(input)
-    output = run_arcade(program)
-    return output, None
+    part2 = run_arcade(program)
+    return None, part2
 
 if __name__ == '__main__':
     with open('day13.input', 'r') as input_file:
