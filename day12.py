@@ -75,8 +75,8 @@ def do_single_step(ps, vs, zero, sgn_fn):
         accs[i] += sgn
         accs[j] -= sgn
 
-    next_vs = [v + accs[i] for i, v in enumerate(vs)]
-    next_ps = [p + next_vs[i] for i, p in enumerate(ps)]
+    next_vs = [v + a for v, a in zip(vs, accs)]
+    next_ps = [p + v for p, v in zip(ps, next_vs)]
     return next_ps, next_vs
 
 def compute_energy(ps, vs):
