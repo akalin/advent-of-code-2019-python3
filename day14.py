@@ -45,14 +45,6 @@ def reduce_chem(reactions, start, nstart, need=None):
 #        print(need)
     return need
 
-def zero_point(need):
-    for chem, n in need.items():
-        if chem == 'ORE':
-            continue
-        if n != 0:
-            return False
-    return True
-
 def compute_day14(input):
     reactions = parse_reactions(input)
     need = reduce_chem(reactions, 'FUEL', 1)
