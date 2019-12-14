@@ -21,22 +21,16 @@ def compute_ore_for_fuel(reactions, fuel_q):
     need = collections.defaultdict(int)
     need['FUEL'] = fuel_q
     while True:
-        need_chems = [chem for chem, q in need.items() if chem != 'ORE' and q > 0]
-        if len(need_chems) == 0:
+        chem_q = next(((chem, q) for chem, q in need.items() if chem != 'ORE' and q > 0), None)
+        if not chem_q:
             break
+        chem, needed_q = chem_q
 
-        chem = need_chems[0]
-        q = need[chem]
-#        print(f'need {q} of {chem}')
-        (m, r_map) = reactions[chem]
-        ratio = (q + (m - 1)) // m
-#        print(f'can produce {m} of {chem}, so running reaction {ratio} times')
-        for dchem, r in r_map.items():
-#            print(f'  need {r * ratio} more of {dchem}')
-            need[dchem] += r * ratio
-#        print(f'now need {q - m*ratio} of {chem}')
-        need[chem] = q - m*ratio
-#        print(need)
+        (out_q, inputs) = reactions[chem]
+        ratio = (needed_q + (out_q - 1)) // out_q
+        need[chem] -= out_q * ratio
+        for in_chem, in_q in inputs.items():
+            need[in_chem] += in_q * ratio
     return need['ORE']
 
 def compute_fuel_for_ore(reactions, ore_q):
