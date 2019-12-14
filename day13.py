@@ -38,64 +38,10 @@ def get_initial_game_data(intputer):
 
     return walls, blocks, paddle, ball, score, max_x, max_y
 
-def update_game_data(paint, walls, blocks, paddle, ball, score):
-    next_walls = walls.copy()
-    next_blocks = blocks.copy()
-    next_paddle = paddle
-    next_ball = ball
-    next_score = score
-    for p, c in paint.items():
-        if p[0] == -1:
-            next_score = c
-        elif c == 0:
-            next_walls.discard(p)
-            next_blocks.discard(p)
-        elif c == 1:
-            next_walls.add(p)
-            next_blocks.discard(p)
-        elif c == 2:
-            next_walls.discard(p)
-            next_blocks.add(p)
-        elif c == 3:
-            next_paddle = p
-        elif c == 4:
-            next_ball = p
-        else:
-            raise Exception(f'unknown c={c}')
-
-    return next_walls, next_blocks, next_paddle, next_ball, next_score
-
 def get_next_paint(intputer, next_input):
     output = []
     intputer.run(next_input, output)
     return {(x, y): c for x, y, c in sliced(output, 3)}
-
-def update_game_data(paint, walls, blocks, paddle, ball, score):
-    next_walls = walls.copy()
-    next_blocks = blocks.copy()
-    next_paddle = paddle
-    next_ball = ball
-    next_score = score
-    for p, c in paint.items():
-        if p[0] == -1:
-            next_score = c
-        elif c == 0:
-            next_walls.discard(p)
-            next_blocks.discard(p)
-        elif c == 1:
-            next_walls.add(p)
-            next_blocks.discard(p)
-        elif c == 2:
-            next_walls.discard(p)
-            next_blocks.add(p)
-        elif c == 3:
-            next_paddle = p
-        elif c == 4:
-            next_ball = p
-        else:
-            raise Exception(f'unknown c={c}')
-
-    return next_walls, next_blocks, next_paddle, next_ball, next_score
 
 def dump_board(walls, blocks, paddle, ball, width, height):
     grid = []
@@ -139,7 +85,19 @@ def run_arcade(program):
             next_move = -1
             paddle = (paddle[0] - 1, paddle[1])
         paint = get_next_paint(intputer, [next_move])
-        walls, blocks, paddle, ball, score = update_game_data(paint, walls, blocks, paddle, ball, score)
+
+        for p, c in paint.items():
+            if p[0] == -1:
+                score = c
+            elif c == 0:
+                blocks.discard(p)
+            elif c == 3:
+                paddle = p
+            elif c == 4:
+                ball = p
+            else:
+                raise Exception(f'unexpected c={c}')
+
         img = dump_board(walls, blocks, paddle, ball, width, height)
         print(f'score = {score}, remaining={len(blocks)}')
         print(img)
