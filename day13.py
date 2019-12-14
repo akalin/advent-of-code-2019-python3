@@ -7,7 +7,11 @@ def count_blocks(program):
     Intputer(program).run([], output)
     return len([c for _, _, c in sliced(output, 3) if c == 2])
 
-def dump_board(walls, blocks, paddle, ball, width, height):
+def maybe_show_game(walls, blocks, paddle, ball, width, height):
+    show_game = False
+    if not show_game:
+        return
+
     grid = []
     for i in range(height):
         grid.append([' '] * width)
@@ -25,7 +29,10 @@ def dump_board(walls, blocks, paddle, ball, width, height):
     grid[y][x] = 'o'
 
     img = '\n'.join([''.join(row) for row in grid])
-    return img
+
+    os.system('clear')
+    print(f'score = {score}, remaining={len(blocks)}')
+    print(img)
 
 def play_game(program):
     program = program[:]
@@ -63,10 +70,7 @@ def play_game(program):
 
     width = max_x + 1
     height = max_y + 1
-    img = dump_board(walls, blocks, paddle, ball, width, height)
-    os.system('clear')
-    print(f'score = {score}, remaining={len(blocks)}')
-    print(img)
+    maybe_show_game(walls, blocks, paddle, ball, width, height)
 
     while not intputer.halted:
         next_move = 0
@@ -92,10 +96,7 @@ def play_game(program):
             else:
                 raise Exception(f'unexpected c={c}')
 
-        img = dump_board(walls, blocks, paddle, ball, width, height)
-        os.system('clear')
-        print(f'score = {score}, remaining={len(blocks)}')
-        print(img)
+        maybe_show_game(walls, blocks, paddle, ball, width, height)
 
     if blocks:
         raise(f'blocks unexpectedly non-empty: {blocks}')
