@@ -25,13 +25,13 @@ def do_turn(dir, turn):
 
 def move_forward(pos, dir):
     if dir == 'U':
-        return pos + (1, 0)
-    if dir == 'D':
-        return pos + (-1, 0)
-    if dir == 'L':
-        return pos + (0, -1)
-    if dir == 'R':
         return pos + (0, 1)
+    if dir == 'D':
+        return pos + (0, -1)
+    if dir == 'L':
+        return pos + (-1, 0)
+    if dir == 'R':
+        return pos + (1, 0)
 
 def run_robot(program, initial_color):
     intputer = Intputer(program)
@@ -60,21 +60,15 @@ def compute_day11(input):
     min_y = min([y for x, y in grid2.keys()])
     max_y = max([y for x, y in grid2.keys()])
     grid3 = []
-    for i in range(max_x - min_x + 1):
-        grid3.append([' '] * (max_y - min_y + 1))
+    for i in range(max_y - min_y + 1):
+        grid3.append([' '] * (max_x - min_x + 1))
     for (x, y), c in grid2.items():
         if c == 0:
-            grid3[x - min_x][y - min_y] = ' '
+            grid3[y - min_y][x - min_x] = ' '
         elif c == 1:
-            grid3[x - min_x][y - min_y] = '.'
+            grid3[y - min_y][x - min_x] = '.'
         else:
             raise
-#        print(f'printing {c} at {x - min_x} {y - min_y}')
-#    print(''.join(grid2[0]))
-#    print(''.join(grid2[1]))
-#    print(len(grid2), len(grid2[0]))
-#    print([''.join(row) for row in grid2])
-#    print(grid2[0] == grid2[3])
     img = '\n'.join(reversed([''.join(row) for row in grid3]))
     return len(grid1), img
 
