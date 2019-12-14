@@ -1,5 +1,6 @@
 from math import gcd
 import collections.abc
+import itertools
 from util import *
 
 class Vec3(collections.abc.Sequence):
@@ -69,14 +70,10 @@ def vec3_sgn(v):
 def do_single_step(ps, vs, zero, sgn_fn):
     n = len(ps)
     accs = [zero] * n
-
-    for i in range(n):
-        p1 = ps[i]
-        for j in range(i+1, n):
-            p2 = ps[j]
-            sgn = sgn_fn(p2 - p1)
-            accs[i] += sgn
-            accs[j] -= sgn
+    for (i, p1), (j, p2) in itertools.combinations(enumerate(ps), 2):
+        sgn = sgn_fn(p2 - p1)
+        accs[i] += sgn
+        accs[j] -= sgn
 
     for i in range(n):
         vs[i] += accs[i]
@@ -123,8 +120,7 @@ def compute_day12(input):
 
     ps = [parse_position(line) for line in lines]
     vs = [[0, 0, 0] for line in lines]
-    m = len(ps[0])
-    periods = [compute_ith_period(ps, vs, i) for i in range(m)]
+    periods = [compute_ith_period(ps, vs, i) for i in range(3)]
     part2 = lcm_n(periods)
     return part1, part2
 
