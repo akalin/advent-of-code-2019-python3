@@ -38,11 +38,6 @@ def get_initial_game_data(intputer):
 
     return walls, blocks, paddle, ball, score, max_x, max_y
 
-def get_next_paint(intputer, next_input):
-    output = []
-    intputer.run(next_input, output)
-    return {(x, y): c for x, y, c in sliced(output, 3)}
-
 def dump_board(walls, blocks, paddle, ball, width, height):
     grid = []
     for i in range(height):
@@ -84,17 +79,18 @@ def run_arcade(program):
         elif dx2 < 0:
             next_move = -1
             paddle = (paddle[0] - 1, paddle[1])
-        paint = get_next_paint(intputer, [next_move])
 
-        for p, c in paint.items():
-            if p[0] == -1:
+        output = []
+        intputer.run([next_move], output)
+        for x, y, c in sliced(output, 3):
+            if x == -1:
                 score = c
             elif c == 0:
-                blocks.discard(p)
+                blocks.discard((x, y))
             elif c == 3:
-                paddle = p
+                paddle = (x, y)
             elif c == 4:
-                ball = p
+                ball = (x, y)
             else:
                 raise Exception(f'unexpected c={c}')
 
