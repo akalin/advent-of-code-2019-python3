@@ -1,25 +1,64 @@
 from math import gcd
+import collections.abc
+
+class Vec2(collections.abc.Sequence):
+    def __init__(self, *args):
+        if len(args) == 2:
+            self._v = tuple(args)
+        elif len(args) == 1 and len(args[0]) == 2:
+            self._v = tuple(args[0])
+        else:
+            raise TypeError(f'Expected 2 arguments or a sequence of length 2, got {args}')
+
+    def __len__(self):
+        return len(self._v)
+
+    def __getitem__(self, index):
+        return self._v[index]
+
+    def __str__(self):
+        return f'Vec2{str(self._v)}'
+
+    def __repr__(self):
+        return f'Vec2{repr(self._v)}'
+
+    def __hash__(self):
+        return hash(self._v)
+
+    @property
+    def x(self):
+        return self[0]
+
+    @property
+    def y(self):
+        return self[1]
+
+    def __eq__(self, other):
+        ox, oy = other
+        return self.x == ox and self.y == oy
+
+    def __add__(self, other):
+        ox, oy = other
+        return self.__class__(self.x + ox, self.y + oy)
+
+    def __sub__(self, other):
+        ox, oy = other
+        return self.__class__(self.x - ox, self.y - oy)
 
 def parse_asteroids(input):
     rows = input.strip().split('\n')
-    return set((x, y) for y, row in enumerate(rows) for x, cell in enumerate(row.strip()) if cell == '#')
-
-def vadd(v1, v2):
-    return (v1[0] + v2[0], v1[1] + v2[1])
-
-def vsub(v1, v2):
-    return (v1[0] - v2[0], v1[1] - v2[1])
+    return set(Vec2(x, y) for y, row in enumerate(rows) for x, cell in enumerate(row.strip()) if cell == '#')
 
 def can_detect(asteroids, a1, a2):
-    dx, dy = vsub(a2, a1)
+    dx, dy = a2 - a1
     g = gcd(dx, dy)
-    s = (dx // g, dy // g)
+    s = Vec2(dx // g, dy // g)
 
-    v = vadd(a1, s)
+    v = a1 + s
     while v != a2:
         if v in asteroids:
             return False
-        v = vadd(v, s)
+        v += s
 
     return True
 
@@ -31,7 +70,7 @@ def compute_best_location(asteroids):
     return max(detected_counts, key=lambda x: x[1])
 
 def compute_angle(a1, a2):
-    dx, dy = vsub(a2, a1)
+    dx, dy = a2 - a1
     if dx == 0:
         if dy == 0:
             raise Exception(f'a1 == a2 == {a1}')
