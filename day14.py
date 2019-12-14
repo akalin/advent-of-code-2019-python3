@@ -17,9 +17,9 @@ def parse_reactions(input):
         reactions[out_chem] = (out_q, inputs)
     return reactions
 
-def compute_ore_req(reactions, start, nstart):
+def compute_ore_for_fuel(reactions, fuel_q):
     need = collections.defaultdict(int)
-    need[start] = nstart
+    need['FUEL'] = fuel_q
     while True:
         need_chems = [chem for chem, q in need.items() if chem != 'ORE' and q > 0]
         if len(need_chems) == 0:
@@ -41,13 +41,13 @@ def compute_ore_req(reactions, start, nstart):
 
 def compute_day14(input):
     reactions = parse_reactions(input)
-    part1 = compute_ore_req(reactions, 'FUEL', 1)
+    part1 = compute_ore_for_fuel(reactions, 1)
 
     total_ore = 1000000000000
     fuel = 1
     while True:
-        ore_req = compute_ore_req(reactions, 'FUEL', fuel)
-        if ore_req > total_ore:
+        ore_for_fuel = compute_ore_for_fuel(reactions, fuel)
+        if ore_for_fuel > total_ore:
             fuel //= 2
             break
         fuel *= 2
@@ -55,15 +55,15 @@ def compute_day14(input):
     print(fuel)
 
     while True:
-        ore_req = compute_ore_req(reactions, 'FUEL', fuel)
-        if ore_req > total_ore:
+        ore_for_fuel = compute_ore_for_fuel(reactions, fuel)
+        if ore_for_fuel > total_ore:
             fuel -= 100
             break
         fuel += 100
 
     while True:
-        ore_req = compute_ore_req(reactions, 'FUEL', fuel)
-        if ore_req > total_ore:
+        ore_for_fuel = compute_ore_for_fuel(reactions, fuel)
+        if ore_for_fuel > total_ore:
             fuel -= 1
             break
         fuel += 1
