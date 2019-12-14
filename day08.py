@@ -6,7 +6,8 @@ def compute_day08(input, m, n):
     part1 = min_layer.count('1') * min_layer.count('2')
 
     image = [next(x for x in p if x != '2') for p in zip(*layers)]
-    part2 = '\n'.join([''.join(r).replace('0', ' ').replace('1', '⋅') for r in sliced(image, m)])
+    disp_image = ''.join(image).replace('0', ' ').replace('1', '⋅')
+    part2 = '\n'.join([r for r in sliced(disp_image, m)])
     return part1, part2
 
 if __name__ == '__main__':
