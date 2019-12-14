@@ -1,5 +1,6 @@
 from intcode import *
 from more_itertools import sliced
+import os
 
 def count_blocks(program):
     output = []
@@ -63,6 +64,7 @@ def play_game(program):
     width = max_x + 1
     height = max_y + 1
     img = dump_board(walls, blocks, paddle, ball, width, height)
+    os.system('clear')
     print(f'score = {score}, remaining={len(blocks)}')
     print(img)
 
@@ -91,6 +93,7 @@ def play_game(program):
                 raise Exception(f'unexpected c={c}')
 
         img = dump_board(walls, blocks, paddle, ball, width, height)
+        os.system('clear')
         print(f'score = {score}, remaining={len(blocks)}')
         print(img)
 
