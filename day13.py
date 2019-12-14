@@ -6,6 +6,65 @@ def count_blocks(program):
     Intputer(program).run([], output)
     return len([1 for _, _, c in sliced(output, 3) if c == 2])
 
+def get_initial_game_data(intputer):
+    output = []
+    intputer.run([], output)
+    walls = set()
+    blocks = set()
+    paddle = None
+    ball = None
+    score = None
+    max_x = 0
+    max_y = 0
+    for x, y, c in sliced(output, 3):
+        if x == -1:
+            score = c
+            continue
+
+        max_x = max(max_x, x)
+        max_y = max(max_y, y)
+        if c == 0:
+            pass
+        elif c == 1:
+            walls.add((x, y))
+        elif c == 2:
+            blocks.add((x, y))
+        elif c == 3:
+            paddle = (x, y)
+        elif c == 4:
+            ball = (x, y)
+        else:
+            raise Exception(f'unknown c={c}')
+
+    return walls, blocks, paddle, ball, score, max_x, max_y
+
+def update_game_data(paint, walls, blocks, paddle, ball, score):
+    next_walls = walls.copy()
+    next_blocks = blocks.copy()
+    next_paddle = paddle
+    next_ball = ball
+    next_score = score
+    for p, c in paint.items():
+        if p[0] == -1:
+            next_score = c
+        elif c == 0:
+            next_walls.discard(p)
+            next_blocks.discard(p)
+        elif c == 1:
+            next_walls.add(p)
+            next_blocks.discard(p)
+        elif c == 2:
+            next_walls.discard(p)
+            next_blocks.add(p)
+        elif c == 3:
+            next_paddle = p
+        elif c == 4:
+            next_ball = p
+        else:
+            raise Exception(f'unknown c={c}')
+
+    return next_walls, next_blocks, next_paddle, next_ball, next_score
+
 def get_next_paint(intputer, next_input):
     output = []
     intputer.run(next_input, output)
@@ -62,18 +121,10 @@ def run_arcade(program):
     program = program[:]
     program[0] = 2
     intputer = Intputer(program)
-    output = []
 
-    initial_paint = get_next_paint(intputer, [])
-    width = 1 + max([x for x, _ in initial_paint.keys()])
-    height = 1 + max([y for _, y in initial_paint.keys()])
-
-    walls = set()
-    blocks = set()
-    paddle = None
-    ball = None
-    score = None
-    walls, blocks, paddle, ball, score = update_game_data(initial_paint, walls, blocks, paddle, ball, score)
+    walls, blocks, paddle, ball, score, max_x, max_y = get_initial_game_data(intputer)
+    width = max_x + 1
+    height = max_y + 1
     img = dump_board(walls, blocks, paddle, ball, width, height)
     print(f'score = {score}, remaining={len(blocks)}')
     print(img)
