@@ -1,5 +1,6 @@
 from math import gcd
 import collections.abc
+from util import *
 
 class Vec3(collections.abc.Sequence):
     def __init__(self, *args):
@@ -84,19 +85,7 @@ def do_single_step(ps, vs, zero, sgn_fn):
         ps[i] += vs[i]
 
 def compute_energy(ps, vs):
-    n = len(ps)
-    m = len(ps[0])
-    e = 0
-    for i in range(n):
-        pe = 0
-        ke = 0
-        p = ps[i]
-        v = vs[i]
-        for k in range(m):
-            pe += abs(p[k])
-            ke += abs(v[k])
-        e += pe * ke
-    return e
+    return sum([manhattan_norm(p) * manhattan_norm(v) for p, v in zip(ps, vs)])
 
 def ith_slice(ps, i):
     return [p[i] for p in ps]

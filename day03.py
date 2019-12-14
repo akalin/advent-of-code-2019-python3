@@ -1,4 +1,5 @@
 from collections import defaultdict
+from util import *
 from vec2 import *
 
 def compute_closest_intersection(input):
@@ -32,7 +33,7 @@ def compute_closest_intersection(input):
 
     intersections = [(p, steps) for p, steps in grid.items() if len(steps) > 1]
 
-    min_manhattan_distance = min([abs(p.x) + abs(p.y) for p, _ in intersections])
+    min_manhattan_distance = min([manhattan_norm(p) for p, _ in intersections])
     min_step_count = min([sum(steps.values()) for _, steps in intersections])
     return min_manhattan_distance, min_step_count
 
