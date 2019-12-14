@@ -34,29 +34,27 @@ def compute_ore_for_fuel(reactions, fuel_q):
     return need['ORE']
 
 def compute_fuel_for_ore(reactions, ore_q):
-    fuel = 1
+    ub = 1
     while True:
-        ore_for_fuel = compute_ore_for_fuel(reactions, fuel)
+        ore_for_fuel = compute_ore_for_fuel(reactions, ub)
         if ore_for_fuel > ore_q:
-            fuel //= 2
             break
-        fuel *= 2
+        ub *= 2
 
-    while True:
-        ore_for_fuel = compute_ore_for_fuel(reactions, fuel)
+    if ub == 1:
+        raise Exception('ub unexpectedly 1')
+
+    lb = ub // 2
+
+    while ub > lb + 1:
+        x = lb + (ub - lb) // 2
+        ore_for_fuel = compute_ore_for_fuel(reactions, x)
         if ore_for_fuel > ore_q:
-            fuel -= 100
-            break
-        fuel += 100
+            ub = x
+        else:
+            lb = x
 
-    while True:
-        ore_for_fuel = compute_ore_for_fuel(reactions, fuel)
-        if ore_for_fuel > ore_q:
-            fuel -= 1
-            break
-        fuel += 1
-
-    return fuel
+    return lb
 
 def compute_day14(input):
     reactions = parse_reactions(input)
