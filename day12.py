@@ -82,15 +82,8 @@ def do_single_step(ps, vs, zero, sgn_fn):
 def compute_energy(ps, vs):
     return sum([manhattan_norm(p) * manhattan_norm(v) for p, v in zip(ps, vs)])
 
-def ith_slice(ps, i):
-    return [p[i] for p in ps]
-
-def compute_ith_period(ps, vs, i):
-    pz0 = ith_slice(ps, i)
-    vz0 = ith_slice(vs, i)
-
-    pz = pz0
-    vz = vz0
+def compute_period(pz0, vz0):
+    pz, vz = pz0, vz0
     n_steps = 0
     while True:
         pz, vz = do_single_step(pz, vz, 0, int_sgn)
@@ -115,10 +108,11 @@ def compute_day12(input):
     ps, vs = ps0, vs0
     for i in range(1000):
         ps, vs = do_single_step(ps, vs, Vec3(0, 0, 0), vec3_sgn)
-
     part1 = compute_energy(ps, vs)
 
-    periods = [compute_ith_period(ps, vs, i) for i in range(3)]
+    p_slices = [list(pz) for pz in zip(*ps)]
+    v_slices = [list(vz) for vz in zip(*vs)]
+    periods = [compute_period(pz, vz) for pz, vz in zip(p_slices, v_slices)]
     part2 = lcm_n(periods)
     return part1, part2
 
