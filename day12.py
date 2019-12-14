@@ -50,13 +50,13 @@ def compute_ith_period(ps, vs, i):
     pz0 = ith_slice(ps, i)
     vz0 = ith_slice(vs, i)
 
-    pz = ith_slice(ps, i)
-    vz = ith_slice(vs, i)
+    pz = [x[:] for x in pz0]
+    vz = [x[:] for x in vz0]
     n_steps = 0
     while True:
         do_single_step(pz, vz)
         n_steps += 1
-        if (pz, vz) == (pz0, vz0) and n_steps > 0:
+        if (pz, vz) == (pz0, vz0):
             return n_steps
 
 def lcm(x, y):
