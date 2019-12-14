@@ -1,9 +1,4 @@
-from math import gcd
 import collections
-import itertools
-from util import *
-from vec2 import *
-from vec3 import *
 
 def parse_chem(s):
     q, chem = s.split(' ')
