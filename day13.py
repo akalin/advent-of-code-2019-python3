@@ -1,6 +1,11 @@
 from intcode import *
 from more_itertools import sliced
 
+def count_blocks(program):
+    intputer = Intputer(program)
+    initial_paint = get_next_paint(intputer, [])
+    return len([1 for c in initial_paint.values() if c == 2])
+
 def get_next_paint(intputer, next_input):
     output = []
     intputer.run(next_input, output)
@@ -54,6 +59,7 @@ def dump_board(walls, blocks, paddle, ball, width, height):
     return img
 
 def run_arcade(program):
+    program = program[:]
     program[0] = 2
     intputer = Intputer(program)
     output = []
@@ -93,11 +99,12 @@ def run_arcade(program):
 
 def compute_day13(input):
     program = parse_intcode(input)
+    part1 = count_blocks(program)
     part2 = run_arcade(program)
-    return None, part2
+    return part1, part2
 
 if __name__ == '__main__':
     with open('day13.input', 'r') as input_file:
         input = input_file.read()
         part1, part2 = compute_day13(input)
-        print(f'part1: {part1}, part2:\n{part2}')
+        print(f'part1: {part1}, part2: {part2}')
