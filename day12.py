@@ -75,11 +75,9 @@ def do_single_step(ps, vs, zero, sgn_fn):
         accs[i] += sgn
         accs[j] -= sgn
 
-    for i in range(n):
-        vs[i] += accs[i]
-
-    for i in range(n):
-        ps[i] += vs[i]
+    next_vs = [v + accs[i] for i, v in enumerate(vs)]
+    next_ps = [p + next_vs[i] for i, p in enumerate(ps)]
+    return next_ps, next_vs
 
 def compute_energy(ps, vs):
     return sum([manhattan_norm(p) * manhattan_norm(v) for p, v in zip(ps, vs)])
@@ -91,11 +89,11 @@ def compute_ith_period(ps, vs, i):
     pz0 = ith_slice(ps, i)
     vz0 = ith_slice(vs, i)
 
-    pz = pz0[:]
-    vz = vz0[:]
+    pz = pz0
+    vz = vz0
     n_steps = 0
     while True:
-        do_single_step(pz, vz, 0, int_sgn)
+        pz, vz = do_single_step(pz, vz, 0, int_sgn)
         n_steps += 1
         if (pz, vz) == (pz0, vz0):
             return n_steps
@@ -111,15 +109,15 @@ def lcm_n(l):
 
 def compute_day12(input):
     lines = [line.strip() for line in input.strip().split('\n')]
-    ps = [parse_position(line) for line in lines]
-    vs = [Vec3(0, 0, 0) for line in lines]
+    ps0 = [parse_position(line) for line in lines]
+    vs0 = [Vec3(0, 0, 0) for line in lines]
+
+    ps, vs = ps0, vs0
     for i in range(1000):
-        do_single_step(ps, vs, Vec3(0, 0, 0), vec3_sgn)
+        ps, vs = do_single_step(ps, vs, Vec3(0, 0, 0), vec3_sgn)
 
     part1 = compute_energy(ps, vs)
 
-    ps = [parse_position(line) for line in lines]
-    vs = [[0, 0, 0] for line in lines]
     periods = [compute_ith_period(ps, vs, i) for i in range(3)]
     part2 = lcm_n(periods)
     return part1, part2
