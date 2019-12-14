@@ -1,14 +1,12 @@
-def chunked(l, n):
-    return [l[i:i+n] for i in range(0, len(l), n)]
+from more_itertools import sliced
 
 def compute_day08(input, m, n):
-    layers = chunked(input.strip(), m*n)
+    layers = list(sliced(input.strip(), m*n))
     min_layer = min(layers, key=lambda l: l.count('0'))
     part1 = min_layer.count('1') * min_layer.count('2')
 
     image = [next(x for x in p if x != '2') for p in zip(*layers)]
-    rows = chunked(image, m)
-    part2 = '\n'.join([''.join(r).replace('0', ' ').replace('1', '⋅') for r in rows])
+    part2 = '\n'.join([''.join(r).replace('0', ' ').replace('1', '⋅') for r in sliced(image, m)])
     return part1, part2
 
 if __name__ == '__main__':
