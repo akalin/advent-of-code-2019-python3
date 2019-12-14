@@ -65,16 +65,20 @@ def int_sgn(x):
 def vec3_sgn(v):
     return Vec3([int_sgn(x) for x in v])
 
-def do_single_step(ps, vs, sgn_fn):
+def do_single_step(ps, vs, zero, sgn_fn):
     n = len(ps)
+    accs = [zero] * n
 
     for i in range(n):
         p1 = ps[i]
         for j in range(i+1, n):
             p2 = ps[j]
             sgn = sgn_fn(p2 - p1)
-            vs[i] += sgn
-            vs[j] -= sgn
+            accs[i] += sgn
+            accs[j] -= sgn
+
+    for i in range(n):
+        vs[i] += accs[i]
 
     for i in range(n):
         ps[i] += vs[i]
@@ -105,7 +109,7 @@ def compute_ith_period(ps, vs, i):
     vz = vz0[:]
     n_steps = 0
     while True:
-        do_single_step(pz, vz, int_sgn)
+        do_single_step(pz, vz, 0, int_sgn)
         n_steps += 1
         if (pz, vz) == (pz0, vz0):
             return n_steps
@@ -124,7 +128,7 @@ def compute_day12(input):
     ps = [parse_position(line) for line in lines]
     vs = [Vec3(0, 0, 0) for line in lines]
     for i in range(1000):
-        do_single_step(ps, vs, vec3_sgn)
+        do_single_step(ps, vs, Vec3(0, 0, 0), vec3_sgn)
 
     part1 = compute_energy(ps, vs)
 
