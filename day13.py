@@ -6,7 +6,31 @@ def count_blocks(program):
     Intputer(program).run([], output)
     return len([1 for _, _, c in sliced(output, 3) if c == 2])
 
-def get_initial_game_data(intputer):
+def dump_board(walls, blocks, paddle, ball, width, height):
+    grid = []
+    for i in range(height):
+        grid.append([' '] * width)
+
+    for (x, y) in walls:
+        grid[height - y - 1][x] = 'X'
+
+    for (x, y) in blocks:
+        grid[height - y - 1][x] = '@'
+
+    (x, y) = paddle
+    grid[height - y - 1][x] = '-'
+
+    (x, y) = ball
+    grid[height - y - 1][x] = 'o'
+
+    img = '\n'.join(reversed([''.join(row) for row in grid]))
+    return img
+
+def play_game(program):
+    program = program[:]
+    program[0] = 2
+    intputer = Intputer(program)
+
     output = []
     intputer.run([], output)
     walls = set()
@@ -36,34 +60,6 @@ def get_initial_game_data(intputer):
         else:
             raise Exception(f'unknown c={c}')
 
-    return walls, blocks, paddle, ball, score, max_x, max_y
-
-def dump_board(walls, blocks, paddle, ball, width, height):
-    grid = []
-    for i in range(height):
-        grid.append([' '] * width)
-
-    for (x, y) in walls:
-        grid[height - y - 1][x] = 'X'
-
-    for (x, y) in blocks:
-        grid[height - y - 1][x] = '@'
-
-    (x, y) = paddle
-    grid[height - y - 1][x] = '-'
-
-    (x, y) = ball
-    grid[height - y - 1][x] = 'o'
-
-    img = '\n'.join(reversed([''.join(row) for row in grid]))
-    return img
-
-def run_arcade(program):
-    program = program[:]
-    program[0] = 2
-    intputer = Intputer(program)
-
-    walls, blocks, paddle, ball, score, max_x, max_y = get_initial_game_data(intputer)
     width = max_x + 1
     height = max_y + 1
     img = dump_board(walls, blocks, paddle, ball, width, height)
@@ -105,7 +101,7 @@ def run_arcade(program):
 def compute_day13(input):
     program = parse_intcode(input)
     part1 = count_blocks(program)
-    part2 = run_arcade(program)
+    part2 = play_game(program)
     return part1, part2
 
 if __name__ == '__main__':
