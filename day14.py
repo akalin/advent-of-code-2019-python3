@@ -22,10 +22,10 @@ def parse_reactions(input):
         reactions[chem] = (m, r_map)
     return reactions
 
-def reduce_chem(reactions, start, need=None):
+def reduce_chem(reactions, start, nstart, need=None):
     if not need:
         need = collections.defaultdict(int)
-    need[start] = 1
+    need[start] = nstart
     while True:
         need_chems = [chem for chem, q in need.items() if chem != 'ORE' and q > 0]
         if len(need_chems) == 0:
@@ -55,58 +55,38 @@ def zero_point(need):
 
 def compute_day14(input):
     reactions = parse_reactions(input)
-    need = reduce_chem(reactions, 'FUEL')
+    need = reduce_chem(reactions, 'FUEL', 1)
     part1 = need['ORE']
 
-    fuel = 0
-    need = collections.defaultdict(int)
-    while True:
-        need = reduce_chem(reactions, 'FUEL', need)
-        fuel += 1
-        if zero_point(need):
-            break
-    x = need['ORE']
     total_ore = 1000000000000
-    rat = total_ore // x
-    total_fuel = rat * fuel
-    rem_ore = total_ore - rat * x
-    print('rem_ore', rem_ore)
-
-    rem_fuel = 0
-    need = None
+    fuel = 1
     while True:
-        next_need = reduce_chem(reactions, 'FUEL', need)
-        print('what', next_need['ORE'])
-        if next_need['ORE'] > rem_ore:
+        need = reduce_chem(reactions, 'FUEL', fuel)
+        if need['ORE'] > total_ore:
+            fuel //= 2
             break
-        rem_fuel += 1
-        need = next_need
+        fuel *= 2
 
-    print('rem_fuel', rem_fuel)
-    total_fuel += rem_fuel
-    return part1, total_fuel
+    print(fuel)
+
+    while True:
+        need = reduce_chem(reactions, 'FUEL', fuel)
+        if need['ORE'] > total_ore:
+            fuel -= 100
+            break
+        fuel += 100
+
+    while True:
+        need = reduce_chem(reactions, 'FUEL', fuel)
+        if need['ORE'] > total_ore:
+            fuel -= 1
+            break
+        fuel += 1
+
+    return part1, fuel
 
 if __name__ == '__main__':
     with open('day14.input', 'r') as input_file:
-        input = '''
-171 ORE => 8 CNZTR
-7 ZLQW, 3 BMBT, 9 XCVML, 26 XMNCP, 1 WPTQ, 2 MZWV, 1 RJRHP => 4 PLWSL
-114 ORE => 4 BHXH
-14 VRPVC => 6 BMBT
-6 BHXH, 18 KTJDG, 12 WPTQ, 7 PLWSL, 31 FHTLT, 37 ZDVW => 1 FUEL
-6 WPTQ, 2 BMBT, 8 ZLQW, 18 KTJDG, 1 XMNCP, 6 MZWV, 1 RJRHP => 6 FHTLT
-15 XDBXC, 2 LTCX, 1 VRPVC => 6 ZLQW
-13 WPTQ, 10 LTCX, 3 RJRHP, 14 XMNCP, 2 MZWV, 1 ZLQW => 1 ZDVW
-5 BMBT => 4 WPTQ
-189 ORE => 9 KTJDG
-1 MZWV, 17 XDBXC, 3 XCVML => 2 XMNCP
-12 VRPVC, 27 CNZTR => 2 XDBXC
-15 KTJDG, 12 BHXH => 5 XCVML
-3 BHXH, 2 VRPVC => 7 MZWV
-121 ORE => 7 VRPVC
-7 XCVML => 6 RJRHP
-5 BHXH, 4 VRPVC => 5 LTCX
-'''
-#        input = input_file.read()
+        input = input_file.read()
         p1, p2 = compute_day14(input)
         print(f'part 1: {p1}, part 2: {p2}')
