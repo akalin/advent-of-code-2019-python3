@@ -1,16 +1,10 @@
 from intcode import *
+from more_itertools import sliced
 
 def get_next_paint(intputer, next_input):
     output = []
     intputer.run(next_input, output)
-
-    paint = {}
-    for i in range(0, len(output), 3):
-        x = output[i]
-        y = output[i+1]
-        c = output[i+2]
-        paint[(x, y)] = c
-    return paint
+    return {(x, y): c for x, y, c in sliced(output, 3)}
 
 def update_game_data(paint, walls, blocks, paddle, ball, score):
     next_walls = walls.copy()
