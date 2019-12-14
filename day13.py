@@ -12,18 +12,18 @@ def dump_board(walls, blocks, paddle, ball, width, height):
         grid.append([' '] * width)
 
     for (x, y) in walls:
-        grid[height - y - 1][x] = 'X'
+        grid[y][x] = 'X'
 
     for (x, y) in blocks:
-        grid[height - y - 1][x] = '@'
+        grid[y][x] = '@'
 
     (x, y) = paddle
-    grid[height - y - 1][x] = '-'
+    grid[y][x] = '-'
 
     (x, y) = ball
-    grid[height - y - 1][x] = 'o'
+    grid[y][x] = 'o'
 
-    img = '\n'.join(reversed([''.join(row) for row in grid]))
+    img = '\n'.join([''.join(row) for row in grid])
     return img
 
 def play_game(program):
