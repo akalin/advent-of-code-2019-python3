@@ -1,6 +1,6 @@
 import unittest
 
-from day14 import parse_reactions, compute_ore_for_fuel
+from day14 import parse_reactions, compute_ore_for_fuel, compute_fuel_for_ore
 
 class TestDay14(unittest.TestCase):
     test_cases = [
@@ -31,7 +31,7 @@ class TestDay14(unittest.TestCase):
         7 DCFZ, 7 PSHF => 2 XJWVT
         165 ORE => 2 GPVTF
         3 DCFZ, 7 NZVS, 5 HKGWZ, 10 PSHF => 8 KHKGT
-        ''', 13312, None),
+        ''', 13312, 82892753),
         ('''
         2 VPVL, 7 FWMGM, 2 CXFTF, 11 MNCFX => 1 STKFG
         17 NVRVD, 3 JNWZP => 8 VPVL
@@ -45,7 +45,7 @@ class TestDay14(unittest.TestCase):
         1 NVRVD => 8 CXFTF
         1 VJHF, 6 MNCFX => 4 RFSQX
         176 ORE => 6 VJHF
-        ''', 180697, None),
+        ''', 180697, 5586022),
         ('''
         171 ORE => 8 CNZTR
         7 ZLQW, 3 BMBT, 9 XCVML, 26 XMNCP, 1 WPTQ, 2 MZWV, 1 RJRHP => 4 PLWSL
@@ -64,7 +64,7 @@ class TestDay14(unittest.TestCase):
         121 ORE => 7 VRPVC
         7 XCVML => 6 RJRHP
         5 BHXH, 4 VRPVC => 5 LTCX
-        ''', 2210736, None),
+        ''', 2210736, 460664),
     ]
 
     def test_part1(self):
@@ -72,6 +72,15 @@ class TestDay14(unittest.TestCase):
             reactions = parse_reactions(input)
             ore = compute_ore_for_fuel(reactions, 1)
             self.assertEqual(ore, expected_ore)
+
+    def test_part2(self):
+        ore_q = 1000000000000
+        for input, _, expected_fuel in self.test_cases:
+            if not expected_fuel:
+                continue
+            reactions = parse_reactions(input)
+            fuel = compute_fuel_for_ore(reactions, ore_q)
+            self.assertEqual(fuel, expected_fuel)
 
 if __name__ == '__main__':
     unittest.main()

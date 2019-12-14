@@ -39,36 +39,37 @@ def compute_ore_for_fuel(reactions, fuel_q):
 #        print(need)
     return need['ORE']
 
-def compute_day14(input):
-    reactions = parse_reactions(input)
-    part1 = compute_ore_for_fuel(reactions, 1)
-
-    total_ore = 1000000000000
+def compute_fuel_for_ore(reactions, ore_q):
     fuel = 1
     while True:
         ore_for_fuel = compute_ore_for_fuel(reactions, fuel)
-        if ore_for_fuel > total_ore:
+        if ore_for_fuel > ore_q:
             fuel //= 2
             break
         fuel *= 2
 
-    print(fuel)
-
     while True:
         ore_for_fuel = compute_ore_for_fuel(reactions, fuel)
-        if ore_for_fuel > total_ore:
+        if ore_for_fuel > ore_q:
             fuel -= 100
             break
         fuel += 100
 
     while True:
         ore_for_fuel = compute_ore_for_fuel(reactions, fuel)
-        if ore_for_fuel > total_ore:
+        if ore_for_fuel > ore_q:
             fuel -= 1
             break
         fuel += 1
 
-    return part1, fuel
+    return fuel
+
+def compute_day14(input):
+    reactions = parse_reactions(input)
+    part1 = compute_ore_for_fuel(reactions, 1)
+
+    part2 = compute_fuel_for_ore(reactions, 1000000000000)
+    return part1, part2
 
 if __name__ == '__main__':
     with open('day14.input', 'r') as input_file:
