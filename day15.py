@@ -88,9 +88,6 @@ def compute_day15(input):
     def visit_fn(n, parent):
         oxygen_distances[n] = oxygen_distances[parent] + 1
 
-    def get_neighbor_fn(n):
-        return get_neighbors(n, walls)
-
     do_bfs(oxygen, get_neighbor_fn, visit_fn)
     part2 = max(oxygen_distances.values())
 
