@@ -28,6 +28,8 @@ def get_possible_neighbors(p):
     return possible_neighbors
 
 def get_neighbors(p, walls, visited):
+    if p in walls:
+        return []
     possible_neighbors = get_possible_neighbors(p)
     neighbors = [n for n in possible_neighbors if (n not in walls) and (n not in visited)]
     return neighbors
@@ -88,64 +90,87 @@ def find_next_dest(walls, visited, pos):
         for n in neighbors:
             return n
 
+def find_path_to_origin(n, visited):
+    m = n
+    path = []
+    while m:
+        path.append(m)
+        m = visited[m]
+    return path
+
+def find_path(start, end, visited):
+    start_to_x = find_path_to_origin(start, visited)
+    end_to_x = find_path_to_origin(end, visited)
+    while len(start_to_x) > 1 and len(end_to_x) > 1 and start_to_x[-1] == end_to_x[-1] and start_to_x[-2] == end_to_x[-2]:
+        start_to_x.pop()
+        end_to_x.pop()
+    x_to_end = list(reversed(end_to_x))
+    return start_to_x + x_to_end[1:]
+
 def run_robot(program):
     intputer = Intputer(program)
+
     walls = set()
-    visited = set()
+    oxygen = None
+
     pos = Vec2(0, 0)
-    visited.add(pos)
-    dir = Direction('U')
-    next_dest = find_next_dest(walls, visited, pos)
-    path = find_shortest_path(walls, pos, next_dest)
-    path.popleft()
-    print('initial path', pos, path)
-    found = None
-    while True:
-        next_dest = path.popleft()
-        diff = next_dest - pos
+
+    def visit_fn(n, parent, visited):
+        nonlocal pos
+        nonlocal oxygen
+        pos_to_parent = find_path(pos, parent, visited)
+        print('path', pos, parent, pos_to_parent, n)
+        for m in pos_to_parent[1:]:
+            diff = m - pos
+            dir = Direction(vec_to_dir[diff])
+#            print(f'{pos} to {m} in dir {dir}')
+            input = dir_to_input[dir.str()]
+            output = []
+            intputer.run([input], output)
+            status = output[0]
+            if status != 1 and status != 2:
+                raise Exception(f'unexpected status {status}')
+            pos = m
+
+        diff = n - pos
         dir = Direction(vec_to_dir[diff])
         input = dir_to_input[dir.str()]
-#        print(f'{pos} {next_dest}, {path}, walls={walls}, visted={visited}')
-
         output = []
         intputer.run([input], output)
         status = output[0]
         if status == 0:
-            walls.add(pos + dir.vec())
+            walls.add(n)
             path = []
         elif status == 1:
-            print(f'pos was {pos} dir is {dir}')
-            pos += dir.vec()
-            print(f'adding {pos}')
-            visited.add(pos)
+            pos = n
         elif status == 2:
-            pos += dir.vec()
-            found = pos
-            print(f'adding {pos} (found)')
-            visited.add(pos)
+            pos = n
+            oxygen = pos
         else:
             raise Exception(f'unknown status {status}')
 
-        print(f'status={status}')
+        print(f'status of {n} is {status}')
 
         canvas = ASCIICanvas()
-        canvas.put_set(walls, 'X')
-        canvas.put_set(visited, '.')
+#        canvas.put_set(visited, '.')
+        canvas.put_set(walls, '@')
         canvas.put((0, 0), 'o')
         canvas.put(pos, '*')
+        if oxygen:
+            canvas.put(oxygen, 'O')
         print(canvas.render(flip_y=True))
 
-        if len(path) == 0:
-            print('finding next dest')
-            next_dest = find_next_dest(walls, visited, pos)
-            if next_dest is None:
-                break
-            print(f'finding shortest_path {pos} {next_dest}')
-            path = find_shortest_path(walls, pos, next_dest)
-            path.popleft()
-            print('new path', pos, next_dest, path)
+        return parent, True
 
-    shortest_path = find_shortest_path(walls, Vec2(0, 0), found)
+    def get_neighbor_fn(n):
+        return get_neighbors(n, walls, set())
+
+    parents = do_dfs(pos, None, get_neighbor_fn, visit_fn)
+
+    if oxygen is None:
+        raise Exception('oxygen not found')
+
+    shortest_path = find_shortest_path(walls, Vec2(0, 0), oxygen)
     print(f'shortest path {len(shortest_path) - 1}')
     part1 = len(shortest_path) - 1
 
@@ -155,7 +180,7 @@ def run_robot(program):
     def get_neighbor_fn(n):
         return get_neighbors(n, walls, set())
 
-    counts = do_dfs(found, 0, get_neighbor_fn, visit_fn)
+    counts = do_dfs(oxygen, 0, get_neighbor_fn, visit_fn)
     part2 = max(counts.values())
 
     return part1, part2
