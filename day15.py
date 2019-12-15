@@ -71,8 +71,9 @@ def compute_day15(input):
 
     walls = set()
     oxygen = None
+    origin = Vec2(0, 0)
 
-    pos = Vec2(0, 0)
+    pos = origin
 
     dir_to_input = {
         'U': 1,
@@ -103,7 +104,7 @@ def compute_day15(input):
     def show_map():
         canvas = ASCIICanvas()
         canvas.put_set(walls, '.')
-        canvas.put((0, 0), 'o')
+        canvas.put(origin, 'o')
         canvas.put(pos, '*')
         if oxygen:
             canvas.put(oxygen, 'O')
@@ -126,20 +127,21 @@ def compute_day15(input):
     def get_neighbor_fn(n):
         return get_neighbors(n, walls)
 
-    visited = do_dfs(pos, (None, 0), get_neighbor_fn, visit_fn)
+    visited = do_dfs(origin, (None, 0), get_neighbor_fn, visit_fn)
 
     show_map()
 
     if oxygen is None:
         raise Exception('oxygen not found')
 
-    _, part1 = visited[oxygen]
-
     def visit_fn(n, parent, visited):
         return visited[parent] + 1, True
 
     def get_neighbor_fn(n):
         return get_neighbors(n, walls)
+
+    counts = do_bfs(origin, 0, get_neighbor_fn, visit_fn)
+    part1 = counts[oxygen]
 
     counts = do_bfs(oxygen, 0, get_neighbor_fn, visit_fn)
     part2 = max(counts.values())
