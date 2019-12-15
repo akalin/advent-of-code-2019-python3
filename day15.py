@@ -23,19 +23,6 @@ def do_bfs(start, start_val, get_neighbor_fn, visit_fn):
             queue.append(m)
     return visited
 
-def do_dfs(start, start_val, get_neighbor_fn, visit_fn):
-    visited = {start: start_val}
-    stack = [start]
-    while stack:
-        n = stack.pop()
-        for m in get_neighbor_fn(n):
-            if m in visited:
-                continue
-            val = visit_fn(m, n, visited)
-            visited[m] = val
-            stack.append(m)
-    return visited
-
 def compute_day15(input):
     program = parse_intcode(input)
 
@@ -85,7 +72,7 @@ def compute_day15(input):
     def get_neighbor_fn(n):
         return get_neighbors(n, walls)
 
-    visited = do_dfs(origin, Intputer(program), get_neighbor_fn, visit_fn)
+    visited = do_bfs(origin, Intputer(program), get_neighbor_fn, visit_fn)
 
     show_map()
 
