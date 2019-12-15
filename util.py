@@ -3,6 +3,13 @@ from vec2 import *
 def manhattan_norm(v):
     return sum([abs(x) for x in v])
 
+def int_sgn(x):
+    if x < 0:
+        return -1
+    elif x > 0:
+        return +1
+    return 0
+
 _dir_to_vec = {
     'U': Vec2(0, 1),
     'D': Vec2(0, -1),

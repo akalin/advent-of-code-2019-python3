@@ -8,13 +8,6 @@ def parse_position(line):
     vals = t.split(', ')
     return Vec3([int(val.split('=')[1]) for val in vals])
 
-def int_sgn(x):
-    if x < 0:
-        return -1
-    elif x > 0:
-        return +1
-    return 0
-
 def vec3_sgn(v):
     return Vec3([int_sgn(x) for x in v])
 

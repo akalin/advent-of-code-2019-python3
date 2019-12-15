@@ -9,7 +9,7 @@ def count_blocks(program):
     return len([c for _, _, c in sliced(output, 3) if c == 2])
 
 def maybe_show_game(walls, blocks, paddle, ball, score):
-    show_game = True
+    show_game = False
     if not show_game:
         return
 
@@ -57,14 +57,7 @@ def play_game(program):
     maybe_show_game(walls, blocks, paddle, ball, score)
 
     while not intputer.halted:
-        next_move = 0
-        dx2 = ball[0] - paddle[0]
-        if dx2 > 0:
-            next_move = 1
-            paddle = (paddle[0] + 1, paddle[1])
-        elif dx2 < 0:
-            next_move = -1
-            paddle = (paddle[0] - 1, paddle[1])
+        next_move = int_sgn(ball[0] - paddle[0])
 
         output = []
         intputer.run([next_move], output)
