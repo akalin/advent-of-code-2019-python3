@@ -64,13 +64,11 @@ def compute_day15(input):
         if status == 0:
             walls.add(neighbor)
         elif status == 1:
-            pos = neighbor
+            pass
         elif status == 2:
-            pos = neighbor
-            oxygen = pos
+            oxygen = neighbor
         else:
             raise Exception(f'unknown status {status}')
-        return status
 
     def show_map(pos=None):
         canvas = ASCIICanvas()
@@ -84,16 +82,16 @@ def compute_day15(input):
         print(canvas.render(flip_y=True))
 
     def visit_fn(n, parent, visited):
-        intputer = visited[parent][1].copy()
+        intputer = visited[parent].copy()
         move_to(n, intputer, parent)
         show_map(n)
 
-        return (parent, intputer), True
+        return intputer, True
 
     def get_neighbor_fn(n):
         return get_neighbors(n, walls)
 
-    visited = do_dfs(origin, (None, Intputer(program)), get_neighbor_fn, visit_fn)
+    visited = do_dfs(origin, Intputer(program), get_neighbor_fn, visit_fn)
 
     show_map()
 
