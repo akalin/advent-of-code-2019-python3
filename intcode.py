@@ -2,7 +2,8 @@ import collections
 
 class Intputer(object):
     def __init__(self, program):
-        self.memory = collections.defaultdict(int, enumerate(program))
+        self.program = program[:]
+        self.memory = {}
         self.ip = 0
         self.rel_base = 0
         self.waiting_for_input = False
@@ -10,6 +11,7 @@ class Intputer(object):
 
     def copy(self):
         c = self.__class__([])
+        c.program = self.program
         c.memory = self.memory.copy()
         c.ip = self.ip
         c.rel_base = self.rel_base
@@ -34,7 +36,11 @@ class Intputer(object):
         def getmem(i):
             if i < 0:
                 raise Exception(f'getmem: Invalid address {i}')
-            return self.memory[i]
+            if i in self.memory:
+                return self.memory[i]
+            if i < len(self.program):
+                return self.program[i]
+            return 0
 
         def setmem(i, v):
             if i < 0:
