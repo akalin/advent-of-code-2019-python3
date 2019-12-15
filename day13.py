@@ -1,4 +1,5 @@
 from intcode import *
+from util import *
 from more_itertools import sliced
 import os
 
@@ -7,32 +8,28 @@ def count_blocks(program):
     Intputer(program).run([], output)
     return len([c for _, _, c in sliced(output, 3) if c == 2])
 
-def maybe_show_game(walls, blocks, paddle, ball, width, height):
+def maybe_show_game(walls, blocks, paddle, ball, score):
     show_game = False
     if not show_game:
         return
 
-    grid = []
-    for i in range(height):
-        grid.append([' '] * width)
+    canvas = ASCIICanvas()
 
     for (x, y) in walls:
-        grid[y][x] = 'X'
+        canvas.draw_pixel(x, y, 'X')
 
     for (x, y) in blocks:
-        grid[y][x] = '@'
+        canvas.draw_pixel(x, y, '@')
 
     (x, y) = paddle
-    grid[y][x] = '-'
+    canvas.draw_pixel(x, y, '-')
 
     (x, y) = ball
-    grid[y][x] = 'o'
-
-    img = '\n'.join([''.join(row) for row in grid])
+    canvas.draw_pixel(x, y, '-')
 
     os.system('clear')
     print(f'score = {score}, remaining={len(blocks)}')
-    print(img)
+    print(canvas.render())
 
 def play_game(program):
     program = program[:]
@@ -46,15 +43,11 @@ def play_game(program):
     paddle = None
     ball = None
     score = None
-    max_x = 0
-    max_y = 0
     for x, y, c in sliced(output, 3):
         if x == -1:
             score = c
             continue
 
-        max_x = max(max_x, x)
-        max_y = max(max_y, y)
         if c == 0:
             pass
         elif c == 1:
@@ -68,9 +61,7 @@ def play_game(program):
         else:
             raise Exception(f'unknown c={c}')
 
-    width = max_x + 1
-    height = max_y + 1
-    maybe_show_game(walls, blocks, paddle, ball, width, height)
+    maybe_show_game(walls, blocks, paddle, ball, score)
 
     while not intputer.halted:
         next_move = 0
@@ -96,7 +87,7 @@ def play_game(program):
             else:
                 raise Exception(f'unexpected c={c}')
 
-        maybe_show_game(walls, blocks, paddle, ball, width, height)
+        maybe_show_game(walls, blocks, paddle, ball, score)
 
     if blocks:
         raise(f'blocks unexpectedly non-empty: {blocks}')
