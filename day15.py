@@ -48,6 +48,7 @@ def compute_day15(input):
         print(canvas.render(flip_y=True))
 
     intputers = {origin: Intputer(program)}
+    origin_distances = {origin: 0}
 
     def visit_fn(n, parent):
         nonlocal oxygen
@@ -68,6 +69,7 @@ def compute_day15(input):
 
         if status != 0:
             intputers[n] = intputer
+            origin_distances[n] = origin_distances[parent] + 1
 
     def get_neighbor_fn(n):
         return get_neighbors(n, walls)
@@ -79,20 +81,18 @@ def compute_day15(input):
     if oxygen is None:
         raise Exception('oxygen not found')
 
-    counts = {origin: 0}
-    
+    part1 = origin_distances[oxygen]
+
+    oxygen_distances = {oxygen: 0}
+
     def visit_fn(n, parent):
-        counts[n] = counts[parent] + 1
+        oxygen_distances[n] = oxygen_distances[parent] + 1
 
     def get_neighbor_fn(n):
         return get_neighbors(n, walls)
 
-    do_bfs(origin, get_neighbor_fn, visit_fn)
-    part1 = counts[oxygen]
-
-    counts = {oxygen: 0}
     do_bfs(oxygen, get_neighbor_fn, visit_fn)
-    part2 = max(counts.values())
+    part2 = max(oxygen_distances.values())
 
     return part1, part2
 
