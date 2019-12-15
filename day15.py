@@ -11,28 +11,11 @@ dir_to_input = {
     'L': 3,
 }
 
-vec_to_dir = {
-    Vec2(0, 1): 'U',
-    Vec2(0, -1): 'D',
-    Vec2(-1, 0): 'L',
-    Vec2(1, 0): 'R',
-}
-
-def get_possible_neighbors(p):
-    up = Direction('U')
-    down = Direction('D')
-    left = Direction('L')
-    right = Direction('R')
-    dirs = [up, down, left, right]
-    possible_neighbors = [p + dir.vec() for dir in dirs]
-    return possible_neighbors
-
 def get_neighbors(p, walls):
     if p in walls:
         return []
-    possible_neighbors = get_possible_neighbors(p)
-    neighbors = [n for n in possible_neighbors if (n not in walls)]
-    return neighbors
+    possible_neighbors = [p + d.vec() for d in all_directions]
+    return [n for n in possible_neighbors if (n not in walls)]
 
 def do_bfs(start, start_val, get_neighbor_fn, visit_fn):
     visited = {start: start_val}
@@ -96,7 +79,7 @@ def run_robot(program):
 #        print('path', pos, parent, pos_to_parent, n)
         for m in pos_to_parent[1:]:
             diff = m - pos
-            dir = Direction(vec_to_dir[diff])
+            dir = Direction(diff)
 #            print(f'{pos} to {m} in dir {dir}')
             input = dir_to_input[dir.str()]
             output = []
@@ -107,7 +90,7 @@ def run_robot(program):
             pos = m
 
         diff = n - pos
-        dir = Direction(vec_to_dir[diff])
+        dir = Direction(diff)
         input = dir_to_input[dir.str()]
         output = []
         intputer.run([input], output)

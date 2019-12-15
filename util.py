@@ -17,6 +17,8 @@ _dir_to_vec = {
     'R': Vec2(1, 0),
 }
 
+_vec_to_dir = {v: d for d, v in _dir_to_vec.items()}
+
 _dir_to_left = {
     'U': 'L',
     'L': 'D',
@@ -24,17 +26,14 @@ _dir_to_left = {
     'R': 'U',
 }
 
-_dir_to_right = {
-    'U': 'R',
-    'R': 'D',
-    'D': 'L',
-    'L': 'U',
-}
+_dir_to_right = {v: d for d, v in _dir_to_left.items()}
 
 class Direction(object):
-    def __init__(self, direction):
-        _dir_to_vec[direction]
-        self._dir = direction
+    def __init__(self, arg):
+        if arg in _dir_to_vec:
+            self._dir = arg
+        else:
+            self._dir = _vec_to_dir[arg]
 
     def vec(self):
         return _dir_to_vec[self._dir]
@@ -50,6 +49,8 @@ class Direction(object):
 
     def __repr__(self):
         return f'Direction({self._dir})'
+
+all_directions = [Direction(d) for d in _dir_to_vec.keys()]
 
 class ASCIICanvas(object):
     def __init__(self, default_c = ' '):
