@@ -9,23 +9,15 @@ def count_blocks(program):
     return len([c for _, _, c in sliced(output, 3) if c == 2])
 
 def maybe_show_game(walls, blocks, paddle, ball, score):
-    show_game = False
+    show_game = True
     if not show_game:
         return
 
     canvas = ASCIICanvas()
-
-    for (x, y) in walls:
-        canvas.put(x, y, 'X')
-
-    for (x, y) in blocks:
-        canvas.put(x, y, '@')
-
-    (x, y) = paddle
-    canvas.put(x, y, '-')
-
-    (x, y) = ball
-    canvas.put(x, y, '-')
+    canvas.put_set(walls, 'X')
+    canvas.put_set(blocks, '@')
+    canvas.put(paddle, '-')
+    canvas.put(ball, 'o')
 
     os.system('clear')
     print(f'score = {score}, remaining={len(blocks)}')
@@ -48,16 +40,17 @@ def play_game(program):
             score = c
             continue
 
+        p = (x, y)
         if c == 0:
             pass
         elif c == 1:
-            walls.add((x, y))
+            walls.add(p)
         elif c == 2:
-            blocks.add((x, y))
+            blocks.add(p)
         elif c == 3:
-            paddle = (x, y)
+            paddle = p
         elif c == 4:
-            ball = (x, y)
+            ball = p
         else:
             raise Exception(f'unknown c={c}')
 
@@ -78,12 +71,15 @@ def play_game(program):
         for x, y, c in sliced(output, 3):
             if x == -1:
                 score = c
-            elif c == 0:
-                blocks.discard((x, y))
+                continue
+
+            p = (x, y)
+            if c == 0:
+                blocks.discard(p)
             elif c == 3:
-                paddle = (x, y)
+                paddle = p
             elif c == 4:
-                ball = (x, y)
+                ball = p
             else:
                 raise Exception(f'unexpected c={c}')
 

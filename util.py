@@ -57,6 +57,10 @@ class ASCIICanvas(object):
             raise TypeError(f'Expected (x, y, c) or ((x, y), c), got {args}')
         self._pixels[p] = c
 
+    def put_set(self, s, c):
+        for p in s:
+            self.put(p, c)
+
     def put_dict(self, d, c_map=None):
         for p, c in d.items():
             if c_map:
