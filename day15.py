@@ -25,22 +25,30 @@ def do_dfs(start, start_val, get_neighbor_fn, visit_fn):
                 return visited
     return visited
 
-def find_path_to_origin(n, visited):
+def find_path_to_origin(n, lower_bound, visited):
     m = n
     path = []
-    while m:
+    while m and visited[m][1] > lower_bound:
         path.append(m)
         m, _ = visited[m]
-    return path
+    return path, m
 
-def find_path(start, end, visited):
-    start_to_x = find_path_to_origin(start, visited)
-    end_to_x = find_path_to_origin(end, visited)
-    while len(start_to_x) > 1 and len(end_to_x) > 1 and start_to_x[-1] == end_to_x[-1] and start_to_x[-2] == end_to_x[-2]:
-        start_to_x.pop()
-        end_to_x.pop()
-    x_to_end = list(reversed(end_to_x))
-    return start_to_x + x_to_end[1:]
+def backtrack_to(start, end, visited):
+    max_common_level = min(visited[start][1], visited[end][1])
+
+    start_to_c, c = find_path_to_origin(start, max_common_level, visited)
+    end_to_d, d = find_path_to_origin(end, max_common_level, visited)
+
+    c_to_common = []
+    d_to_common = []
+
+    while c != d:
+        c_to_common.append(c)
+        d_to_common.append(d)
+        c, _ = visited[c]
+        d, _ = visited[d]
+
+    return start_to_c + c_to_common + [c] + list(reversed(end_to_d + d_to_common))
 
 def compute_day15(input):
     program = parse_intcode(input)
@@ -89,7 +97,7 @@ def compute_day15(input):
     def visit_fn(n, parent, visited):
         nonlocal pos
         nonlocal oxygen
-        pos_to_parent = find_path(pos, parent, visited)
+        pos_to_parent = backtrack_to(pos, parent, visited)
         for m in pos_to_parent[1:]:
             status = move_to(m)
             if status != 1 and status != 2:
