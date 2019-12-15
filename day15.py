@@ -42,7 +42,8 @@ def find_path(start, end, visited):
     x_to_end = list(reversed(end_to_x))
     return start_to_x + x_to_end[1:]
 
-def run_robot(program):
+def compute_day15(input):
+    program = parse_intcode(input)
     intputer = Intputer(program)
 
     walls = set()
@@ -120,10 +121,6 @@ def run_robot(program):
     part2 = max(counts.values())
 
     return part1, part2
-
-def compute_day15(input):
-    program = parse_intcode(input)
-    return run_robot(program)
 
 if __name__ == '__main__':
     with open('day15.input', 'r') as input_file:
