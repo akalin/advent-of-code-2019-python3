@@ -42,13 +42,10 @@ def do_dfs(start, start_val, get_neighbor_fn, visit_fn):
 
 def compute_day15(input):
     program = parse_intcode(input)
-    intputer = Intputer(program)
 
     walls = set()
     oxygen = None
     origin = Vec2(0, 0)
-
-    pos = origin
 
     dir_to_input = {
         'U': 1,
@@ -57,8 +54,7 @@ def compute_day15(input):
         'L': 3,
     }
 
-    def move_to(neighbor):
-        nonlocal pos
+    def move_to(neighbor, intputer, pos):
         nonlocal oxygen
         dir = Direction(neighbor - pos)
         input = dir_to_input[dir.str()]
@@ -80,33 +76,21 @@ def compute_day15(input):
         canvas = ASCIICanvas()
         canvas.put_set(walls, '.')
         canvas.put(origin, 'o')
-        canvas.put(pos, '*')
         if oxygen:
             canvas.put(oxygen, 'O')
         cls()
         print(canvas.render(flip_y=True))
 
-    intputers = {}
-
     def visit_fn(n, parent, visited):
-        nonlocal pos
-        nonlocal oxygen
-        nonlocal intputer
-        if parent == pos:
-            pass
-        elif has_direction(parent - pos):
-            move_to(parent)
-        else:
-            intputer = visited[parent][1].copy()
-            pos = parent
-        move_to(n)
+        intputer = visited[parent][1].copy()
+        move_to(n, intputer, parent)
 
         return (parent, intputer.copy()), True
 
     def get_neighbor_fn(n):
         return get_neighbors(n, walls)
 
-    visited = do_dfs(origin, (None, intputer.copy()), get_neighbor_fn, visit_fn)
+    visited = do_dfs(origin, (None, Intputer(program)), get_neighbor_fn, visit_fn)
 
     show_map()
 
