@@ -71,6 +71,7 @@ def run_robot(program):
     path = find_shortest_path(walls, pos, next_dest)
     path.popleft()
     print('initial path', pos, path)
+    found = None
     while True:
         next_dest = path.popleft()
         diff = next_dest - pos
@@ -90,6 +91,7 @@ def run_robot(program):
             print(f'adding {pos}')
             visited.add(pos)
         elif status == 2:
+            found = pos + dir.vec()
             break
         else:
             raise Exception(f'unknown status {status}')
@@ -111,7 +113,8 @@ def run_robot(program):
             path.popleft()
             print('new path', pos, next_dest, path)
 
-    return None
+    path = find_shortest_path(walls, Vec2(0, 0), found)
+    return len(path) - 1
 
 def compute_day15(input):
     program = parse_intcode(input)
