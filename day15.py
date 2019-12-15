@@ -4,12 +4,6 @@ from intcode import *
 from util import *
 from vec2 import *
 
-def get_neighbors(p, walls):
-    if p in walls:
-        return []
-    possible_neighbors = [p + d.vec() for d in all_directions]
-    return [n for n in possible_neighbors if (n not in walls)]
-
 def do_bfs(start, get_neighbor_fn, visit_fn):
     visited = set([start])
     queue = deque([start])
@@ -72,7 +66,10 @@ def compute_day15(input):
             origin_distances[n] = origin_distances[parent] + 1
 
     def get_neighbor_fn(n):
-        return get_neighbors(n, walls)
+        if n in walls:
+            return []
+        possible_neighbors = [n + d.vec() for d in all_directions]
+        return [m for m in possible_neighbors if (m not in walls)]
 
     do_bfs(origin, get_neighbor_fn, visit_fn)
 
