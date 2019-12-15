@@ -52,6 +52,18 @@ def find_shortest_path(walls, start, end):
             pred[n] = p
     raise Exception('unexpected end')
 
+def do_bfs(walls, start):
+    counts = {}
+    queue = deque([start])
+    counts[start] = 0
+    while queue:
+        p = queue.popleft()
+        neighbors = get_neighbors(p, walls, counts)
+        queue.extend(neighbors)
+        for n in neighbors:
+            counts[n] = counts[p] + 1
+    return max(counts.values())
+
 def find_next_dest(walls, visited, pos):
     candidates = visited
     candidates.add(pos)
@@ -91,8 +103,10 @@ def run_robot(program):
             print(f'adding {pos}')
             visited.add(pos)
         elif status == 2:
-            found = pos + dir.vec()
-            break
+            pos += dir.vec()
+            found = pos
+            print(f'adding {pos} (found)')
+            visited.add(pos)
         else:
             raise Exception(f'unknown status {status}')
 
@@ -108,18 +122,24 @@ def run_robot(program):
         if len(path) == 0:
             print('finding next dest')
             next_dest = find_next_dest(walls, visited, pos)
+            if next_dest is None:
+                break
             print(f'finding shortest_path {pos} {next_dest}')
             path = find_shortest_path(walls, pos, next_dest)
             path.popleft()
             print('new path', pos, next_dest, path)
 
-    path = find_shortest_path(walls, Vec2(0, 0), found)
-    return len(path) - 1
+    shortest_path = find_shortest_path(walls, Vec2(0, 0), found)
+    print(f'shortest path {len(shortest_path) - 1}')
+    part1 = len(shortest_path) - 1
+
+    part2 = do_bfs(walls, found) - 1
+
+    return part1, part2
 
 def compute_day15(input):
     program = parse_intcode(input)
-    part1 = run_robot(program)
-    return part1, None
+    return run_robot(program)
 
 if __name__ == '__main__':
     with open('day15.input', 'r') as input_file:
