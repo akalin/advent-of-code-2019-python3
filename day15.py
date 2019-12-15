@@ -27,11 +27,11 @@ def get_possible_neighbors(p):
     possible_neighbors = [p + dir.vec() for dir in dirs]
     return possible_neighbors
 
-def get_neighbors(p, walls, visited):
+def get_neighbors(p, walls):
     if p in walls:
         return []
     possible_neighbors = get_possible_neighbors(p)
-    neighbors = [n for n in possible_neighbors if (n not in walls) and (n not in visited)]
+    neighbors = [n for n in possible_neighbors if (n not in walls)]
     return neighbors
 
 def do_bfs(start, start_val, get_neighbor_fn, visit_fn):
@@ -69,7 +69,7 @@ def find_shortest_path(walls, start, end):
         return parent, n != end
 
     def get_neighbor_fn(n):
-        return get_neighbors(n, walls, set())
+        return get_neighbors(n, walls)
 
     parents = do_bfs(start, None, get_neighbor_fn, visit_fn)
 
@@ -81,14 +81,6 @@ def find_shortest_path(walls, start, end):
             break
         path.appendleft(n)
     return path
-
-def find_next_dest(walls, visited, pos):
-    candidates = visited
-    candidates.add(pos)
-    for c in candidates:
-        neighbors = get_neighbors(c, walls, visited)
-        for n in neighbors:
-            return n
 
 def find_path_to_origin(n, visited):
     m = n
@@ -163,7 +155,7 @@ def run_robot(program):
         return parent, True
 
     def get_neighbor_fn(n):
-        return get_neighbors(n, walls, set())
+        return get_neighbors(n, walls)
 
     parents = do_dfs(pos, None, get_neighbor_fn, visit_fn)
 
@@ -187,7 +179,7 @@ def run_robot(program):
         return visited[parent] + 1, True
 
     def get_neighbor_fn(n):
-        return get_neighbors(n, walls, set())
+        return get_neighbors(n, walls)
 
     counts = do_dfs(oxygen, 0, get_neighbor_fn, visit_fn)
     part2 = max(counts.values())
