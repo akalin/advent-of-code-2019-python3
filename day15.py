@@ -10,21 +10,6 @@ def get_neighbors(p, walls):
     possible_neighbors = [p + d.vec() for d in all_directions]
     return [n for n in possible_neighbors if (n not in walls)]
 
-def do_bfs(start, start_val, get_neighbor_fn, visit_fn):
-    visited = {start: start_val}
-    queue = deque([start])
-    while queue:
-        n = queue.popleft()
-        for m in get_neighbor_fn(n):
-            if m in visited:
-                continue
-            val, should_continue = visit_fn(m, n, visited)
-            visited[m] = val
-            queue.extend([m])
-            if not should_continue:
-                return visited
-    return visited
-
 def do_dfs(start, start_val, get_neighbor_fn, visit_fn):
     visited = {start: start_val}
     stack = [start]
