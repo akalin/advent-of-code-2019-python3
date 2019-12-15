@@ -33,19 +33,23 @@ def get_neighbors(p, walls, visited):
     return neighbors
 
 def find_shortest_path(walls, start, end):
-    path_to = {}
-    queue = deque([deque([start])])
+    pred = {}
+    queue = deque([start])
+    pred[start] = None
     while queue:
         p = queue.popleft()
-        p_end = p[-1]
-        if p_end == end:
-            return p
-        path_to[p_end] = p
-        neighbors = get_neighbors(p_end, walls, path_to)
+        if p == end:
+            path = deque([end])
+            while True:
+                p = pred[p]
+                if not p:
+                    break
+                path.appendleft(p)
+            return path
+        neighbors = get_neighbors(p, walls, pred)
+        queue.extend(neighbors)
         for n in neighbors:
-            n_path = p.copy()
-            n_path.extend([n])
-            queue.extend([n_path])
+            pred[n] = p
     raise Exception('unexpected end')
 
 def find_next_dest(walls, visited, pos):
