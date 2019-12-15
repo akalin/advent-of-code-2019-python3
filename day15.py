@@ -79,7 +79,7 @@ def compute_day15(input):
 
     def show_map():
         canvas = ASCIICanvas()
-        canvas.put_set(walls, '@')
+        canvas.put_set(walls, '.')
         canvas.put((0, 0), 'o')
         canvas.put(pos, '*')
         if oxygen:
