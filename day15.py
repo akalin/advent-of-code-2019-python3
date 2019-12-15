@@ -32,26 +32,6 @@ def get_neighbors(p, walls, visited):
     neighbors = [n for n in possible_neighbors if (n not in walls) and (n not in visited)]
     return neighbors
 
-def find_shortest_path(walls, start, end):
-    pred = {}
-    queue = deque([start])
-    pred[start] = None
-    while queue:
-        p = queue.popleft()
-        if p == end:
-            path = deque([end])
-            while True:
-                p = pred[p]
-                if not p:
-                    break
-                path.appendleft(p)
-            return path
-        neighbors = get_neighbors(p, walls, pred)
-        queue.extend(neighbors)
-        for n in neighbors:
-            pred[n] = p
-    raise Exception('unexpected end')
-
 def do_bfs(start, get_neighbor_fn, visit_fn):
     queue = deque([start])
     while queue:
@@ -59,7 +39,30 @@ def do_bfs(start, get_neighbor_fn, visit_fn):
         neighbors = get_neighbor_fn(n)
         queue.extend(neighbors)
         for m in neighbors:
-            visit_fn(m, n)
+            should_continue = visit_fn(m, n)
+            if not should_continue:
+                return
+
+def find_shortest_path(walls, start, end):
+    preds = {start: None}
+
+    def visit_fn(n, parent):
+        preds[n] = parent
+        return n != end
+
+    def get_neighbor_fn(n):
+        return get_neighbors(n, walls, preds)
+
+    do_bfs(start, get_neighbor_fn, visit_fn)
+
+    n = end
+    path = deque([end])
+    while True:
+        n = preds[n]
+        if not n:
+            break
+        path.appendleft(n)
+    return path
 
 def find_next_dest(walls, visited, pos):
     candidates = visited
@@ -134,6 +137,7 @@ def run_robot(program):
 
     def visit_fn(n, parent):
         counts[n] = counts[parent] + 1
+        return True
 
     def get_neighbor_fn(n):
         return get_neighbors(n, walls, counts)
