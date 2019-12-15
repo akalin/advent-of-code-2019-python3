@@ -72,18 +72,21 @@ def compute_day15(input):
             raise Exception(f'unknown status {status}')
         return status
 
-    def show_map():
+    def show_map(pos=None):
         canvas = ASCIICanvas()
         canvas.put_set(walls, '.')
         canvas.put(origin, 'o')
         if oxygen:
             canvas.put(oxygen, 'O')
+        if pos:
+            canvas.put(pos, '*')
         cls()
         print(canvas.render(flip_y=True))
 
     def visit_fn(n, parent, visited):
         intputer = visited[parent][1].copy()
         move_to(n, intputer, parent)
+        show_map(n)
 
         return (parent, intputer), True
 
