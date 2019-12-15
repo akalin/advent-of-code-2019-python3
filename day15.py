@@ -114,7 +114,6 @@ def run_robot(program):
         status = output[0]
         if status == 0:
             walls.add(n)
-            path = []
         elif status == 1:
             pos = n
         elif status == 2:
