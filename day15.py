@@ -85,7 +85,7 @@ def compute_day15(input):
         intputer = visited[parent][1].copy()
         move_to(n, intputer, parent)
 
-        return (parent, intputer.copy()), True
+        return (parent, intputer), True
 
     def get_neighbor_fn(n):
         return get_neighbors(n, walls)
