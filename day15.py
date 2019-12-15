@@ -50,22 +50,6 @@ def compute_day15(input):
         'L': 3,
     }
 
-    def move_to(neighbor, intputer, pos):
-        nonlocal oxygen
-        dir = Direction(neighbor - pos)
-        input = dir_to_input[dir.str()]
-        output = []
-        intputer.run([input], output)
-        status = output[0]
-        if status == 0:
-            walls.add(neighbor)
-        elif status == 1:
-            pass
-        elif status == 2:
-            oxygen = neighbor
-        else:
-            raise Exception(f'unknown status {status}')
-
     def show_map(pos=None):
         canvas = ASCIICanvas()
         canvas.put_set(walls, '.')
@@ -78,8 +62,22 @@ def compute_day15(input):
         print(canvas.render(flip_y=True))
 
     def visit_fn(n, parent, visited):
+        nonlocal oxygen
         intputer = visited[parent].copy()
-        move_to(n, intputer, parent)
+        dir = Direction(n - parent)
+        input = dir_to_input[dir.str()]
+        output = []
+        intputer.run([input], output)
+        status = output[0]
+        if status == 0:
+            walls.add(n)
+        elif status == 1:
+            pass
+        elif status == 2:
+            oxygen = n
+        else:
+            raise Exception(f'unknown status {status}')
+
         show_map(n)
 
         return intputer
