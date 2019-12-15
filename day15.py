@@ -1,102 +1,119 @@
+import collections
+import itertools
 from intcode import *
 from util import *
-from more_itertools import sliced
-import os
+from vec2 import *
 
-def count_blocks(program):
-    output = []
-    Intputer(program).run([], output)
-    return len([c for _, _, c in sliced(output, 3) if c == 2])
+dir_to_input = {
+    'U': 1,
+    'R': 4,
+    'D': 2,
+    'L': 3,
+}
 
-def maybe_show_game(walls, blocks, paddle, ball, score):
-    show_game = True
-    if not show_game:
-        return
+vec_to_dir = {
+    Vec2(0, 1): 'U',
+    Vec2(0, -1): 'D',
+    Vec2(-1, 0): 'L',
+    Vec2(1, 0): 'R',
+}
 
-    canvas = ASCIICanvas()
-    canvas.put_set(walls, 'X')
-    canvas.put_set(blocks, '@')
-    canvas.put(paddle, '-')
-    canvas.put(ball, 'o')
+def get_possible_neighbors(p):
+    up = Direction('U')
+    down = Direction('D')
+    left = Direction('L')
+    right = Direction('R')
+    dirs = [up, down, left, right]
+    possible_neighbors = [p + dir.vec() for dir in dirs]
+    return possible_neighbors
 
-    os.system('clear')
-    print(f'score = {score}, remaining={len(blocks)}')
-    print(canvas.render())
+def get_neighbors(p, walls, visited):
+    possible_neighbors = get_possible_neighbors(p)
+    neighbors = [n for n in possible_neighbors if (n not in walls) and (n not in visited)]
+    return neighbors
 
-def play_game(program):
-    program = program[:]
-    program[0] = 2
+def find_shortest_path(walls, start, end):
+    path_to = {}
+    queue = [[start]]
+    while queue:
+        p = queue.pop(0)
+        p_end = p[-1]
+        if p_end == end:
+            return p
+        path_to[p_end] = p
+        neighbors = get_neighbors(p_end, walls, path_to)
+        paths = [p + [n] for n in neighbors]
+        queue += paths
+    raise Exception('unexpected end')
+
+def find_next_dest(walls, visited, pos):
+    candidates = visited
+    candidates.add(pos)
+    for c in candidates:
+        neighbors = get_neighbors(c, walls, visited)
+        for n in neighbors:
+            return n
+
+def run_robot(program):
     intputer = Intputer(program)
-
-    output = []
-    intputer.run([], output)
     walls = set()
-    blocks = set()
-    paddle = None
-    ball = None
-    score = None
-    for x, y, c in sliced(output, 3):
-        if x == -1:
-            score = c
-            continue
-
-        p = (x, y)
-        if c == 0:
-            pass
-        elif c == 1:
-            walls.add(p)
-        elif c == 2:
-            blocks.add(p)
-        elif c == 3:
-            paddle = p
-        elif c == 4:
-            ball = p
-        else:
-            raise Exception(f'unknown c={c}')
-
-    maybe_show_game(walls, blocks, paddle, ball, score)
-
-    while not intputer.halted:
-        next_move = 0
-        dx2 = ball[0] - paddle[0]
-        if dx2 > 0:
-            next_move = 1
-            paddle = (paddle[0] + 1, paddle[1])
-        elif dx2 < 0:
-            next_move = -1
-            paddle = (paddle[0] - 1, paddle[1])
+    visited = set()
+    pos = Vec2(0, 0)
+    visited.add(pos)
+    dir = Direction('U')
+    next_dest = find_next_dest(walls, visited, pos)
+    path = find_shortest_path(walls, pos, next_dest)
+    path.pop(0)
+    print('initial path', pos, path)
+    while True:
+        next_dest = path.pop(0)
+        diff = next_dest - pos
+        dir = Direction(vec_to_dir[diff])
+        input = dir_to_input[dir.str()]
+#        print(f'{pos} {next_dest}, {path}, walls={walls}, visted={visited}')
 
         output = []
-        intputer.run([next_move], output)
-        for x, y, c in sliced(output, 3):
-            if x == -1:
-                score = c
-                continue
+        intputer.run([input], output)
+        status = output[0]
+        if status == 0:
+            walls.add(pos + dir.vec())
+            path = []
+        elif status == 1:
+            print(f'pos was {pos} dir is {dir}')
+            pos += dir.vec()
+            print(f'adding {pos}')
+            visited.add(pos)
+        elif status == 2:
+            break
+        else:
+            raise Exception(f'unknown status {status}')
 
-            p = (x, y)
-            if c == 0:
-                blocks.discard(p)
-            elif c == 3:
-                paddle = p
-            elif c == 4:
-                ball = p
-            else:
-                raise Exception(f'unexpected c={c}')
+        print(f'status={status}')
 
-        maybe_show_game(walls, blocks, paddle, ball, score)
+        canvas = ASCIICanvas()
+        canvas.put_set(walls, 'X')
+        canvas.put_set(visited, '.')
+        canvas.put((0, 0), 'o')
+        canvas.put(pos, '*')
+        print(canvas.render(flip_y=True))
 
-    if blocks:
-        raise(f'blocks unexpectedly non-empty: {blocks}')
-    return score
+        if len(path) == 0:
+            print('finding next dest')
+            next_dest = find_next_dest(walls, visited, pos)
+            print(f'finding shortest_path {pos} {next_dest}')
+            path = find_shortest_path(walls, pos, next_dest)
+            path.pop(0)
+            print('new path', pos, next_dest, path)
+
+    return None
 
 def compute_day15(input):
     program = parse_intcode(input)
-    part1 = count_blocks(program)
-    part2 = play_game(program)
-    return part1, part2
+    part1 = run_robot(program)
+    return part1, None
 
 if __name__ == '__main__':
     with open('day15.input', 'r') as input_file:
         input = input_file.read()
         part1, part2 = compute_day15(input)
-        print(f'part1: {part1}, part2: {part2}')
+        print(f'part1: {part1}, part2:\n{part2}')

@@ -45,8 +45,11 @@ class Direction(object):
     def turn_right(self):
         return self.__class__(_dir_to_right[self._dir])
 
+    def str(self):
+        return self._dir
+
     def __repr__(self):
-        return f'Direction{{self._dir}}'
+        return f'Direction({self._dir})'
 
 class ASCIICanvas(object):
     def __init__(self, default_c = ' '):
