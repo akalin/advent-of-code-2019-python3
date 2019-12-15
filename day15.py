@@ -32,33 +32,34 @@ def get_neighbors(p, walls, visited):
     neighbors = [n for n in possible_neighbors if (n not in walls) and (n not in visited)]
     return neighbors
 
-def do_bfs(start, get_neighbor_fn, visit_fn):
+def do_bfs(start, start_val, get_neighbor_fn, visit_fn):
+    visited = {start: start_val}
     queue = deque([start])
     while queue:
         n = queue.popleft()
-        neighbors = get_neighbor_fn(n)
-        queue.extend(neighbors)
-        for m in neighbors:
-            should_continue = visit_fn(m, n)
+        for m in get_neighbor_fn(n):
+            if m in visited:
+                continue
+            val, should_continue = visit_fn(m, n, visited[n])
+            visited[m] = val
+            queue.extend([m])
             if not should_continue:
-                return
+                return visited
+    return visited
 
 def find_shortest_path(walls, start, end):
-    preds = {start: None}
-
-    def visit_fn(n, parent):
-        preds[n] = parent
-        return n != end
+    def visit_fn(n, parent, _):
+        return parent, n != end
 
     def get_neighbor_fn(n):
-        return get_neighbors(n, walls, preds)
+        return get_neighbors(n, walls, set())
 
-    do_bfs(start, get_neighbor_fn, visit_fn)
+    parents = do_bfs(start, None, get_neighbor_fn, visit_fn)
 
     n = end
     path = deque([end])
     while True:
-        n = preds[n]
+        n = parents[n]
         if not n:
             break
         path.appendleft(n)
@@ -133,17 +134,13 @@ def run_robot(program):
     print(f'shortest path {len(shortest_path) - 1}')
     part1 = len(shortest_path) - 1
 
-    counts = {found: 0}
-
-    def visit_fn(n, parent):
-        counts[n] = counts[parent] + 1
-        return True
+    def visit_fn(n, parent, parent_val):
+        return parent_val + 1, True
 
     def get_neighbor_fn(n):
-        return get_neighbors(n, walls, counts)
+        return get_neighbors(n, walls, set())
 
-    do_bfs(found, get_neighbor_fn, visit_fn)
-
+    counts = do_bfs(found, 0, get_neighbor_fn, visit_fn)
     part2 = max(counts.values())
 
     return part1, part2
