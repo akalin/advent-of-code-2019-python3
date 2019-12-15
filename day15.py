@@ -25,12 +25,12 @@ def do_dfs(start, start_val, get_neighbor_fn, visit_fn):
                 return visited
     return visited
 
-def find_path_to_origin(n, parents):
+def find_path_to_origin(n, visited):
     m = n
     path = []
     while m:
         path.append(m)
-        m = parents[m]
+        m, _ = visited[m]
     return path
 
 def find_path(start, end, visited):
@@ -95,20 +95,20 @@ def run_robot(program):
                 raise Exception(f'unexpected status {status}')
         move_to(n)
 
-        return parent, True
+        _, parent_count = visited[parent]
+        return (parent, parent_count + 1), True
 
     def get_neighbor_fn(n):
         return get_neighbors(n, walls)
 
-    parents = do_dfs(pos, None, get_neighbor_fn, visit_fn)
+    visited = do_dfs(pos, (None, 0), get_neighbor_fn, visit_fn)
 
     show_map()
 
     if oxygen is None:
         raise Exception('oxygen not found')
 
-    shortest_path = find_path_to_origin(oxygen, parents)
-    part1 = len(shortest_path) - 1
+    _, part1 = visited[oxygen]
 
     def visit_fn(n, parent, visited):
         return visited[parent] + 1, True
