@@ -69,10 +69,18 @@ class ASCIICanvas(object):
                 self.put(p, c)
 
     def render(self, flip_y=False):
-        min_x = min([x for x, y in self._pixels.keys()])
-        max_x = max([x for x, y in self._pixels.keys()])
-        min_y = min([y for x, y in self._pixels.keys()])
-        max_y = max([y for x, y in self._pixels.keys()])
+        if len(self._pixels) == 0:
+            return ''
+
+        it = iter(self._pixels.keys())
+        first = next(it)
+        min_x, min_y = first
+        max_x, max_y = first
+        for x, y in it:
+            min_x = min(min_x, x)
+            min_y = min(min_y, y)
+            max_x = max(max_x, x)
+            max_y = max(max_y, y)
         grid = []
         for i in range(max_y - min_y + 1):
             grid.append([self._default_c] * (max_x - min_x + 1))
