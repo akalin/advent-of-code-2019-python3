@@ -48,10 +48,12 @@ def compute_day15(input):
         print(canvas.render(flip_y=True))
 
     intputers = {origin: Intputer(program)}
+    copies = collections.defaultdict(int)
 
     def visit_fn(n, parent):
         nonlocal oxygen
         intputer = intputers[parent].copy()
+        copies[parent] += 1
         dir = Direction(n - parent)
         input = dir_to_input[dir.str()]
         output = []
@@ -66,8 +68,9 @@ def compute_day15(input):
         else:
             raise Exception(f'unknown status {status}')
 
-        show_map(n)
-        intputers[n] = intputer
+#        show_map(n)
+        if status != 0:
+            intputers[n] = intputer
 
     def get_neighbor_fn(n):
         return get_neighbors(n, walls)
@@ -75,6 +78,8 @@ def compute_day15(input):
     do_bfs(origin, get_neighbor_fn, visit_fn)
 
     show_map()
+    print(sum([c for c in copies.values() if c == 1]))
+    print(sum([c for c in copies.values() if c != 1]))
 
     if oxygen is None:
         raise Exception('oxygen not found')
