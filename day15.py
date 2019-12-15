@@ -4,13 +4,6 @@ from intcode import *
 from util import *
 from vec2 import *
 
-dir_to_input = {
-    'U': 1,
-    'R': 4,
-    'D': 2,
-    'L': 3,
-}
-
 def get_neighbors(p, walls):
     if p in walls:
         return []
@@ -72,49 +65,50 @@ def run_robot(program):
 
     pos = Vec2(0, 0)
 
-    def visit_fn(n, parent, visited):
+    dir_to_input = {
+        'U': 1,
+        'R': 4,
+        'D': 2,
+        'L': 3,
+    }
+
+    def move_to(neighbor):
         nonlocal pos
         nonlocal oxygen
-        pos_to_parent = find_path(pos, parent, visited)
-#        print('path', pos, parent, pos_to_parent, n)
-        for m in pos_to_parent[1:]:
-            diff = m - pos
-            dir = Direction(diff)
-#            print(f'{pos} to {m} in dir {dir}')
-            input = dir_to_input[dir.str()]
-            output = []
-            intputer.run([input], output)
-            status = output[0]
-            if status != 1 and status != 2:
-                raise Exception(f'unexpected status {status}')
-            pos = m
-
-        diff = n - pos
-        dir = Direction(diff)
+        dir = Direction(neighbor - pos)
         input = dir_to_input[dir.str()]
         output = []
         intputer.run([input], output)
         status = output[0]
         if status == 0:
-            walls.add(n)
+            walls.add(neighbor)
         elif status == 1:
-            pos = n
+            pos = neighbor
         elif status == 2:
-            pos = n
+            pos = neighbor
             oxygen = pos
         else:
             raise Exception(f'unknown status {status}')
+        return status
 
-#        print(f'status of {n} is {status}')
-
+    def show_map():
         canvas = ASCIICanvas()
-#        canvas.put_set(visited, '.')
         canvas.put_set(walls, '@')
         canvas.put((0, 0), 'o')
         canvas.put(pos, '*')
         if oxygen:
             canvas.put(oxygen, 'O')
-#        print(canvas.render(flip_y=True))
+        print(canvas.render(flip_y=True))
+
+    def visit_fn(n, parent, visited):
+        nonlocal pos
+        nonlocal oxygen
+        pos_to_parent = find_path(pos, parent, visited)
+        for m in pos_to_parent[1:]:
+            status = move_to(m)
+            if status != 1 and status != 2:
+                raise Exception(f'unexpected status {status}')
+        move_to(n)
 
         return parent, True
 
@@ -123,20 +117,12 @@ def run_robot(program):
 
     parents = do_dfs(pos, None, get_neighbor_fn, visit_fn)
 
-    canvas = ASCIICanvas()
-#    canvas.put_set(visited, '.')
-    canvas.put_set(walls, '@')
-    canvas.put((0, 0), 'o')
-    canvas.put(pos, '*')
-    if oxygen:
-        canvas.put(oxygen, 'O')
-    print(canvas.render(flip_y=True))
+    show_map()
 
     if oxygen is None:
         raise Exception('oxygen not found')
 
     shortest_path = find_path_to_origin(oxygen, parents)
-    print(f'shortest path {len(shortest_path) - 1}')
     part1 = len(shortest_path) - 1
 
     def visit_fn(n, parent, visited):
