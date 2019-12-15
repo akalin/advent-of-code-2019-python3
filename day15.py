@@ -119,7 +119,7 @@ def run_robot(program):
         nonlocal pos
         nonlocal oxygen
         pos_to_parent = find_path(pos, parent, visited)
-        print('path', pos, parent, pos_to_parent, n)
+#        print('path', pos, parent, pos_to_parent, n)
         for m in pos_to_parent[1:]:
             diff = m - pos
             dir = Direction(vec_to_dir[diff])
@@ -149,7 +149,7 @@ def run_robot(program):
         else:
             raise Exception(f'unknown status {status}')
 
-        print(f'status of {n} is {status}')
+#        print(f'status of {n} is {status}')
 
         canvas = ASCIICanvas()
 #        canvas.put_set(visited, '.')
@@ -158,7 +158,7 @@ def run_robot(program):
         canvas.put(pos, '*')
         if oxygen:
             canvas.put(oxygen, 'O')
-        print(canvas.render(flip_y=True))
+#        print(canvas.render(flip_y=True))
 
         return parent, True
 
@@ -166,6 +166,15 @@ def run_robot(program):
         return get_neighbors(n, walls, set())
 
     parents = do_dfs(pos, None, get_neighbor_fn, visit_fn)
+
+    canvas = ASCIICanvas()
+#    canvas.put_set(visited, '.')
+    canvas.put_set(walls, '@')
+    canvas.put((0, 0), 'o')
+    canvas.put(pos, '*')
+    if oxygen:
+        canvas.put(oxygen, 'O')
+    print(canvas.render(flip_y=True))
 
     if oxygen is None:
         raise Exception('oxygen not found')
