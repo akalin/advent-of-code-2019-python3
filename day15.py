@@ -10,18 +10,17 @@ def get_neighbors(p, walls):
     possible_neighbors = [p + d.vec() for d in all_directions]
     return [n for n in possible_neighbors if (n not in walls)]
 
-def do_bfs(start, start_val, get_neighbor_fn, visit_fn):
-    visited = {start: start_val}
+def do_bfs(start, get_neighbor_fn, visit_fn):
+    visited = set([start])
     queue = deque([start])
     while queue:
         n = queue.popleft()
         for m in get_neighbor_fn(n):
             if m in visited:
                 continue
-            val = visit_fn(m, n, visited)
-            visited[m] = val
+            visit_fn(m, n)
+            visited.add(m)
             queue.append(m)
-    return visited
 
 def compute_day15(input):
     program = parse_intcode(input)
@@ -48,9 +47,11 @@ def compute_day15(input):
         cls()
         print(canvas.render(flip_y=True))
 
-    def visit_fn(n, parent, visited):
+    intputers = {origin: Intputer(program)}
+
+    def visit_fn(n, parent):
         nonlocal oxygen
-        intputer = visited[parent].copy()
+        intputer = intputers[parent].copy()
         dir = Direction(n - parent)
         input = dir_to_input[dir.str()]
         output = []
@@ -66,29 +67,31 @@ def compute_day15(input):
             raise Exception(f'unknown status {status}')
 
         show_map(n)
-
-        return intputer
+        intputers[n] = intputer
 
     def get_neighbor_fn(n):
         return get_neighbors(n, walls)
 
-    visited = do_bfs(origin, Intputer(program), get_neighbor_fn, visit_fn)
+    do_bfs(origin, get_neighbor_fn, visit_fn)
 
     show_map()
 
     if oxygen is None:
         raise Exception('oxygen not found')
 
-    def visit_fn(n, parent, visited):
-        return visited[parent] + 1
+    counts = {origin: 0}
+    
+    def visit_fn(n, parent):
+        counts[n] = counts[parent] + 1
 
     def get_neighbor_fn(n):
         return get_neighbors(n, walls)
 
-    counts = do_bfs(origin, 0, get_neighbor_fn, visit_fn)
+    do_bfs(origin, get_neighbor_fn, visit_fn)
     part1 = counts[oxygen]
 
-    counts = do_bfs(oxygen, 0, get_neighbor_fn, visit_fn)
+    counts = {oxygen: 0}
+    do_bfs(oxygen, get_neighbor_fn, visit_fn)
     part2 = max(counts.values())
 
     return part1, part2
