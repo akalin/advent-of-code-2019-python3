@@ -52,17 +52,14 @@ def find_shortest_path(walls, start, end):
             pred[n] = p
     raise Exception('unexpected end')
 
-def do_bfs(walls, start):
-    counts = {}
+def do_bfs(start, get_neighbor_fn, visit_fn):
     queue = deque([start])
-    counts[start] = 0
     while queue:
-        p = queue.popleft()
-        neighbors = get_neighbors(p, walls, counts)
+        n = queue.popleft()
+        neighbors = get_neighbor_fn(n)
         queue.extend(neighbors)
-        for n in neighbors:
-            counts[n] = counts[p] + 1
-    return max(counts.values())
+        for m in neighbors:
+            visit_fn(m, n)
 
 def find_next_dest(walls, visited, pos):
     candidates = visited
@@ -133,7 +130,17 @@ def run_robot(program):
     print(f'shortest path {len(shortest_path) - 1}')
     part1 = len(shortest_path) - 1
 
-    part2 = do_bfs(walls, found) - 1
+    counts = {found: 0}
+
+    def visit_fn(n, parent):
+        counts[n] = counts[parent] + 1
+
+    def get_neighbor_fn(n):
+        return get_neighbors(n, walls, counts)
+
+    do_bfs(found, get_neighbor_fn, visit_fn)
+
+    part2 = max(counts.values())
 
     return part1, part2
 
@@ -145,4 +152,4 @@ if __name__ == '__main__':
     with open('day15.input', 'r') as input_file:
         input = input_file.read()
         part1, part2 = compute_day15(input)
-        print(f'part1: {part1}, part2:\n{part2}')
+        print(f'part1: {part1}, part2: {part2}')
