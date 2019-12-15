@@ -64,30 +64,12 @@ def do_dfs(start, start_val, get_neighbor_fn, visit_fn):
                 return visited
     return visited
 
-def find_shortest_path(walls, start, end):
-    def visit_fn(n, parent, _):
-        return parent, n != end
-
-    def get_neighbor_fn(n):
-        return get_neighbors(n, walls)
-
-    parents = do_bfs(start, None, get_neighbor_fn, visit_fn)
-
-    n = end
-    path = deque([end])
-    while True:
-        n = parents[n]
-        if not n:
-            break
-        path.appendleft(n)
-    return path
-
-def find_path_to_origin(n, visited):
+def find_path_to_origin(n, parents):
     m = n
     path = []
     while m:
         path.append(m)
-        m = visited[m]
+        m = parents[m]
     return path
 
 def find_path(start, end, visited):
@@ -171,7 +153,7 @@ def run_robot(program):
     if oxygen is None:
         raise Exception('oxygen not found')
 
-    shortest_path = find_shortest_path(walls, Vec2(0, 0), oxygen)
+    shortest_path = find_path_to_origin(oxygen, parents)
     print(f'shortest path {len(shortest_path) - 1}')
     part1 = len(shortest_path) - 1
 
