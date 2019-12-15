@@ -1,4 +1,4 @@
-import collections
+from collections import deque
 import itertools
 from intcode import *
 from util import *
@@ -34,16 +34,18 @@ def get_neighbors(p, walls, visited):
 
 def find_shortest_path(walls, start, end):
     path_to = {}
-    queue = [[start]]
+    queue = deque([deque([start])])
     while queue:
-        p = queue.pop(0)
+        p = queue.popleft()
         p_end = p[-1]
         if p_end == end:
             return p
         path_to[p_end] = p
         neighbors = get_neighbors(p_end, walls, path_to)
-        paths = [p + [n] for n in neighbors]
-        queue += paths
+        for n in neighbors:
+            n_path = p.copy()
+            n_path.extend([n])
+            queue.extend([n_path])
     raise Exception('unexpected end')
 
 def find_next_dest(walls, visited, pos):
@@ -63,10 +65,10 @@ def run_robot(program):
     dir = Direction('U')
     next_dest = find_next_dest(walls, visited, pos)
     path = find_shortest_path(walls, pos, next_dest)
-    path.pop(0)
+    path.popleft()
     print('initial path', pos, path)
     while True:
-        next_dest = path.pop(0)
+        next_dest = path.popleft()
         diff = next_dest - pos
         dir = Direction(vec_to_dir[diff])
         input = dir_to_input[dir.str()]
@@ -102,7 +104,7 @@ def run_robot(program):
             next_dest = find_next_dest(walls, visited, pos)
             print(f'finding shortest_path {pos} {next_dest}')
             path = find_shortest_path(walls, pos, next_dest)
-            path.pop(0)
+            path.popleft()
             print('new path', pos, next_dest, path)
 
     return None
