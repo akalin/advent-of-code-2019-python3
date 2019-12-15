@@ -19,7 +19,7 @@ def maybe_show_game(walls, blocks, paddle, ball, score):
     canvas.put(paddle, '-')
     canvas.put(ball, 'o')
 
-    os.system('clear')
+    cls()
     print(f'score = {score}, remaining={len(blocks)}')
     print(canvas.render())
 

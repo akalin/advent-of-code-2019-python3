@@ -92,6 +92,7 @@ def compute_day15(input):
         canvas.put(pos, '*')
         if oxygen:
             canvas.put(oxygen, 'O')
+        cls()
         print(canvas.render(flip_y=True))
 
     def visit_fn(n, parent, visited):

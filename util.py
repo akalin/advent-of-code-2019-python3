@@ -1,4 +1,8 @@
 from vec2 import *
+import os
+
+def cls():
+    os.system('clear')
 
 def manhattan_norm(v):
     return sum([abs(x) for x in v])
