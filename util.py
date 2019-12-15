@@ -46,8 +46,23 @@ class ASCIICanvas(object):
         self._default_c = default_c
         self._pixels = {}
 
-    def draw_pixel(self, x, y, c):
-        self._pixels[(x, y)] = c
+    def put(self, *args):
+        if len(args) == 3:
+            p = (args[0], args[1])
+            c = args[2]
+        elif len(args) == 2 and len(args[0]) == 2:
+            p = (args[0][0], args[0][1])
+            c = args[1]
+        else:
+            raise TypeError(f'Expected (x, y, c) or ((x, y), c), got {args}')
+        self._pixels[p] = c
+
+    def put_dict(self, d, c_map=None):
+        for p, c in d.items():
+            if c_map:
+                self.put(p, c_map[c])
+            else:
+                self.put(p, c)
 
     def render(self, flip_y=False):
         min_x = min([x for x, y in self._pixels.keys()])

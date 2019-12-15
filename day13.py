@@ -16,16 +16,16 @@ def maybe_show_game(walls, blocks, paddle, ball, score):
     canvas = ASCIICanvas()
 
     for (x, y) in walls:
-        canvas.draw_pixel(x, y, 'X')
+        canvas.put(x, y, 'X')
 
     for (x, y) in blocks:
-        canvas.draw_pixel(x, y, '@')
+        canvas.put(x, y, '@')
 
     (x, y) = paddle
-    canvas.draw_pixel(x, y, '-')
+    canvas.put(x, y, '-')
 
     (x, y) = ball
-    canvas.draw_pixel(x, y, '-')
+    canvas.put(x, y, '-')
 
     os.system('clear')
     print(f'score = {score}, remaining={len(blocks)}')

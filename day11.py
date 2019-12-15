@@ -31,14 +31,12 @@ def compute_day11(input):
     program = parse_intcode(input)
     grid1 = run_robot(program, 0)
     grid2 = run_robot(program, 1)
+    c_map = {
+        0: ' ',
+        1: '.',
+    }
     canvas = ASCIICanvas()
-    for (x, y), c in grid2.items():
-        if c == 0:
-            canvas.draw_pixel(x, y, ' ')
-        elif c == 1:
-            canvas.draw_pixel(x, y, '.')
-        else:
-            raise Exception(f'unknown c={c}')
+    canvas.put_dict(grid2, c_map)
     return len(grid1), canvas.render(flip_y=True)
 
 if __name__ == '__main__':
