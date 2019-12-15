@@ -40,31 +40,6 @@ def do_dfs(start, start_val, get_neighbor_fn, visit_fn):
                 return visited
     return visited
 
-def find_path_to_origin(n, lower_bound, visited):
-    m = n
-    path = []
-    while m and visited[m][1] > lower_bound:
-        path.append(m)
-        m, _ = visited[m]
-    return path, m
-
-def backtrack_to(start, end, visited):
-    max_common_level = min(visited[start][1], visited[end][1])
-
-    start_to_c, c = find_path_to_origin(start, max_common_level, visited)
-    end_to_d, d = find_path_to_origin(end, max_common_level, visited)
-
-    c_to_common = []
-    d_to_common = []
-
-    while c != d:
-        c_to_common.append(c)
-        d_to_common.append(d)
-        c, _ = visited[c]
-        d, _ = visited[d]
-
-    return start_to_c + c_to_common + [c] + list(reversed(end_to_d + d_to_common))
-
 def compute_day15(input):
     program = parse_intcode(input)
     intputer = Intputer(program)
@@ -111,23 +86,27 @@ def compute_day15(input):
         cls()
         print(canvas.render(flip_y=True))
 
+    intputers = {}
+
     def visit_fn(n, parent, visited):
         nonlocal pos
         nonlocal oxygen
-        pos_to_parent = backtrack_to(pos, parent, visited)
-        for m in pos_to_parent[1:]:
-            status = move_to(m)
-            if status != 1 and status != 2:
-                raise Exception(f'unexpected status {status}')
+        nonlocal intputer
+        if parent == pos:
+            pass
+        elif has_direction(parent - pos):
+            move_to(parent)
+        else:
+            intputer = visited[parent][1].copy()
+            pos = parent
         move_to(n)
 
-        _, parent_count = visited[parent]
-        return (parent, parent_count + 1), True
+        return (parent, intputer.copy()), True
 
     def get_neighbor_fn(n):
         return get_neighbors(n, walls)
 
-    visited = do_dfs(origin, (None, 0), get_neighbor_fn, visit_fn)
+    visited = do_dfs(origin, (None, intputer.copy()), get_neighbor_fn, visit_fn)
 
     show_map()
 

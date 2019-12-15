@@ -32,6 +32,9 @@ _dir_to_left = {
 
 _dir_to_right = {v: d for d, v in _dir_to_left.items()}
 
+def has_direction(v):
+    return v in _vec_to_dir
+
 class Direction(object):
     def __init__(self, arg):
         if arg in _dir_to_vec:

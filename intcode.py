@@ -8,6 +8,15 @@ class Intputer(object):
         self.waiting_for_input = False
         self.halted = False
 
+    def copy(self):
+        c = self.__class__([])
+        c.memory = self.memory.copy()
+        c.ip = self.ip
+        c.rel_base = self.rel_base
+        c.waiting_for_input = self.waiting_for_input
+        c.halted = self.halted
+        return c
+
     def run(self, input, output):
         if self.halted:
             raise Exception('Called run when halted')
