@@ -31,22 +31,15 @@ def compute_day11(input):
     program = parse_intcode(input)
     grid1 = run_robot(program, 0)
     grid2 = run_robot(program, 1)
-    min_x = min([x for x, y in grid2.keys()])
-    max_x = max([x for x, y in grid2.keys()])
-    min_y = min([y for x, y in grid2.keys()])
-    max_y = max([y for x, y in grid2.keys()])
-    grid3 = []
-    for i in range(max_y - min_y + 1):
-        grid3.append([' '] * (max_x - min_x + 1))
+    canvas = ASCIICanvas()
     for (x, y), c in grid2.items():
         if c == 0:
-            grid3[y - min_y][x - min_x] = ' '
+            canvas.draw_pixel(x, y, ' ')
         elif c == 1:
-            grid3[y - min_y][x - min_x] = '.'
+            canvas.draw_pixel(x, y, '.')
         else:
-            raise
-    img = '\n'.join(reversed([''.join(row) for row in grid3]))
-    return len(grid1), img
+            raise Exception(f'unknown c={c}')
+    return len(grid1), canvas.render(flip_y=True)
 
 if __name__ == '__main__':
     with open('day11.input', 'r') as input_file:
