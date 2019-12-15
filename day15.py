@@ -47,6 +47,21 @@ def do_bfs(start, start_val, get_neighbor_fn, visit_fn):
                 return visited
     return visited
 
+def do_dfs(start, start_val, get_neighbor_fn, visit_fn):
+    visited = {start: start_val}
+    stack = [start]
+    while stack:
+        n = stack.pop()
+        for m in get_neighbor_fn(n):
+            if m in visited:
+                continue
+            val, should_continue = visit_fn(m, n, visited[n])
+            visited[m] = val
+            stack.append(m)
+            if not should_continue:
+                return visited
+    return visited
+
 def find_shortest_path(walls, start, end):
     def visit_fn(n, parent, _):
         return parent, n != end
@@ -140,7 +155,7 @@ def run_robot(program):
     def get_neighbor_fn(n):
         return get_neighbors(n, walls, set())
 
-    counts = do_bfs(found, 0, get_neighbor_fn, visit_fn)
+    counts = do_dfs(found, 0, get_neighbor_fn, visit_fn)
     part2 = max(counts.values())
 
     return part1, part2
