@@ -1,44 +1,15 @@
 import collections
 import itertools
 from intcode import *
+from util import *
 from vec2 import *
-
-def do_turn(dir, turn):
-    if turn == 0:
-        if dir == 'U':
-            return 'L'
-        if dir == 'L':
-            return 'D'
-        if dir == 'D':
-            return 'R'
-        if dir == 'R':
-            return 'U'
-    else:
-        if dir == 'U':
-            return 'R'
-        if dir == 'R':
-            return 'D'
-        if dir == 'D':
-            return 'L'
-        if dir == 'L':
-            return 'U'
-
-def move_forward(pos, dir):
-    if dir == 'U':
-        return pos + (0, 1)
-    if dir == 'D':
-        return pos + (0, -1)
-    if dir == 'L':
-        return pos + (-1, 0)
-    if dir == 'R':
-        return pos + (1, 0)
 
 def run_robot(program, initial_color):
     intputer = Intputer(program)
     grid = collections.defaultdict(int)
     pos = Vec2(0, 0)
     grid[pos] = initial_color
-    dir = 'U'
+    dir = Direction('U')
     while True:
         input = [grid[pos]]
         output = []
@@ -47,8 +18,13 @@ def run_robot(program, initial_color):
             break
         color, turn = output
         grid[pos] = color
-        dir = do_turn(dir, turn)
-        pos = move_forward(pos, dir)
+        if turn == 0:
+            dir = dir.turn_left()
+        elif turn == 1:
+            dir = dir.turn_right()
+        else:
+            raise Exception(f'unknown turn {turn}')
+        pos += dir.vec()
     return grid
 
 def compute_day11(input):

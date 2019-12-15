@@ -12,21 +12,10 @@ def compute_closest_intersection(input):
         p = Vec2(0, 0)
         step_count = 0
         for segment in path:
-            direction = segment[0]
+            direction = Direction(segment[0])
             steps = int(segment[1:])
-            if direction == 'U':
-                dp = (0, 1)
-            elif direction == 'D':
-                dp = (0, -1)
-            elif direction == 'L':
-                dp = (-1, 0)
-            elif direction == 'R':
-                dp = (1, 0)
-            else:
-                raise Exception(f'Unknown direction {direction}')
-
             for _ in range(steps):
-                p += dp
+                p += direction.vec()
                 step_count += 1
                 if wire_no not in grid[p]:
                     grid[p][wire_no] = step_count
