@@ -18,11 +18,9 @@ def do_bfs(start, start_val, get_neighbor_fn, visit_fn):
         for m in get_neighbor_fn(n):
             if m in visited:
                 continue
-            val, should_continue = visit_fn(m, n, visited)
+            val = visit_fn(m, n, visited)
             visited[m] = val
             queue.append(m)
-            if not should_continue:
-                return visited
     return visited
 
 def do_dfs(start, start_val, get_neighbor_fn, visit_fn):
@@ -33,11 +31,9 @@ def do_dfs(start, start_val, get_neighbor_fn, visit_fn):
         for m in get_neighbor_fn(n):
             if m in visited:
                 continue
-            val, should_continue = visit_fn(m, n, visited)
+            val = visit_fn(m, n, visited)
             visited[m] = val
             stack.append(m)
-            if not should_continue:
-                return visited
     return visited
 
 def compute_day15(input):
@@ -86,7 +82,7 @@ def compute_day15(input):
         move_to(n, intputer, parent)
         show_map(n)
 
-        return intputer, True
+        return intputer
 
     def get_neighbor_fn(n):
         return get_neighbors(n, walls)
@@ -99,7 +95,7 @@ def compute_day15(input):
         raise Exception('oxygen not found')
 
     def visit_fn(n, parent, visited):
-        return visited[parent] + 1, True
+        return visited[parent] + 1
 
     def get_neighbor_fn(n):
         return get_neighbors(n, walls)
