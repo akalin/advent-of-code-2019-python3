@@ -42,7 +42,7 @@ def apply_fft(nums, rounds):
 #
 #       [ 1 2 ... n-1   n ]
 #       [ 0 1 ... n-2 n-1 ]
-# A^2 = [ ...       ...   ]
+# A^2 = [ ... ... ... ... ]
 #       [ 0 0 ...   1   2 ]
 #       [ 0 0 ...   0   1 ]
 #
@@ -52,25 +52,27 @@ def apply_fft(nums, rounds):
 # columns of A^2, namely the sums of the first n integers. Therefore, the
 # first row of A^3 are the triangular numbers:
 #
-# A^3 = [ 1 3 6 10 ... ]
-#       [ 0 1 3  6 ... ]
-#         ...
+#       [ 1 3 6 10  ... ]
+#       [ 0 1 3  6  ... ]
+# A^3 = [       ...     ]
+#       [ 0 0 0 ... 1 3 ]
+#       [ 0 0 0 ... 0 1 ]
 #
 # The formula for the nth triangular number is:
 #
-#   T_n = B(n+1, 2) = n*(n+1)/2,
+#   T_{n,3} = B(n+1, 2) = n*(n+1)/2,
 #
-# where B(n, k) = n!/(k!(n-k)!) are the binomial coefficients.
+# where B(n, k) = n!/(k!*(n-k)!) are the binomial coefficients.
 #
 # Similarly, the first row of A^4 are the tetrahedral numbers, which are
 # the sum of the first n triangular numbers. The formula for the nth
 # tetrahedral number is:
 #
-#   S_n = B(n+2, 3) = n*(n+1)*(n+2)/3.
+#   T_{n,4} = B(n+2, 3) = n*(n+1)*(n+2)/3.
 #
 # We can then guess that the first row of A^k follows the formula:
 #
-#   R_{n,k} = B(n+k-1, k).
+#   T_{n,k} = B(n+k-2, k-1).
 #
 # This is in fact true, and we can show this by showing:
 #
@@ -83,9 +85,6 @@ def apply_fft(nums, rounds):
 # compute the binomial coefficients mod 2 and 5, and then use the
 # Chinese remainder theorem to use those to compute the mod 10:
 # see https://gist.github.com/alexanderhaupt/1ac31ecbd316aca32c469f42d8646c98 )
-#
-# Therefore, given max_n and k, we compute R_{n,k}, which is the first
-# row of A^k, and then we can apply A^k to our input data.
 
 def binoms(max_n, k, modulus):
     coeffs = [0] * max_n
