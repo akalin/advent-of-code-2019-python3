@@ -1,6 +1,6 @@
 import unittest
 
-from day16 import parse_input, to_str, apply_fft
+from day16 import parse_input, to_str, apply_fft, extract_message
 
 class TestDay16(unittest.TestCase):
     def test_fft_short(self):
@@ -18,6 +18,16 @@ class TestDay16(unittest.TestCase):
             nums_in = parse_input(input)
             nums_out = apply_fft(nums_in, 100)
             self.assertEqual(to_str(nums_out[:8]), expected_out)
+
+    def test_extract_message(self):
+        test_cases = [
+            ('03036732577212944063491565474664', '84462026'),
+            ('02935109699940807407585447034323', '78725270'),
+            ('03081770884921959731165446850517', '53553731'),
+        ]
+        for input, expected_out in test_cases:
+            msg = extract_message(input)
+            self.assertEqual(msg, expected_out)
 
 if __name__ == '__main__':
     unittest.main()
