@@ -86,7 +86,7 @@ def apply_fft(nums, rounds):
 # Chinese remainder theorem to use those to compute the mod 10:
 # see https://gist.github.com/alexanderhaupt/1ac31ecbd316aca32c469f42d8646c98 )
 
-def binoms(max_n, k, modulus):
+def binoms_mod(max_n, k, modulus):
     coeffs = [0] * max_n
     x = 1
     coeffs[0] = 1
@@ -96,25 +96,20 @@ def binoms(max_n, k, modulus):
         coeffs[n - 1] = (x % modulus)
     return coeffs
 
-def apply_fft_second_half(nums_in, rounds, count):
-    coeffs = binoms(len(nums_in), rounds - 1, 10)
-    nums_out = [0] * count
-    for i in range(count):
-        nums_out[i] = sum([(x * y) % 10 for x, y in zip(nums_in[i:], coeffs)]) % 10
-    return nums_out
+def apply_fft_second_half(nums_in, rounds, c):
+    modulus = 10
+    coeffs = binoms_mod(len(nums_in), rounds - 1, modulus)
+    return [sum([(x * y) % modulus for x, y in zip(nums_in[i:], coeffs)]) % modulus for i in range(c)]
 
 def compute_day16(input):
     nums_in = parse_input(input)
-    output = apply_fft(nums_in, 100)
-    part1 = to_str(output[:8])
+    output_part1 = apply_fft(nums_in, 100)
+    part1 = to_str(output_part1[:8])
 
     offset = int(input[:7])
     extended_nums_in = nums_in * 10000
-
-    dim = len(extended_nums_in) - offset
-
-    output_second_half = apply_fft_second_half(extended_nums_in[offset:], 100, 8)
-    part2 = to_str(output_second_half)
+    output_part2 = apply_fft_second_half(extended_nums_in[offset:], 100, 8)
+    part2 = to_str(output_part2)
 
     return part1, part2
 
