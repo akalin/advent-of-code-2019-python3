@@ -91,7 +91,7 @@ def binom(n, k):
 
 # Straightforward (but slow) implementation.
 
-def T_k(max_n, k, modulus):
+def T_k_slow(max_n, k, modulus):
     return [binom(n+k-2, k-1) % modulus for n in range(1, max_n+1)]
 
 # Compute the binomial coefficients using a running product.
@@ -124,25 +124,31 @@ def binom_mod_p(n, k, p):
 #
 # Since (-2)*2 + 1*5 = 1, the CRT says that if n = a_1 mod 2 and n = a_2 mod 5,
 # then n = (5*a_1 - 4*a_2) mod 10.
+#
+# This is actually slower than T_k_fast above for small inputs,
+# though. It's only used for
+# https://www.reddit.com/r/adventofcode/comments/ebb8w6/2019_day_16_part_three_a_fanfiction_by_askalski/ .
 
 def binom_mod_10(n, k):
     a1 = binom_mod_p(n, k, 2)
     a2 = binom_mod_p(n, k, 5)
     return (5*a1 - 4*a2) % 10
 
-def T_k_asympt_fastest(max_n, k):
+def T_k_asympt_fastest(max_n, k, m):
+    if m != 10:
+        raise Exception('unexpected m={m}')
     return [binom_mod_10(n+k-2, k-1) for n in range(1, max_n+1)]
 
-def apply_fft_second_half(nums_in, rounds, c):
+def apply_fft_second_half(nums_in, rounds, c, T_k):
     modulus = 10
-    coeffs = T_k_fast(len(nums_in), rounds, modulus)
+    coeffs = T_k(len(nums_in), rounds, modulus)
     return [sum([(x * y) % modulus for x, y in zip(nums_in[i:], coeffs)]) % modulus for i in range(c)]
 
-def extract_message(input):
+def extract_message(input, rounds, T_k):
     nums_in = parse_input(input)
     offset = int(input[:7])
     extended_nums_in = nums_in * 10000
-    output = apply_fft_second_half(extended_nums_in[offset:], 100, 8)
+    output = apply_fft_second_half(extended_nums_in[offset:], rounds, 8, T_k)
     return to_str(output)
 
 def compute_day16(input):
@@ -150,7 +156,7 @@ def compute_day16(input):
     output_part1 = apply_fft(nums_in, 100)
     part1 = to_str(output_part1[:8])
 
-    part2 = extract_message(input)
+    part2 = extract_message(input, 100, T_k_fast)
     return part1, part2
 
 if __name__ == '__main__':
@@ -158,3 +164,8 @@ if __name__ == '__main__':
         input = input_file.read()
         p1, p2 = compute_day16(input)
         print(f'part 1: {p1}, part 2: {p2}')
+
+    with open('day16_part3.input', 'r') as input_file:
+        input = input_file.read()
+        p3 = extract_message(input, 287029238942, T_k_asympt_fastest)
+        print(f'part 3: {p3}')
