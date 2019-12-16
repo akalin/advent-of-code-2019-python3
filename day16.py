@@ -31,13 +31,13 @@ def apply_fft(nums_in, rounds):
         nums_out = do_round(nums_out)
     return nums_out
 
-def compute_ith_second_half(nums_in, i):
-    s = sum(nums_in[i:]) % 10
-    return s
-
 def do_round_second_half(nums_in):
-    nums_out = [compute_ith_second_half(nums_in, i) for i in range(len(nums_in))]
-    return nums_out
+    s = 0
+    nums_out_rev = []
+    for i in range(1, len(nums_in) + 1):
+        s = (s + nums_in[-i]) % 10
+        nums_out_rev.append(s)
+    return list(reversed(nums_out_rev))
 
 def apply_fft_second_half(nums_in, rounds):
     nums_out = nums_in
