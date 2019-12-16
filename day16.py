@@ -95,8 +95,12 @@ def prod(it):
 def binom(n, k):
     return prod([n - i for i in range(k)]) // prod(range(1, k+1))
 
+# Straightforward (but slow) implementation.
+
 def T_k(max_n, k, modulus):
     return [binom(n+k-2, k-1) % modulus for n in range(1, max_n+1)]
+
+# Compute the binomial coefficients using a running product.
 
 def T_k_fast(max_n, k, modulus):
     out = [0] * max_n
