@@ -101,16 +101,19 @@ def apply_fft_second_half(nums_in, rounds, c):
     coeffs = binoms_mod(len(nums_in), rounds - 1, modulus)
     return [sum([(x * y) % modulus for x, y in zip(nums_in[i:], coeffs)]) % modulus for i in range(c)]
 
+def extract_message(input):
+    nums_in = parse_input(input)
+    offset = int(input[:7])
+    extended_nums_in = nums_in * 10000
+    output = apply_fft_second_half(extended_nums_in[offset:], 100, 8)
+    return to_str(output)
+
 def compute_day16(input):
     nums_in = parse_input(input)
     output_part1 = apply_fft(nums_in, 100)
     part1 = to_str(output_part1[:8])
 
-    offset = int(input[:7])
-    extended_nums_in = nums_in * 10000
-    output_part2 = apply_fft_second_half(extended_nums_in[offset:], 100, 8)
-    part2 = to_str(output_part2)
-
+    part2 = extract_message(input)
     return part1, part2
 
 if __name__ == '__main__':
