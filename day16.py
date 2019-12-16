@@ -1,8 +1,8 @@
-import collections
-from intcode import *
-from util import *
-from vec2 import *
-from vec3 import *
+def parse_input(input):
+    return [int(x) for x in input.strip()]
+
+def to_str(digits):
+    return ''.join([str(x) for x in digits])
 
 base_pattern = [0, 1, 0, -1]
 
@@ -107,11 +107,8 @@ def apply_fft_second_half(nums_in, rounds, count):
         nums_out[i] = sum([(x * y) % 10 for x, y in zip(nums_in[i:], coeffs)]) % 10
     return nums_out
 
-def to_str(digits):
-    return ''.join([str(x) for x in digits])
-
 def compute_day16(input):
-    nums_in = [int(x) for x in input.strip()]
+    nums_in = parse_input(input)
     output = apply_fft(nums_in, 100)
     part1 = to_str(output[:8])
 
