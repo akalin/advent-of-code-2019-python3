@@ -31,12 +31,6 @@ def apply_fft(nums_in, rounds):
         nums_out = do_round(nums_out)
     return nums_out
 
-def do_round_second_half(nums):
-    s = 0
-    for i in range(1, len(nums) + 1):
-        s = (s + nums[-i]) % 10
-        nums[-i] = s
-
 def gen_tet_nums(count, k, modulus):
     tet_nums = [0] * count
     x = 1
