@@ -15,15 +15,15 @@ def get_pattern(num_count, i):
         pi = (pi + 1) % len(base_pattern)
     return pattern[1:num_count+1]
 
-def compute_ith(nums, i):
-    pattern = get_pattern(len(nums), i)
-    s = sum([a * b for a, b in zip(nums, pattern)])
-    return abs(s) % 10
-
-def apply_fft(nums, rounds):
-    for i in range(rounds):
-        nums = [compute_ith(nums, i) for i in range(len(nums))]
-    return nums
+def apply_fft(nums_in, rounds):
+    nums_out = [0] * len(nums_in)
+    for _ in range(rounds):
+        for i in range(len(nums_in)):
+            pattern = get_pattern(len(nums_in), i)
+            s = sum([a * b for a, b in zip(nums_in, pattern)])
+            nums_out[i] = abs(s) % 10
+        nums_in, nums_out = nums_out, nums_in
+    return nums_in
 
 # We want to compute A^count where
 #
