@@ -31,21 +31,21 @@ def apply_fft(nums_in, rounds):
         nums_out = do_round(nums_out)
     return nums_out
 
-def gen_tet_nums(count, k, modulus):
-    tet_nums = [0] * count
+def binoms(max_n, k, modulus):
+    coeffs = [0] * max_n
     x = 1
-    tet_nums[0] = 1
-    for n in range(2, count + 1):
+    coeffs[0] = 1
+    for n in range(2, max_n + 1):
         x *= (n + k - 1)
         x //= (n - 1)
-        tet_nums[n - 1] = (x % modulus)
-    return tet_nums
+        coeffs[n - 1] = (x % modulus)
+    return coeffs
 
 def apply_fft_second_half(nums_in, rounds, count):
-    tet_nums = gen_tet_nums(len(nums_in), rounds - 1, 10)
+    coeffs = binoms(len(nums_in), rounds - 1, 10)
     nums_out = [0] * count
     for i in range(count):
-        nums_out[i] = sum([(x * y) % 10 for x, y in zip(nums_in[i:], tet_nums)]) % 10
+        nums_out[i] = sum([(x * y) % 10 for x, y in zip(nums_in[i:], coeffs)]) % 10
     return nums_out
 
 def to_str(digits):
