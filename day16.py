@@ -37,11 +37,20 @@ def do_round_second_half(nums):
         s = (s + nums[-i]) % 10
         nums[-i] = s
 
-def apply_fft_second_half(nums_in, rounds):
-    nums_out = nums_in
-    for i in range(rounds):
-        print(i)
-        do_round_second_half(nums_out)
+def gen_tet(count, k, modulus):
+    x = 1
+    yield x
+    for n in range(2, count + 1):
+        x *= (n + k - 1)
+        x //= (n - 1)
+        yield (x % modulus)
+
+def apply_fft_second_half(nums_in, rounds, count):
+    g = gen_tet(len(nums_in), rounds - 1, 10)
+    vec = list(g)
+    nums_out = [0] * count
+    for i in range(count):
+        nums_out[i] = sum([(x * y) % 10 for x, y in zip(nums_in[i:], vec)]) % 10
     return nums_out
 
 def to_str(digits):
@@ -49,15 +58,17 @@ def to_str(digits):
 
 def compute_day16(input):
     nums_in = [int(x) for x in input.strip()]
-    output = apply_fft(nums_in, 100)
-    part1 = to_str(output[:8])
+#    output = apply_fft(nums_in, 100)
+#    part1 = to_str(output[:8])
+    part1 = None
 
     offset = int(input[:7])
     extended_nums_in = nums_in * 10000
-    h = len(extended_nums_in)//2
-    output_second_half = apply_fft_second_half(extended_nums_in[offset:], 100)
-    part2_ints = output_second_half[:8]
-    part2 = to_str(part2_ints)
+
+    dim = len(extended_nums_in) - offset
+
+    output_second_half = apply_fft_second_half(extended_nums_in[offset:], 100, 8)
+    part2 = to_str(output_second_half)
 
     return part1, part2
 
