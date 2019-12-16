@@ -1,6 +1,6 @@
 import unittest
 
-from day16 import parse_input, to_str, apply_fft, extract_message
+from day16 import parse_input, to_str, apply_fft, extract_message, T_k, T_k_fast
 
 class TestDay16(unittest.TestCase):
     def test_fft_short(self):
@@ -18,6 +18,11 @@ class TestDay16(unittest.TestCase):
             nums_in = parse_input(input)
             nums_out = apply_fft(nums_in, 100)
             self.assertEqual(to_str(nums_out[:8]), expected_out)
+
+    def test_T_k_fast(self):
+        expected_out = T_k(10, 3, 5)
+        out = T_k_fast(10, 3, 5)
+        self.assertEqual(out, expected_out)
 
     def test_extract_message(self):
         test_cases = [
