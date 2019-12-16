@@ -130,6 +130,9 @@ def binom_mod_10(n, k):
     a2 = binom_mod_p(n, k, 5)
     return (5*a1 - 4*a2) % 10
 
+def T_k_asympt_fastest(max_n, k):
+    return [binom_mod_10(n+k-2, k-1) for n in range(1, max_n+1)]
+
 def apply_fft_second_half(nums_in, rounds, c):
     modulus = 10
     coeffs = T_k_fast(len(nums_in), rounds, modulus)
