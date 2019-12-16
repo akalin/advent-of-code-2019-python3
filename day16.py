@@ -37,20 +37,21 @@ def do_round_second_half(nums):
         s = (s + nums[-i]) % 10
         nums[-i] = s
 
-def gen_tet(count, k, modulus):
+def gen_tet_nums(count, k, modulus):
+    tet_nums = [0] * count
     x = 1
-    yield x
+    tet_nums[0] = 1
     for n in range(2, count + 1):
         x *= (n + k - 1)
         x //= (n - 1)
-        yield (x % modulus)
+        tet_nums[n - 1] = (x % modulus)
+    return tet_nums
 
 def apply_fft_second_half(nums_in, rounds, count):
-    g = gen_tet(len(nums_in), rounds - 1, 10)
-    vec = list(g)
+    tet_nums = gen_tet_nums(len(nums_in), rounds - 1, 10)
     nums_out = [0] * count
     for i in range(count):
-        nums_out[i] = sum([(x * y) % 10 for x, y in zip(nums_in[i:], vec)]) % 10
+        nums_out[i] = sum([(x * y) % 10 for x, y in zip(nums_in[i:], tet_nums)]) % 10
     return nums_out
 
 def to_str(digits):
