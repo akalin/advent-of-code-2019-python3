@@ -15,19 +15,18 @@ def get_pattern(num_count, i):
         pi = (pi + 1) % len(base_pattern)
     return pattern[1:num_count+1]
 
-def apply_fft(nums_in, rounds):
-    c = len(nums_in)
-    nums_out = [0] * c
+def apply_fft(nums, rounds):
+    nums = nums[:]
+    c = len(nums)
     for _ in range(rounds):
         for i in range(c):
             s = 0
             sign = 1
             for j in range(i, c, 2 * (i + 1)):
-                s += sign * sum(nums_in[j:j+i+1])
+                s += sign * sum(nums[j:j+i+1])
                 sign = -sign
-            nums_out[i] = abs(s) % 10
-        nums_in, nums_out = nums_out, nums_in
-    return nums_in
+            nums[i] = abs(s) % 10
+    return nums
 
 # We want to compute A^count where
 #
