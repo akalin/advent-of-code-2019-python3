@@ -1,6 +1,6 @@
 import unittest
 
-from day16 import parse_input, to_str, apply_fft, extract_message, T_k, T_k_fast
+from day16 import parse_input, to_str, apply_fft, extract_message, T_k, T_k_fast, binom, binom_mod_p
 
 class TestDay16(unittest.TestCase):
     def test_fft_short(self):
@@ -23,6 +23,12 @@ class TestDay16(unittest.TestCase):
         expected_out = T_k(10, 3, 5)
         out = T_k_fast(10, 3, 5)
         self.assertEqual(out, expected_out)
+
+    def test_binom_mod_p(self):
+        m = 5
+        x = binom(10, 3) % m
+        y = binom_mod_p(10, 3, m)
+        self.assertEqual(x, y)
 
     def test_extract_message(self):
         test_cases = [

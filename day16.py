@@ -79,12 +79,6 @@ def apply_fft(nums, rounds):
 #  B(n+k-1, k) = ∑_{m=1}^n B(m+k-2, k-1),
 #
 # which follows from https://en.wikipedia.org/wiki/Hockey-stick_identity .
-#
-# (We can in fact go further, since we only need the binomial
-# coefficients mod 10. To do so we need to apply Lucas' theorem to
-# compute the binomial coefficients mod 2 and 5, and then use the
-# Chinese remainder theorem to use those to compute the mod 10:
-# see https://gist.github.com/alexanderhaupt/1ac31ecbd316aca32c469f42d8646c98 )
 
 def prod(it):
     p = 1
@@ -111,6 +105,19 @@ def T_k_fast(max_n, k, modulus):
         x //= (n - 1)
         out[n - 1] = (x % modulus)
     return out
+
+# Use https://en.wikipedia.org/wiki/Lucas%27s_theorem
+# to compute binom(n, k) % p efficiently for prime p.
+
+def binom_mod_p(n, k, p):
+    prod = 1
+    while True:
+        n, n_i = divmod(n, p)
+        k, k_i = divmod(k, p)
+        prod = (prod * binom(n_i, k_i)) % p
+        if n == 0 and k == 0:
+            break
+    return prod
 
 def apply_fft_second_half(nums_in, rounds, c):
     modulus = 10
