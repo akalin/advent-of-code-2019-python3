@@ -86,19 +86,31 @@ def apply_fft(nums, rounds):
 # Chinese remainder theorem to use those to compute the mod 10:
 # see https://gist.github.com/alexanderhaupt/1ac31ecbd316aca32c469f42d8646c98 )
 
-def binoms_mod(max_n, k, modulus):
-    coeffs = [0] * max_n
+def prod(it):
+    p = 1
+    for x in it:
+        p *= x
+    return p
+
+def binom(n, k):
+    return prod([n - i for i in range(k)]) // prod(range(1, k+1))
+
+def T_k(max_n, k, modulus):
+    return [binom(n+k-2, k-1) % modulus for n in range(1, max_n+1)]
+
+def T_k_fast(max_n, k, modulus):
+    out = [0] * max_n
     x = 1
-    coeffs[0] = 1
+    out[0] = 1
     for n in range(2, max_n + 1):
-        x *= (n + k - 1)
+        x *= (n + k - 2)
         x //= (n - 1)
-        coeffs[n - 1] = (x % modulus)
-    return coeffs
+        out[n - 1] = (x % modulus)
+    return out
 
 def apply_fft_second_half(nums_in, rounds, c):
     modulus = 10
-    coeffs = binoms_mod(len(nums_in), rounds - 1, modulus)
+    coeffs = T_k_fast(len(nums_in), rounds, modulus)
     return [sum([(x * y) % modulus for x, y in zip(nums_in[i:], coeffs)]) % modulus for i in range(c)]
 
 def extract_message(input):
