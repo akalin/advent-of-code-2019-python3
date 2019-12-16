@@ -16,11 +16,15 @@ def get_pattern(num_count, i):
     return pattern[1:num_count+1]
 
 def apply_fft(nums_in, rounds):
-    nums_out = [0] * len(nums_in)
+    c = len(nums_in)
+    nums_out = [0] * c
     for _ in range(rounds):
-        for i in range(len(nums_in)):
-            pattern = get_pattern(len(nums_in), i)
-            s = sum([a * b for a, b in zip(nums_in, pattern)])
+        for i in range(c):
+            s = 0
+            sign = 1
+            for j in range(i, c, 2 * (i + 1)):
+                s += sign * sum(nums_in[j:j+i+1])
+                sign = -sign
             nums_out[i] = abs(s) % 10
         nums_in, nums_out = nums_out, nums_in
     return nums_in
