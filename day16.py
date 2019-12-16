@@ -50,18 +50,20 @@ def to_str(digits):
 
 def compute_day16(input):
 #    input = '12345678'
-    input = '80871224585914546619083218645595'
+    input = '03036732577212944063491565474664'
 
     nums_in = [int(x) for x in input.strip()]
     output = apply_fft(nums_in, 100)
     part1 = to_str(output[:8])
 
-    h = len(nums_in)//2
-    output_second_half = apply_fft_second_half(nums_in[h:], 100)
-    if output_second_half != output[h:]:
-        raise
+    offset = int(input[:7])
+    extended_nums_in = nums_in * 10000
+    h = len(extended_nums_in)//2
+    output_second_half = apply_fft_second_half(extended_nums_in[h:], 100)
+    part2_ints = output_second_half[offset-h:offset-h+8]
+    part2 = to_str(part2_ints)
 
-    return part1, to_str(output_second_half)
+    return part1, part2
 
 if __name__ == '__main__':
     with open('day16.input', 'r') as input_file:
