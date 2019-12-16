@@ -11,29 +11,24 @@ def get_pattern(num_count, i):
     pi = 0
     while len(pattern) < num_count+1:
         n = base_pattern[pi]
-#        print(i, n, [n] * (i + 1))
         pattern += [n] * (i + 1)
         pi = (pi + 1) % len(base_pattern)
     return pattern[1:num_count+1]
 
 def compute_ith(nums_in, i):
     pattern = get_pattern(len(nums_in), i)
-#    print(len(nums_in), len(pattern))
     s = sum([a * b for a, b in zip(nums_in, pattern)])
     s = abs(s) % 10
-#    print('convolve', list(zip(nums_in, pattern)), s)
     return s
 
 def do_round(nums_in):
     nums_out = [compute_ith(nums_in, i) for i in range(len(nums_in))]
-#    print(nums_in, nums_out)
     return nums_out
 
 def apply_fft(nums_in, rounds):
     nums_out = nums_in
     for i in range(rounds):
         nums_out = do_round(nums_out)
-#        print(nums_out)
     return nums_out
 
 def compute_ith_second_half(nums_in, i):
@@ -42,7 +37,6 @@ def compute_ith_second_half(nums_in, i):
 
 def do_round_second_half(nums_in):
     nums_out = [compute_ith_second_half(nums_in, i) for i in range(len(nums_in))]
-#    print(nums_in, nums_out)
     return nums_out
 
 def apply_fft_second_half(nums_in, rounds):
