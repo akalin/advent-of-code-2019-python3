@@ -10,11 +10,10 @@ def do_bfs(start, get_neighbor_fn, visit_fn):
     while queue:
         n = queue.popleft()
         for m in get_neighbor_fn(n):
-            if m in visited:
-                continue
-            visit_fn(m, n)
-            visited.add(m)
-            queue.append(m)
+            if m not in visited:
+                visited.add(m)
+                visit_fn(m, n)
+                queue.append(m)
 
 def compute_day15(input):
     program = parse_intcode(input)
