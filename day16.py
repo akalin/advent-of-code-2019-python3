@@ -31,6 +31,65 @@ def apply_fft(nums_in, rounds):
         nums_out = do_round(nums_out)
     return nums_out
 
+# We want to compute A^count where
+#
+#     [ 1 1 ... 1 1 ]
+#     [ 0 1 ... 1 1 ]
+# A = [ ...     ... ]
+#     [ 0 0 ... 1 1 ]
+#     [ 0 0 ... 0 1 ]
+#
+# i.e. where A has 1s on and above the diagonal.
+#
+# If you compute A^2, you notice that it looks like
+#
+#       [ 1 2 ... n-1   n ]
+#       [ 0 1 ... n-2 n-1 ]
+# A^2 = [ ...       ...   ]
+#       [ 0 0 ...   1   2 ]
+#       [ 0 0 ...   0   1 ]
+#
+# i.e., each row is the row above shifted 1 to the right, and the entries
+# in the first row are the sum of the columns of A. Similarly, the rows of
+# A^3 are shifts of the first row, and the first row are the sums of the
+# columns of A^2, namely the sums of the first n integers. Therefore, the
+# first row of A^3 are the triangular numbers:
+#
+# A^3 = [ 1 3 6 10 ... ]
+#       [ 0 1 3  6 ... ]
+#         ...
+#
+# The formula for the nth triangular number is:
+#
+#   T_n = B(n+1, 2) = n*(n+1)/2,
+#
+# where B(n, k) = n!/(k!(n-k)!) are the binomial coefficients.
+#
+# Similarly, the first row of A^4 are the tetrahedral numbers, which are
+# the sum of the first n triangular numbers. The formula for the nth
+# tetrahedral number is:
+#
+#   S_n = B(n+2, 3) = n*(n+1)*(n+2)/3.
+#
+# We can then guess that the first row of A^k follows the formula:
+#
+#   R_{n,k} = B(n+k-1, k).
+#
+# This is in fact true, and we can show this by showing:
+#
+#  B(n+k-1, k) = ∑_{m=1}^n B(m+k-2, k-1),
+#
+# which follows from https://en.wikipedia.org/wiki/Hockey-stick_identity .
+#
+# (We can in fact go further, since we only need the binomial
+# coefficients mod 10. To do so we need to apply Lucas' theorem to
+# compute the binomial coefficients mod 2 and 5, and then use the
+# Chinese remainder theorem to use those to compute the mod 10:
+# see https://gist.github.com/alexanderhaupt/1ac31ecbd316aca32c469f42d8646c98 )
+#
+# Therefore, given max_n and k, we compute R_{n,k}, which is the first
+# row of A^k, and then we can apply A^k to our input data.
+
 def binoms(max_n, k, modulus):
     coeffs = [0] * max_n
     x = 1
