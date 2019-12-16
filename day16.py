@@ -55,8 +55,8 @@ def compute_day16(input):
     offset = int(input[:7])
     extended_nums_in = nums_in * 10000
     h = len(extended_nums_in)//2
-    output_second_half = apply_fft_second_half(extended_nums_in[h:], 100)
-    part2_ints = output_second_half[offset-h:offset-h+8]
+    output_second_half = apply_fft_second_half(extended_nums_in[offset:], 100)
+    part2_ints = output_second_half[:8]
     part2 = to_str(part2_ints)
 
     return part1, part2
