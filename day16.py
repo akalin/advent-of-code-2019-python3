@@ -59,9 +59,8 @@ def to_str(digits):
 
 def compute_day16(input):
     nums_in = [int(x) for x in input.strip()]
-#    output = apply_fft(nums_in, 100)
-#    part1 = to_str(output[:8])
-    part1 = None
+    output = apply_fft(nums_in, 100)
+    part1 = to_str(output[:8])
 
     offset = int(input[:7])
     extended_nums_in = nums_in * 10000
