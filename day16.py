@@ -119,6 +119,17 @@ def binom_mod_p(n, k, p):
             break
     return prod
 
+# Finally, use https://en.wikipedia.org/wiki/Chinese_remainder_theorem to
+# compute binom(n, k) % 10 in terms of binom(n, k) % 2 and binom(n, k) % 5.
+#
+# Since (-2)*2 + 1*5 = 1, the CRT says that if n = a_1 mod 2 and n = a_2 mod 5,
+# then n = (5*a_1 - 4*a_2) mod 10.
+
+def binom_mod_10(n, k):
+    a1 = binom_mod_p(n, k, 2)
+    a2 = binom_mod_p(n, k, 5)
+    return (5*a1 - 4*a2) % 10
+
 def apply_fft_second_half(nums_in, rounds, c):
     modulus = 10
     coeffs = T_k_fast(len(nums_in), rounds, modulus)
