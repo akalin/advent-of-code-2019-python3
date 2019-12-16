@@ -49,9 +49,6 @@ def to_str(digits):
     return ''.join([str(x) for x in digits])
 
 def compute_day16(input):
-#    input = '12345678'
-    input = '03036732577212944063491565474664'
-
     nums_in = [int(x) for x in input.strip()]
     output = apply_fft(nums_in, 100)
     part1 = to_str(output[:8])
