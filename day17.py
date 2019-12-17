@@ -79,40 +79,42 @@ def compute_day17(input):
             dir = next_dir
             cur_leg = 0
 
-    for p in pairs:
-        print(p)
-
     A = [
         ('R', 10),
         ('L', 8),
         ('R', 10),
         ('R', 4),
-        ('L', 6),
     ]
     B = [
         ('L', 6),
-        ('R', 10),
-        ('R', 10),
-        ('L', 8),
-        ('R', 10),
-        ('R', 4),
         ('L', 6),
-        ('R', 12),
-        ('R', 12),
         ('R', 10),
     ]
 
     C = [
         ('L', 6),
-        ('L', 6),
-        ('R', 10),
-        ('L', 6),
         ('R', 12),
         ('R', 12),
         ('R', 10),
     ]
 
-    pairs2 = A + B + C + A + B
+    pairs2 = A + B + A + C + B + C + A + B + A + C
+
+    if pairs != pairs2:
+        raise
+
+    main = 'A,B,A,C,B,C,A,B,A,C'
+
+    def to_str(pairs):
+        return ','.join([f'{t},{c}' for t, c in pairs])
+
+    cmps = [main, to_str(A), to_str(B), to_str(C)]
+
+    for x in [A, B, C]:
+        print(len(to_str(x)))
+
+    prog = '\n'.join(cmps)
+    print(prog)
 
     return part1, None
 
