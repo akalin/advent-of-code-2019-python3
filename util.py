@@ -15,8 +15,8 @@ def int_sgn(x):
     return 0
 
 _dir_to_vec = {
-    'U': Vec2(0, 1),
-    'D': Vec2(0, -1),
+    'U': Vec2(0, -1),
+    'D': Vec2(0, +1),
     'L': Vec2(-1, 0),
     'R': Vec2(1, 0),
 }
