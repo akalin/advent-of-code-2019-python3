@@ -113,10 +113,17 @@ def compute_day17(input):
     for x in [A, B, C]:
         print(len(to_str(x)))
 
-    prog = '\n'.join(cmps)
-    print(prog)
+    prog = '\n'.join(cmps) + '\nn\n'
 
-    return part1, None
+    ss = [ord(x) for x in prog]
+
+    print(program[0])
+    program[0] = 2
+    intputer = Intputer(program)
+    output = []
+    intputer.run(ss, output)
+    part2 = output[-1]
+    return part1, part2
 
 if __name__ == '__main__':
     with open('day17.input', 'r') as input_file:
