@@ -130,7 +130,8 @@ def binom_mod_p(n, k, p):
 # https://www.reddit.com/r/adventofcode/comments/ebb8w6/2019_day_16_part_three_a_fanfiction_by_askalski/ .
 
 def binom_mod_10(n, k):
-    a1 = binom_mod_p(n, k, 2)
+    # Compute binom(n, k) % 2 with bitwise operators.
+    a1 = int(not (~n & k))
     a2 = binom_mod_p(n, k, 5)
     return (5*a1 - 4*a2) % 10
 
