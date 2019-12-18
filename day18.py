@@ -29,9 +29,9 @@ def do_weighted_bfs(start, get_neighbor_fn, visit_fn):
 def compute_day18(input):
     input = '''
 ########################
-#f.D.E.e.C.b.A.@.a.B.c.#
-######################.#
-#d.....................#
+#...............b.C.D.f#
+#.######################
+#.....@.a.B.c.d.A.e.F.g#
 ########################
 '''
 #    input = '''
@@ -120,9 +120,8 @@ def compute_day18(input):
 
     def visit_fn(n, parent):
         pos, inventory = n
-        if n not in dists:
-            dists[n] = dists[parent] + dist_cache[n]
-            print(f'visiting {n} dist={dists[parent]} + {dist_cache[n]}')
+        dists[n] = dists[parent] + dist_cache[n]
+        print(f'visiting {n} dist={dists[parent]} + {dist_cache[n]}')
 
     do_bfs(initial_state, get_neighbor_fn, visit_fn)
     all_keys = frozenset(key_to_pos.keys())
