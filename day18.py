@@ -14,7 +14,7 @@ def do_bfs(start, get_neighbor_fn, visit_fn):
                 visit_fn(m, n)
                 queue.append(m)
 
-def do_a_star(start, get_neighbor_fn, h):
+def do_a_star(start, get_neighbor_fn, h, is_goal):
     open_set = set([start])
     came_from = {start: None}
 
@@ -33,6 +33,8 @@ def do_a_star(start, get_neighbor_fn, h):
 
     while len(open_set) > 0:
         n = min(open_set, key=get_f_score)
+        if is_goal(n):
+            return g_score, f_score, came_from
         open_set.remove(n)
 
         for m, m_len in get_neighbor_fn(n):
@@ -46,7 +48,7 @@ def do_a_star(start, get_neighbor_fn, h):
                 f_score[m] = g_score[m] + h(m)
                 open_set.add(m)
 
-    return g_score, f_score, came_from
+    return None
 
 def compute_day18(input):
     input = '''
@@ -60,7 +62,7 @@ def compute_day18(input):
 #l.F..d...h..C.m#
 #################
 '''
-    input2 = '''
+    input = '''
 ########################
 #...............b.C.D.f#
 #.######################
@@ -160,7 +162,10 @@ def compute_day18(input):
         return min(key_dists.values())
 
     all_keys = frozenset(key_to_pos.keys())
-    dists, f_dists, prev = do_a_star(initial_state, get_neighbor_fn, heuristic)
+    def is_goal(n):
+        return n[1] == all_keys
+
+    dists, f_dists, prev = do_a_star(initial_state, get_neighbor_fn, heuristic, is_goal)
 #    for d in dists.items():
 #        print(d)
 #    for p in prev.items():
