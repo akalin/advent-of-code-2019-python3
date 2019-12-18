@@ -1,5 +1,5 @@
 from collections import deque
-import itertools
+from itertools import chain, combinations
 from intcode import *
 from util import *
 from vec2 import *
@@ -15,18 +15,52 @@ def do_bfs(start, get_neighbor_fn, visit_fn):
                 visit_fn(m, n)
                 queue.append(m)
 
-def do_weighted_bfs(start, get_neighbor_fn, visit_fn):
-    visited = set([start])
-    queue = deque([start])
-    while queue:
-        n = queue.popleft()
-        for m in get_neighbor_fn(n):
-            if m not in visited:
-                visited.add(m)
-                visit_fn(m, n)
-                queue.append(m)
+def do_dijkstra(start, get_neighbor_fn):
+    dist = {start: 0}
+    prev = {start: None}
+
+    def get_dist(n):
+        if n not in dist:
+            return (1, 0)
+        return (0, dist[n])
+
+    visited = set()
+    queue = set([start])
+    while len(queue) > 0:
+        n = min(queue, key=get_dist)
+        queue.remove(n)
+
+        for m, m_len in get_neighbor_fn(n):
+            if m in visited:
+                continue
+            queue.add(m)
+
+            alt = dist[n] + m_len
+            if (0, alt) < get_dist(m):
+                dist[m] = alt
+                prev[m] = n
+
+        visited.add(n)
+
+    return dist, prev
+
+def powerset(iterable):
+    "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+    s = list(iterable)
+    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
 
 def compute_day18(input):
+    input = '''
+#################
+#i.G..c...e..H.p#
+########.########
+#j.A..b...f..D.o#
+########@########
+#k.E..a...g..B.n#
+########.########
+#l.F..d...h..C.m#
+#################
+'''
     input = '''
 ########################
 #...............b.C.D.f#
@@ -34,11 +68,6 @@ def compute_day18(input):
 #.....@.a.B.c.d.A.e.F.g#
 ########################
 '''
-#    input = '''
-##########
-##b.A.@.a#
-##########
-#'''
     lines = [x.strip() for x in input.strip().split('\n')]
     rows = len(lines)
     cols = len(lines[0])
@@ -97,11 +126,7 @@ def compute_day18(input):
         do_bfs(pos, get_neighbor_fn, visit_fn)
         return (key_dists)
 
-    initial_state = (initial_pos, ())
-
-    dists = {initial_state: 0}
-
-    dist_cache = {}
+    initial_state = (initial_pos, frozenset())
 
     def get_neighbor_fn(n):
         pos, inventory = n
@@ -111,20 +136,20 @@ def compute_day18(input):
             if k in inventory:
                 continue
             new_pos = key_to_pos[k]
-            new_inventory = list(inventory)
-            new_inventory.append(k)
-            new_state = (new_pos, tuple(new_inventory))
-            neighbors.append(new_state)
-            dist_cache[new_state] = dist
+            new_inventory = inventory | frozenset([k])
+            new_state = (new_pos, new_inventory)
+            neighbors.append((new_state, dist))
         return neighbors
 
-    def visit_fn(n, parent):
-        pos, inventory = n
-        dists[n] = dists[parent] + dist_cache[n]
-        print(f'visiting {n} dist={dists[parent]} + {dist_cache[n]}')
-
-    do_bfs(initial_state, get_neighbor_fn, visit_fn)
     all_keys = frozenset(key_to_pos.keys())
+    vertices = powerset(all_keys)
+    dists, prev = do_dijkstra(initial_state, get_neighbor_fn)
+#    for d in dists.items():
+#        print(d)
+#    for p in prev.items():
+#        print(p)
+
+#    do_bfs(initial_state, get_neighbor_fn, visit_fn)
     final_states = [(state[1], dist) for (state, dist) in dists.items() if frozenset(state[1]) == all_keys]
     print('min', min(final_states, key=lambda x: x[1]))
 
