@@ -98,42 +98,38 @@ def compute_day18(input):
     if initial_pos is None:
         raise
 
-    def get_dists(pos, inventory):
-        def can_access(p):
-            if p in walls:
-                return False
-
-            if p in pos_to_door:
-                door = pos_to_door[p]
-                key = door.lower()
-                return (key in inventory)
-
-            return True
-
+    def get_raw_dists(pos):
         dists = {pos: 0}
+        blockers = {pos: frozenset()}
         key_dists = {}
         def get_neighbor_fn(n):
-            if not can_access(n):
+            if n in walls:
                 return []
             possible_neighbors = [n + d.vec() for d in all_directions]
-            return [m for m in possible_neighbors if can_access(m)]
+            return [m for m in possible_neighbors if (m not in walls)]
 
         def visit_fn(n, parent):
             dists[n] = dists[parent] + 1
-
-            if n in pos_to_key and pos_to_key[n] not in inventory:
-                key_dists[pos_to_key[n]] = dists[n]
+            new_blockers = blockers[parent]
+            if n in pos_to_door:
+                new_blockers |= frozenset(pos_to_door[n])
+            blockers[n] = new_blockers
 
         do_bfs(pos, get_neighbor_fn, visit_fn)
-        return (key_dists)
+
+        return {k: (dists[p], blockers[p]) for k, p in key_to_pos.items()}
 
     dist_cache = {}
-    def get_dists_cached(pos, inventory):
-        k = (pos, inventory)
-        if k in dist_cache:
-            return dist_cache[k]
-        v = get_dists(pos, inventory)
-        dist_cache[k] = v
+    def get_raw_dists_cached(pos):
+        if pos in dist_cache:
+            return dist_cache[pos]
+        v = get_raw_dists(pos)
+        dist_cache[pos] = v
+        return v
+
+    def get_dists(pos, inventory):
+        key_info = get_raw_dists_cached(pos)
+        v = {k: d for k, (d, b) in key_info.items() if inventory.issuperset([d.lower() for d in b])}
         return v
 
     initial_state = (initial_pos, frozenset())
@@ -145,7 +141,7 @@ def compute_day18(input):
         if len(inventory) > max_l:
             print(max_l)
             max_l = len(inventory)
-        key_dists = get_dists_cached(pos, inventory)
+        key_dists = get_dists(pos, inventory)
         neighbors = []
         for k, dist in key_dists.items():
             new_pos = key_to_pos[k]
@@ -156,10 +152,10 @@ def compute_day18(input):
 
     def heuristic(n):
         pos, inventory = n
-        key_dists = get_dists_cached(pos, inventory)
+        key_dists = get_dists(pos, inventory)
         if len(key_dists) == 0:
             return 0
-        return min(key_dists.values())
+        return sum(key_dists.values())
 
     all_keys = frozenset(key_to_pos.keys())
     def is_goal(n):
