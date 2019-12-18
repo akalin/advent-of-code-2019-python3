@@ -51,15 +51,6 @@ def do_a_star(start, get_neighbor_fn, h, is_goal):
     return None
 
 def compute_day18(input):
-    input = '''
-#######
-#a.#Cd#
-##@#@##
-#######
-##@#@##
-#cB#Ab#
-#######
-'''
     lines = [x.strip() for x in input.strip().split('\n')]
     rows = len(lines)
     cols = len(lines[0])
