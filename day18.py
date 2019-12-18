@@ -124,7 +124,6 @@ def compute_day18(input):
         if pos in dist_cache:
             return dist_cache[pos]
         v = get_raw_dists(pos)
-        print(f'computing for {pos}')
         dist_cache[pos] = v
         return v
 
@@ -156,7 +155,7 @@ def compute_day18(input):
         key_dists = get_dists(pos, inventory)
         if len(key_dists) == 0:
             return 0
-        return min(key_dists.values())
+        return max(key_dists.values())
 
     all_keys = frozenset(key_to_pos.keys())
     def is_goal(n):
