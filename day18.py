@@ -51,7 +51,7 @@ def do_a_star(start, get_neighbor_fn, h, is_goal):
     return None
 
 def compute_day18(input):
-    input = '''
+    input2 = '''
 #################
 #i.G..c...e..H.p#
 ########.########
@@ -62,7 +62,7 @@ def compute_day18(input):
 #l.F..d...h..C.m#
 #################
 '''
-    input = '''
+    input2 = '''
 ########################
 #...............b.C.D.f#
 #.######################
@@ -124,12 +124,13 @@ def compute_day18(input):
         if pos in dist_cache:
             return dist_cache[pos]
         v = get_raw_dists(pos)
+        print(f'computing for {pos}')
         dist_cache[pos] = v
         return v
 
     def get_dists(pos, inventory):
         key_info = get_raw_dists_cached(pos)
-        v = {k: d for k, (d, b) in key_info.items() if inventory.issuperset([d.lower() for d in b])}
+        v = {k: d for k, (d, b) in key_info.items() if inventory.issuperset([d.lower() for d in b]) and k not in inventory}
         return v
 
     initial_state = (initial_pos, frozenset())
