@@ -19,7 +19,7 @@ def do_a_star(start, get_neighbor_fn, h):
     came_from = {start: None}
 
     g_score = {start: 0}
-    f_score = {start: 0}
+    f_score = {start: h(start)}
 
     def get_g_score(n):
         if n not in g_score:
