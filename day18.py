@@ -14,34 +14,39 @@ def do_bfs(start, get_neighbor_fn, visit_fn):
                 visit_fn(m, n)
                 queue.append(m)
 
-def do_dijkstra(start, get_neighbor_fn):
-    dist = {start: 0}
-    prev = {start: None}
+def do_a_star(start, get_neighbor_fn, h):
+    open_set = set([start])
+    came_from = {start: None}
 
-    def get_dist(n):
-        if n not in dist:
+    g_score = {start: 0}
+    f_score = {start: 0}
+
+    def get_g_score(n):
+        if n not in g_score:
             return (1, 0)
-        return (0, dist[n])
+        return (0, g_score[n])
 
-    visited = set()
-    queue = set([start])
-    while len(queue) > 0:
-        n = min(queue, key=get_dist)
-        queue.remove(n)
+    def get_f_score(n):
+        if n not in f_score:
+            return (1, 0)
+        return (0, f_score[n])
+
+    while len(open_set) > 0:
+        n = min(open_set, key=get_f_score)
+        open_set.remove(n)
 
         for m, m_len in get_neighbor_fn(n):
-            if m in visited:
+            if n not in g_score:
                 continue
-            queue.add(m)
 
-            alt = dist[n] + m_len
-            if (0, alt) < get_dist(m):
-                dist[m] = alt
-                prev[m] = n
+            tentative_g_score = g_score[n] + m_len
+            if (0, tentative_g_score) < get_g_score(m):
+                came_from[m] = n
+                g_score[m] = tentative_g_score
+                f_score[m] = g_score[m] + h(m)
+                open_set.add(m)
 
-        visited.add(n)
-
-    return dist, prev
+    return g_score, f_score, came_from
 
 def compute_day18(input):
     input = '''
@@ -55,7 +60,7 @@ def compute_day18(input):
 #l.F..d...h..C.m#
 #################
 '''
-    input2 = '''
+    input = '''
 ########################
 #...............b.C.D.f#
 #.######################
@@ -138,8 +143,15 @@ def compute_day18(input):
             neighbors.append((new_state, dist))
         return neighbors
 
+    def heuristic(n):
+        pos, inventory = n
+        key_dists = get_dists(pos, inventory)
+        if len(key_dists) == 0:
+            return 0
+        return min(key_dists.values())
+
     all_keys = frozenset(key_to_pos.keys())
-    dists, prev = do_dijkstra(initial_state, get_neighbor_fn)
+    dists, f_dists, prev = do_a_star(initial_state, get_neighbor_fn, heuristic)
 #    for d in dists.items():
 #        print(d)
 #    for p in prev.items():
