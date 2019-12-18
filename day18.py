@@ -1,5 +1,4 @@
 from collections import deque
-from itertools import chain, combinations
 from intcode import *
 from util import *
 from vec2 import *
@@ -44,11 +43,6 @@ def do_dijkstra(start, get_neighbor_fn):
 
     return dist, prev
 
-def powerset(iterable):
-    "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
-    s = list(iterable)
-    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
-
 def compute_day18(input):
     input = '''
 #################
@@ -61,7 +55,7 @@ def compute_day18(input):
 #l.F..d...h..C.m#
 #################
 '''
-    input = '''
+    input2 = '''
 ########################
 #...............b.C.D.f#
 #.######################
@@ -120,7 +114,7 @@ def compute_day18(input):
         def visit_fn(n, parent):
             dists[n] = dists[parent] + 1
 
-            if n in pos_to_key:
+            if n in pos_to_key and pos_to_key[n] not in inventory:
                 key_dists[pos_to_key[n]] = dists[n]
 
         do_bfs(pos, get_neighbor_fn, visit_fn)
@@ -128,13 +122,16 @@ def compute_day18(input):
 
     initial_state = (initial_pos, frozenset())
 
+    max_l = 0
     def get_neighbor_fn(n):
+        nonlocal max_l
         pos, inventory = n
+        if len(inventory) > max_l:
+            print(max_l)
+            max_l = len(inventory)
         key_dists = get_dists(pos, inventory)
         neighbors = []
         for k, dist in key_dists.items():
-            if k in inventory:
-                continue
             new_pos = key_to_pos[k]
             new_inventory = inventory | frozenset([k])
             new_state = (new_pos, new_inventory)
@@ -142,7 +139,6 @@ def compute_day18(input):
         return neighbors
 
     all_keys = frozenset(key_to_pos.keys())
-    vertices = powerset(all_keys)
     dists, prev = do_dijkstra(initial_state, get_neighbor_fn)
 #    for d in dists.items():
 #        print(d)
