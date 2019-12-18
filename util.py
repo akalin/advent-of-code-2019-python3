@@ -15,8 +15,8 @@ def int_sgn(x):
     return 0
 
 _dir_to_vec = {
-    'U': Vec2(0, -1),
-    'D': Vec2(0, +1),
+    'U': Vec2(0, +1),
+    'D': Vec2(0, -1),
     'L': Vec2(-1, 0),
     'R': Vec2(1, 0),
 }
@@ -42,8 +42,11 @@ class Direction(object):
         else:
             self._dir = _vec_to_dir[arg]
 
-    def vec(self):
-        return _dir_to_vec[self._dir]
+    def vec(self, flip_y=False):
+        v = _dir_to_vec[self._dir]
+        if flip_y:
+            v = Vec2(v.x, -v.y)
+        return v
 
     def turn_left(self):
         return self.__class__(_dir_to_left[self._dir])

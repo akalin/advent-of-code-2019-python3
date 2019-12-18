@@ -52,7 +52,7 @@ def compute_day17(input):
     pairs = []
     done = False
     while not done:
-        next = pos + dir.vec()
+        next = pos + dir.vec(flip_y=True)
         if cell_eq(next, '#'):
             pos = next
             cur_leg += 1
@@ -60,8 +60,8 @@ def compute_day17(input):
             left_dir = dir.turn_left()
             right_dir = dir.turn_right()
 
-            l_next = pos + left_dir.vec()
-            r_next = pos + right_dir.vec()
+            l_next = pos + left_dir.vec(flip_y=True)
+            r_next = pos + right_dir.vec(flip_y=True)
 
             if cell_eq(l_next, '#'):
                 next_dir = left_dir
