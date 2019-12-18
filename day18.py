@@ -60,7 +60,7 @@ def compute_day18(input):
 #l.F..d...h..C.m#
 #################
 '''
-    input = '''
+    input2 = '''
 ########################
 #...............b.C.D.f#
 #.######################
@@ -125,6 +125,15 @@ def compute_day18(input):
         do_bfs(pos, get_neighbor_fn, visit_fn)
         return (key_dists)
 
+    dist_cache = {}
+    def get_dists_cached(pos, inventory):
+        k = (pos, inventory)
+        if k in dist_cache:
+            return dist_cache[k]
+        v = get_dists(pos, inventory)
+        dist_cache[k] = v
+        return v
+
     initial_state = (initial_pos, frozenset())
 
     max_l = 0
@@ -134,7 +143,7 @@ def compute_day18(input):
         if len(inventory) > max_l:
             print(max_l)
             max_l = len(inventory)
-        key_dists = get_dists(pos, inventory)
+        key_dists = get_dists_cached(pos, inventory)
         neighbors = []
         for k, dist in key_dists.items():
             new_pos = key_to_pos[k]
@@ -145,7 +154,7 @@ def compute_day18(input):
 
     def heuristic(n):
         pos, inventory = n
-        key_dists = get_dists(pos, inventory)
+        key_dists = get_dists_cached(pos, inventory)
         if len(key_dists) == 0:
             return 0
         return min(key_dists.values())
