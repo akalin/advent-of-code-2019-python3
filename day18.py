@@ -62,7 +62,7 @@ def compute_day18(input):
 #l.F..d...h..C.m#
 #################
 '''
-    input2 = '''
+    input = '''
 ########################
 #...............b.C.D.f#
 #.######################
@@ -156,7 +156,7 @@ def compute_day18(input):
         key_dists = get_dists(pos, inventory)
         if len(key_dists) == 0:
             return 0
-        return sum(key_dists.values())
+        return min(key_dists.values())
 
     all_keys = frozenset(key_to_pos.keys())
     def is_goal(n):
