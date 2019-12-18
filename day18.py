@@ -51,29 +51,20 @@ def do_a_star(start, get_neighbor_fn, h, is_goal):
     return None
 
 def compute_day18(input):
-    input2 = '''
-#################
-#i.G..c...e..H.p#
-########.########
-#j.A..b...f..D.o#
-########@########
-#k.E..a...g..B.n#
-########.########
-#l.F..d...h..C.m#
-#################
-'''
-    input2 = '''
-########################
-#...............b.C.D.f#
-#.######################
-#.....@.a.B.c.d.A.e.F.g#
-########################
+    input = '''
+#######
+#a.#Cd#
+##@#@##
+#######
+##@#@##
+#cB#Ab#
+#######
 '''
     lines = [x.strip() for x in input.strip().split('\n')]
     rows = len(lines)
     cols = len(lines[0])
 
-    initial_pos = None
+    initial_pos = []
     pos_to_key = {}
     key_to_pos = {}
     pos_to_door = {}
@@ -85,7 +76,7 @@ def compute_day18(input):
             c = lines[y][x]
             p = Vec2(x, y)
             if c == '@':
-                initial_pos = p
+                initial_pos.append(p)
             elif c == '#':
                 walls.add(p)
             elif ord('a') <= ord(c) <= ord('z'):
@@ -95,8 +86,10 @@ def compute_day18(input):
                 pos_to_door[p] = c
                 door_to_pos[c] = p
 
-    if initial_pos is None:
+    if len(initial_pos) != 4:
         raise
+
+    initial_pos = tuple(initial_pos)
 
     def get_raw_dists(pos):
         dists = {pos: 0}
@@ -117,7 +110,7 @@ def compute_day18(input):
 
         do_bfs(pos, get_neighbor_fn, visit_fn)
 
-        return {k: (dists[p], blockers[p]) for k, p in key_to_pos.items()}
+        return {k: (dists[p], blockers[p]) for k, p in key_to_pos.items() if p in dists and p in blockers}
 
     dist_cache = {}
     def get_raw_dists_cached(pos):
@@ -137,25 +130,31 @@ def compute_day18(input):
     max_l = 0
     def get_neighbor_fn(n):
         nonlocal max_l
-        pos, inventory = n
+        positions, inventory = n
         if len(inventory) > max_l:
             print(max_l)
             max_l = len(inventory)
-        key_dists = get_dists(pos, inventory)
         neighbors = []
-        for k, dist in key_dists.items():
-            new_pos = key_to_pos[k]
-            new_inventory = inventory | frozenset([k])
-            new_state = (new_pos, new_inventory)
-            neighbors.append((new_state, dist))
+        for i, pos in enumerate(positions):
+            key_dists = get_dists(pos, inventory)
+            for k, dist in key_dists.items():
+                new_positions = list(positions)
+                new_positions[i] = key_to_pos[k]
+                new_positions = tuple(new_positions)
+                new_inventory = inventory | frozenset([k])
+                new_state = (new_positions, new_inventory)
+                neighbors.append((new_state, dist))
         return neighbors
 
     def heuristic(n):
-        pos, inventory = n
-        key_dists = get_dists(pos, inventory)
-        if len(key_dists) == 0:
-            return 0
-        return max(key_dists.values())
+        positions, inventory = n
+        s = 0
+        print(f'positions {positions}')
+        for pos in positions:
+            key_dists = get_dists(pos, inventory)
+            if len(key_dists) > 0:
+                s += max(key_dists.values())
+        return s
 
     all_keys = frozenset(key_to_pos.keys())
     def is_goal(n):
