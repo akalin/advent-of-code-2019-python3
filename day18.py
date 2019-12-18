@@ -116,6 +116,38 @@ def compute_day18(input):
         v = {k: d for k, (d, b) in key_info.items() if inventory.issuperset([d.lower() for d in b]) and k not in inventory}
         return v
 
+    def do_single(starting_pos, starting_inventory):
+        def get_neighbor_fn(n):
+            nonlocal max_l
+            pos, inventory = n
+            neighbors = []
+            key_dists = get_dists(pos, inventory)
+            for k, dist in key_dists.items():
+                new_pos = key_to_pos[k]
+                new_inventory = inventory | frozenset([k])
+                new_state = (new_pos, new_inventory)
+                neighbors.append((new_state, dist))
+            return neighbors
+
+        def heuristic(n):
+            pos, inventory = n
+            s = 0
+            key_dists = get_dists(pos, inventory)
+            if len(key_dists) > 0:
+                s = max(key_dists.values())
+            return s
+
+        dists = get_dists(starting_pos, starting_inventory)
+        all_keys = starting_inventory | frozenset(dists.keys())
+        def is_goal(n):
+            return n[1] == all_keys
+
+        initial_state = (starting_pos, starting_inventory)
+
+        dists, f_dists, prev = do_a_star(initial_state, get_neighbor_fn, heuristic, is_goal)
+        final_states = [(state[1], dist) for (state, dist) in dists.items() if frozenset(state[1]) == all_keys]
+        return min(final_states, key=lambda x: x[1])
+
     initial_state = (initial_pos, frozenset())
 
     max_l = 0
@@ -140,11 +172,9 @@ def compute_day18(input):
     def heuristic(n):
         positions, inventory = n
         s = 0
-        print(f'positions {positions}')
         for pos in positions:
-            key_dists = get_dists(pos, inventory)
-            if len(key_dists) > 0:
-                s += max(key_dists.values())
+            single_res = do_single(pos, inventory)
+            s += single_res[1]
         return s
 
     all_keys = frozenset(key_to_pos.keys())
