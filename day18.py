@@ -126,7 +126,7 @@ def compute_day18(input):
     do_bfs(initial_state, get_neighbor_fn, visit_fn)
     all_keys = frozenset(key_to_pos.keys())
     final_states = [(state[1], dist) for (state, dist) in dists.items() if frozenset(state[1]) == all_keys]
-    print(min(final_states))
+    print('min', min(final_states, key=lambda x: x[1]))
 
     return None, None
 
