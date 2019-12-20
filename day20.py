@@ -13,7 +13,9 @@ def do_bfs(start, get_neighbor_fn, visit_fn):
         for m in get_neighbor_fn(n):
             if m not in visited:
                 visited.add(m)
-                visit_fn(m, n)
+                should_continue = visit_fn(m, n)
+                if not should_continue:
+                    return
                 queue.append(m)
 
 def get_label(lines, p):
@@ -83,8 +85,9 @@ def compute_day20(input):
 
     counts = {start_pos3: 0}
 
-    def visit_fn(n, parent):
-        counts[n] = counts[parent] + 1
+    def visit_fn(n3, parent):
+        counts[n3] = counts[parent] + 1
+        return n3 != end_pos3
 
     def get_neighbor_fn(n3):
         n, z = vec3to2(n3)
@@ -94,10 +97,11 @@ def compute_day20(input):
         neighbors = [vec2to3(m, z) for m in possible_neighbors if m in walkables]
         res = get_label(lines, n)
         if res and res[0] in portals:
-            other_side = next(iter(portals[label] - set([n])))
+            other_side = next(iter(portals[res[0]] - set([n])))
             new_z = z + res[1]
             if new_z >= 0:
                 neighbors.append(vec2to3(other_side, new_z))
+#        print(n, neighbors)
         return neighbors
 
     do_bfs(start_pos3, get_neighbor_fn, visit_fn)
