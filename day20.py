@@ -31,7 +31,6 @@ def compute_day20(input):
     cols = len(lines[0])
 
     start_pos = None
-    walls = set()
     walkables = set()
     end_pos = None
 
@@ -58,10 +57,6 @@ def compute_day20(input):
                         portals[label].add(p)
                     else:
                         portals[label] = set([p])
-            elif c == '#':
-                walls.add(p)
-
-    print(start_pos, end_pos, portals)
 
     if start_pos is None or end_pos is None:
         raise
@@ -70,35 +65,25 @@ def compute_day20(input):
     if bad_labels:
         raise Exception(f'{bad_labels}')
 
-    def visit_fn(n, parent):
-        intputer = intputers[parent].copy()
-        dir = Direction(n - parent)
-        input = dir_to_input[dir.str()]
-        output = []
-        intputer.run([input], output)
-        status = output[0]
-        if status == 0:
-            walls.add(n)
-        elif status == 1:
-            pass
-        elif status == 2:
-            oxygen = n
-        else:
-            raise Exception(f'unknown status {status}')
+    counts = {start_pos: 0}
 
-        if status != 0:
-            intputers[n] = intputer
-            origin_distances[n] = origin_distances[parent] + 1
+    def visit_fn(n, parent):
+        counts[n] = counts[parent] + 1
 
     def get_neighbor_fn(n):
-        if n in walls:
+        if n not in walkables:
             return []
         possible_neighbors = [n + d.vec() for d in all_directions]
-        return [m for m in possible_neighbors if (m not in walls)]
+        neighbors = [m for m in possible_neighbors if m in walkables]
+        label = get_label(lines, n)
+        if label in portals:
+            other_side = next(iter(portals[label] - set([n])))
+            neighbors.append(other_side)
+        return neighbors
 
-#    do_bfs(origin, get_neighbor_fn, visit_fn)
+    do_bfs(start_pos, get_neighbor_fn, visit_fn)
 
-    return None, None
+    return counts[end_pos], None
 
 if __name__ == '__main__':
     with open('day20.input', 'r') as input_file:
