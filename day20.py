@@ -22,7 +22,7 @@ def get_label(lines, p):
         if 'A' <= ch1 <= 'Z':
             x2, y2 = Vec2(x1, y1) + d.vec()
             ch2 = lines[y2][x2]
-            return ch1 + ch2
+            return frozenset([ch1, ch2])
     return None
 
 def compute_day20(input):
@@ -47,9 +47,9 @@ def compute_day20(input):
                 if label is None:
                     continue
 
-                if label == 'AA':
+                if label == frozenset(['A']):
                     start_pos = p
-                elif label == 'ZZ':
+                elif label == frozenset(['Z']):
                     end_pos = p
                 else:
                     if label in portals:
@@ -65,6 +65,10 @@ def compute_day20(input):
 
     if start_pos is None or end_pos is None:
         raise
+
+    bad_labels = [v for v in portals.values() if len(v) != 2]
+    if bad_labels:
+        raise Exception(f'{bad_labels}')
 
     def visit_fn(n, parent):
         intputer = intputers[parent].copy()
