@@ -54,16 +54,30 @@ def fits(pts, x, y):
 def compute_day21(input):
     program = parse_intcode(input)
     intputer = Intputer(program)
-    input_s = '''NOT C J
+# not b, not e or not g, d, h
+# not b, not g, d, h
+# not c, d, h
+# not i, h, d
+# not a
+    input_s = '''NOT G J
+NOT E T
+OR J T
+NOT B J
+AND T J
 AND D J
+AND H J
+NOT C T
+AND D T
+AND H T
+OR T J
 NOT A T
 OR T J
-WALK
+RUN
 '''
     input = [ord(x) for x in input_s]
     output = []
     intputer.run(input, output)
-    print(output)
+    print(output[-1])
     output_s = ''.join([chr(x) for x in output])
     print(output_s)
 
