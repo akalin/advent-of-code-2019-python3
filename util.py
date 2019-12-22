@@ -131,3 +131,16 @@ def modinv(a, b):
     if g != 1:
         raise Exception(f'gcd(a, b) = {g} != 1')
     return x % b
+
+def fastpow(x, n, one):
+    if n < 0:
+        raise Exception(f'invalid n={n}')
+    prod = one
+    x_pow = x
+    while n >= 1:
+        b = n & 1
+        if b != 0:
+            prod *= x_pow
+        x_pow *= x_pow
+        n >>= 1
+    return prod

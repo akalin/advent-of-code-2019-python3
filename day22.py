@@ -68,16 +68,6 @@ class Deck(object):
     def __str__(self):
         return f'Deck(count={self.count}, factor={self.factor}, offset={self.offset})'
 
-def my_pow(x, p):
-    print(x, p)
-    if p == 0:
-        return Deck(x.count)
-    if p == 1:
-        return x
-    if p % 2 == 1:
-        return x * my_pow(x * x, (p - 1) // 2)
-    return my_pow(x * x, p // 2)
-
 def compute_day22(input):
     count = 119315717514047
 #    count = 10007
@@ -97,7 +87,7 @@ def compute_day22(input):
 
     p = 101741582076661
 #    for i in range(101741582076661):
-    deck = my_pow(deck, p)
+    deck = fastpow(deck, p, Deck(deck.count))
     print(f'c={deck.count} fac={deck.factor % deck.count} off={deck.offset % deck.count}')
 
 #    for i in range(count):
