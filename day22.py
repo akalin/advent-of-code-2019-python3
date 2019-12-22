@@ -84,13 +84,31 @@ class Deck(object):
             elif words[0] == 'deal' and words[1] == 'into':
                 self.deal_new()
 
-    def square(self):
-        new_factor = (self.factor * self.factor) % self.count
-        new_offset = (self.offset * self.factor + self.offset) % self.count
-        self.factor = new_factor
-        self.offset = new_offset
+    def __mul__(self, other):
+        # c(ax + b) + d = acx + cb + d
+        a = self.factor
+        b = self.offset
+        c = other.factor
+        d = other.offset
+        if self.count != other.count:
+            raise
+        new_deck = Deck(self.count)
+        new_deck.factor = (a * c) % self.count
+        new_deck.offset = (c*b + d) % self.count
+        return new_deck
 
-#            print(self.to_list())
+    def __str__(self):
+        return f'Deck(count={self.count}, factor={self.factor}, offset={self.offset})'
+
+def my_pow(x, p):
+    print(x, p)
+    if p == 0:
+        return Deck(x.count)
+    if p == 1:
+        return x
+    if p % 2 == 1:
+        return x * my_pow(x * x, (p - 1) // 2)
+    return my_pow(x * x, p // 2)
 
 def compute_day22(input):
     count = 119315717514047
@@ -109,8 +127,9 @@ def compute_day22(input):
 
     print(f'fac={new_factor} off={new_offset}')
 
+    p = 101741582076661
 #    for i in range(101741582076661):
-    deck.square()
+    deck = my_pow(deck, p)
     print(f'c={deck.count} fac={deck.factor % deck.count} off={deck.offset % deck.count}')
 
 #    for i in range(count):
