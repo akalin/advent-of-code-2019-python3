@@ -19,18 +19,9 @@ class Intputer(object):
         c.halted = self.halted
         return c
 
-    def run(self, input, output):
-        input_d = deque(input)
-        output_d = deque(output)
-        self.run_deque(input_d, output_d)
-        input.clear()
-        input.extend(input_d)
-        output.clear()
-        output.extend(output_d)
-
     def run_simple(self, input):
         output = []
-        self.run(input[:], output)
+        self.run_deque(deque(input), output)
         return output
 
     def run_deque(self, input, output):
