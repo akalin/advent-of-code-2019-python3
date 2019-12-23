@@ -30,6 +30,25 @@ class Intputer(object):
         self.run_emit(iter(input), emit_next_output)
         return output
 
+    def run_print_ascii(self, input_it, emit_non_ascii=None):
+        nonascii = []
+
+        if not emit_non_ascii:
+            def default_emit_non_ascii(v):
+                print(f'!!NONASCII({v})!!')
+
+            emit_non_ascii = default_emit_non_ascii
+
+        def emit_next_output(v):
+            if v > 255:
+                emit_non_ascii(v)
+                nonascii.append(v)
+                return
+            print(chr(v), end='')
+
+        self.run_emit(input_it, emit_next_output)
+        return nonascii
+
     def run_emit(self, input_it, emit_next_output):
         if self.halted:
             raise Exception('Called run when halted')

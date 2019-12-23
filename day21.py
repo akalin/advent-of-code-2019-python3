@@ -26,12 +26,11 @@ NOT A T
 OR T J
 RUN
 '''
-    output = run_intcode_program(program, ascii_to_ints(input_s))
-    output_ascii, output_non_ascii = ints_to_ascii(output)
-    if output_ascii:
-        print('ASCII output', output_ascii)
+    intputer = Intputer(program)
+    input = ascii_to_ints(input_s)
+    (part2,) = intputer.run_print_ascii(iter(input))
 
-    return None, output_non_ascii[0]
+    return None, part2
 
 if __name__ == '__main__':
     with open('day21.input', 'r') as input_file:

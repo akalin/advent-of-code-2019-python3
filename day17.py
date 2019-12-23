@@ -119,15 +119,7 @@ def compute_day17(input):
     program[0] = 2
     intputer = Intputer(program)
 
-    part2 = None
-    def emit_next_output(v):
-        nonlocal part2
-        if v > 255:
-            part2 = v
-            return
-        print(chr(v), end='')
-
-    output = intputer.run_emit(iter(ss), emit_next_output)
+    (part2,) = intputer.run_print_ascii(iter(ss))
     return part1, part2
 
 if __name__ == '__main__':
