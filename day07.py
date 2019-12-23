@@ -1,3 +1,4 @@
+from collections import deque
 import itertools
 
 class Intputer(object):
@@ -72,7 +73,7 @@ class Intputer(object):
                     self.ip -= 1
                     return
                 self.waiting_for_input = False
-                v = input.pop(0)
+                v = input.popleft()
                 setp(0, v)
                 adv()
 
@@ -120,7 +121,7 @@ class Intputer(object):
                 raise Exception(f'Unknown opcode {opcode}')
 
 def run_serial_mode(program, phases):
-    pipes = [[p] for p in phases] + [[]]
+    pipes = [deque([p]) for p in phases] + [[]]
     pipes[0].append(0)
 
     for input, output in zip(pipes, pipes[1:]):
@@ -129,7 +130,7 @@ def run_serial_mode(program, phases):
     return pipes[-1][0]
 
 def run_feedback_mode(program, phases):
-    pipes = [[p] for p in phases]
+    pipes = [deque([p]) for p in phases]
     pipes[0].append(0)
 
     intputers = [Intputer(program) for _ in range(len(phases))]
