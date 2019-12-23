@@ -28,7 +28,7 @@ RUN
 '''
     intputer = Intputer(program)
     input = ascii_to_ints(input_s)
-    (part2,) = intputer.run_print_ascii(iter(input))
+    (part2,) = intputer.run_print_ascii(input)
 
     return None, part2
 

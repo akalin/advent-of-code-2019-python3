@@ -49,9 +49,11 @@ class Intputer(object):
         self.run_emit(input_it, emit_next_output)
         return nonascii
 
-    def run_emit(self, input_it, emit_next_output):
+    def run_emit(self, input, emit_next_output):
         if self.halted:
             raise Exception('Called run when halted')
+
+        input_it = iter(input)
 
         if self.waiting_for_input:
             next_inputs, input_it = spy(input_it, 1)
