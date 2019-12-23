@@ -48,7 +48,7 @@ def compute_day15(input):
         intputer = intputers[parent].copy()
         dir = Direction(n - parent)
         input = dir_to_input[dir.str()]
-        output = intputer.run_simple([input])
+        output = intputer.run([input])
         status = output[0]
         if status == 0:
             walls.add(n)

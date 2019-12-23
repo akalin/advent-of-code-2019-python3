@@ -20,7 +20,7 @@ class Intputer(object):
         c.halted = self.halted
         return c
 
-    def run_simple(self, input=None):
+    def run(self, input=None):
         if input is None:
             input = []
         output = []
@@ -181,4 +181,4 @@ def parse_intcode(s):
 
 def run_single_program(program, input=None):
     intputer = Intputer(program)
-    return intputer.run_simple(input)
+    return intputer.run(input)

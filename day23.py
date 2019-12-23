@@ -11,7 +11,7 @@ class Node(object):
     def run(self, input):
         if len(self.output) > 0:
             raise
-        self.output = self.intputer.run_simple(input)
+        self.output = self.intputer.run(input)
 
     def boot(self):
         self.run([self.address])
