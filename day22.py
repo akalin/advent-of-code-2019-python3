@@ -78,13 +78,6 @@ def compute_day22(input):
     deck.do_shuffle(lines)
     print(f'c={deck.count} fac={deck.factor} off={deck.offset}')
 
-    # a(ax + b) + b
-    # a^2x + ab + b
-    new_factor = (deck.factor * deck.factor) % deck.count
-    new_offset = (deck.offset * deck.factor + deck.offset) % deck.count
-
-    print(f'fac={new_factor} off={new_offset}')
-
     p = 101741582076661
 #    for i in range(101741582076661):
     deck = fastpow(deck, p, Deck(deck.count))
