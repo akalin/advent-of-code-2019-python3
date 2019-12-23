@@ -84,6 +84,14 @@ class Shuffle(object):
         # Therefore, y[i] = x[-i] = x[n - 1 - i], and thus f(i) = -i - 1.
         return Shuffle(n, -1, -1)
 
+    def iterate(self, count):
+        if self.a == 1:
+            return Shuffle(n, self.a, self.b * count)
+        else:
+            a_count = pow(self.a, count, self.n)
+            b_count = (a_count - 1) * modinv(self.a - 1, self.n) * self.b
+            return Shuffle(self.n, a_count, b_count)
+
     def parse(n, line):
         if line.find('\n') != -1:
             raise Exception(f'parse called with multiple lines "{line}"')
@@ -110,7 +118,7 @@ def compute_day22(input):
 
     n2 = 119315717514047
     sh2 = Shuffle.parse_multiple(n2, input)
-    sh2_rep = fastpow(sh2, 101741582076661, Shuffle(n2))
+    sh2_rep = sh2.iterate(101741582076661)
     part2 = next(itertools.islice(sh2_rep.cards(), 2020, None))
 
     return part1, part2
