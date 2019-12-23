@@ -16,9 +16,7 @@ def do_bfs(start, get_neighbor_fn, visit_fn):
                 queue.append(m)
 
 def is_tractor(program, x, y):
-    intputer = Intputer(program)
-    output = []
-    intputer.run([x, y], output)
+    output = run_single_program(program, [x, y])
     return output[0] == 1
 
 def find_tractor_start(program, y, hint):
@@ -53,7 +51,6 @@ def fits(pts, x, y):
 
 def compute_day21(input):
     program = parse_intcode(input)
-    intputer = Intputer(program)
 # not b, not e or not g, d, h
 # not b, not g, d, h
 # not c, d, h
@@ -74,9 +71,7 @@ NOT A T
 OR T J
 RUN
 '''
-    input = [ord(x) for x in input_s]
-    output = []
-    intputer.run(input, output)
+    output = run_single_program(program, [ord(x) for x in input_s])
     print(output[-1])
     output_s = ''.join([chr(x) for x in output])
     print(output_s)

@@ -174,3 +174,9 @@ class Intputer(object):
 
 def parse_intcode(s):
     return [int(x.strip()) for x in s.strip().split(',')]
+
+def run_single_program(program, input):
+    intputer = Intputer(program)
+    output = deque()
+    intputer.run(deque(input), output)
+    return list(output)
