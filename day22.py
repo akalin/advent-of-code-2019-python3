@@ -53,8 +53,9 @@ class Shuffle(object):
         #
         # Letting
         #
-        #   f1 = ax + b    and    f2 = cx + d, we then have
+        #   f1 = ax + b    and    f2 = cx + d,
         #
+        # we then have
         #
         #   f1 . f2 = a(cx + d) + b = (ac)x + (ad + b)
         return Shuffle(self.n, self.a * other.a, self.a * other.b + self.b)
