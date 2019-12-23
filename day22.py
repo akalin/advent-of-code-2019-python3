@@ -1,3 +1,4 @@
+import itertools
 from util import *
 
 # A shuffle represents an operation on a deck of cards.
@@ -147,25 +148,17 @@ class Deck(object):
         return f'Deck(count={self.count}, factor={self.factor}, offset={self.offset})'
 
 def compute_day22(input):
-    count = 119315717514047
-#    count = 10007
-#    count = 10
-    deck = Deck(count)
-    lines = [x for x in input.split('\n')]
+    n1 = 10007
+    sh1 = Shuffle.parse_multiple(n1, input)
+    sh1_inv = sh1.inverse()
+    part1 = next(itertools.islice(sh1_inv.cards(), 2019, None))
 
-    deck.do_shuffle(lines)
-    print(f'c={deck.count} fac={deck.factor} off={deck.offset}')
+    n2 = 119315717514047
+    sh2 = Shuffle.parse_multiple(n2, input)
 
-    p = 101741582076661
-#    for i in range(101741582076661):
-    deck = fastpow(deck, p, Deck(deck.count))
-    print(f'c={deck.count} fac={deck.factor % deck.count} off={deck.offset % deck.count}')
-
-#    for i in range(count):
-#        if deck.get(i) == 2019:
-#            print(i)
-    print(deck.get(2020))
-    return None, None
+    sh2_rep = fastpow(sh2, 101741582076661, Shuffle(n2))
+    part2 = next(itertools.islice(sh2_rep.cards(), 2020, None))
+    return part1, part2
 
 if __name__ == '__main__':
     with open('day22.input', 'r') as input_file:
