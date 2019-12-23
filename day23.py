@@ -1,9 +1,6 @@
 from collections import defaultdict, deque
 from more_itertools import chunked
-import itertools
 from intcode import *
-from util import *
-from vec2 import *
 
 class Node(object):
     def __init__(self, address, program):
