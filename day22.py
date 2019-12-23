@@ -29,6 +29,21 @@ class Shuffle(object):
     def new_stack(n):
         return Shuffle(n, -1, -1)
 
+    def parse(n, input):
+        SC = self.__class__
+        shuffle = SC(n)
+        for line in input.strip().split('\n'):
+            words = line.strip().split(' ')
+            if words[0] == 'cut':
+                N = int(words[1])
+                shuffle = SC.cut(n, N) * shuffle
+            elif words[0] == 'deal' and words[1] == 'with':
+                N = int(words[3])
+                shuffle = SC.increment(n, N) * shuffle
+            elif words[0] == 'deal' and words[1] == 'into':
+                shuffle = SC.new_stack(n) * shuffle
+        return shuffle
+
 # 7*(i + c)
 # 7*i + 0
 # -7*(i - 1)
