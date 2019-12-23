@@ -92,9 +92,9 @@ def compute_day22(input):
 
     n2 = 119315717514047
     sh2 = Shuffle.parse_multiple(n2, input)
-
     sh2_rep = fastpow(sh2, 101741582076661, Shuffle(n2))
     part2 = next(itertools.islice(sh2_rep.cards(), 2020, None))
+
     return part1, part2
 
 if __name__ == '__main__':
