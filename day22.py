@@ -48,6 +48,10 @@ class Shuffle(object):
         #   g(f(x)) = c(ax + b) + d = (ca)x + (cb + d).
         return Shuffle(self.n, other.a * self.a, other.a * self.b + other.b)
 
+    def inverse(self):
+        a_inv = modinv(self.a, self.n)
+        return Shuffle(self.n, a_inv, -a_inv * self.b)
+
     def cards(self):
         for i in range(self.n):
             yield (self.a*i + self.b) % self.n

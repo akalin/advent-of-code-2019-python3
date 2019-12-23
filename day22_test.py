@@ -98,5 +98,12 @@ class TestDay22(unittest.TestCase):
             sh = Shuffle.parse_multiple(self.__class__.n, input)
             self.assertEqual(sh, expected_sh, f'input is {input}')
 
+    def test_inverse(self):
+        n = 103
+        sh = Shuffle(n, 7, 3)
+        sh_inv = sh.inverse()
+        self.assertEqual(sh * sh_inv, Shuffle(n))
+        self.assertEqual(sh_inv * sh, Shuffle(n))
+
 if __name__ == '__main__':
     unittest.main()
