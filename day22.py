@@ -23,6 +23,9 @@ class Shuffle(object):
     def cut(n, N):
         return Shuffle(n, 1, N)
 
+    def increment(n, N):
+        return Shuffle(n, modinv(N, n), 0)
+
 # 7*(i + c)
 # 7*i + 0
 # -7*(i - 1)
