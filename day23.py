@@ -46,9 +46,7 @@ def compute_day23(input):
     nodes = [Node(i, program) for i in range(node_count)]
 
     packet_queues = defaultdict(deque)
-
-    nat_packet = None
-    last_nat_packet = None
+    nat_queue = packet_queues[255] = deque([], 2)
 
     for i, node in enumerate(nodes):
         node.boot()
@@ -57,27 +55,23 @@ def compute_day23(input):
         for node in nodes:
             node.fill_packet_queues(packet_queues)
 
+        if len(nat_queue) == 1:
+            part1 = nat_queue[0][1]
+
         did_work = False
         for node in nodes:
             node_did_work = node.drain_packet_queue(packet_queues)
             if node_did_work:
                 did_work = True
 
-        if packet_queues[255]:
-            nat_packet = packet_queues[255][-1]
-            print(f'setting nat packet to {nat_packet}')
-            packet_queues[255].clear()
-
         if not did_work:
-            print(f'is idle, nat packet is {nat_packet}')
-            if nat_packet is None:
-                raise
+            nat_packet = nat_queue[-1]
             packet_queues[0].append(nat_packet)
-            if nat_packet == last_nat_packet:
+            if len(nat_queue) > 1 and nat_packet == nat_queue[0]:
+                part2 = nat_packet[1]
                 break
-            last_nat_packet = nat_packet
 
-    return None, None
+    return part1, part2
 
 if __name__ == '__main__':
     with open('day23.input', 'r') as input_file:
