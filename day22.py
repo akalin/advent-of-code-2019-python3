@@ -25,7 +25,7 @@ class Shuffle(object):
         if self.n != other.n:
             raise Exception(f'{self} and {other} have different values of n')
         # self * other is composition, meaning that other is applied first,
-        # then self. If self is represented by f(x), ans other is represented
+        # then self. If self is represented by f(x), and other is represented
         # by g(x), then other applied to the standard deck looks like
         #
         #   D1 = g(0) g(1) ... g(n - 1),
@@ -40,7 +40,7 @@ class Shuffle(object):
         #
         #   g(f(0)) g(f(1)) ... g(f(n - 1)),
         #
-        # i.e. the representing functions compose in the opposite way
+        # i.e. the representing functions compose in the opposite order
         # than the shuffles do.
         #
         # therefore, if f(x) = ax + b and g(x) = cx + d, then
