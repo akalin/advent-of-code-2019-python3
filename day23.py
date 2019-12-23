@@ -15,6 +15,7 @@ def compute_day23(input):
     packet_queues = defaultdict(list)
 
     nat_packet = None
+    last_nat_packet = None
 
     for i, intputer in enumerate(intputers):
         intputer.run(inputs[i], outputs[i])
@@ -58,6 +59,9 @@ def compute_day23(input):
             if nat_packet is None:
                 raise
             packet_queues[0].append(nat_packet)
+            if nat_packet == last_nat_packet:
+                break
+            last_nat_packet = nat_packet
 
     return None, None
 
