@@ -70,10 +70,10 @@ def compute_day18(input):
                 initial_pos.append(p)
             elif c == '#':
                 walls.add(p)
-            elif ord('a') <= ord(c) <= ord('z'):
+            elif 'a' <= c <= 'z':
                 pos_to_key[p] = c
                 key_to_pos[c] = p
-            elif ord('A') <= ord(c) <= ord('Z'):
+            elif 'A' <= c <= 'Z':
                 pos_to_door[p] = c
                 door_to_pos[c] = p
 
