@@ -19,7 +19,9 @@ class Intputer(object):
         c.halted = self.halted
         return c
 
-    def run_simple(self, input):
+    def run_simple(self, input=None):
+        if input is None:
+            input = []
         output = []
         self.run_deque(deque(input), output)
         return output
@@ -188,8 +190,4 @@ def parse_intcode(s):
 
 def run_single_program(program, input=None):
     intputer = Intputer(program)
-    output = deque()
-    if input is None:
-        input = []
-    intputer.run_deque(deque(input), output)
-    return list(output)
+    return intputer.run_simple(input)

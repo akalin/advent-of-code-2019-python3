@@ -27,7 +27,7 @@ def play_game(program):
     program[0] = 2
     intputer = Intputer(program)
 
-    output = intputer.run_simple([])
+    output = intputer.run_simple()
     walls = set()
     blocks = set()
     paddle = None
