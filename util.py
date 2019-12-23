@@ -144,3 +144,9 @@ def fastpow(x, n, one):
         x_pow *= x_pow
         n >>= 1
     return prod
+
+def prod(iterable, start=1):
+    p = start
+    for x in iterable:
+        p *= x
+    return p

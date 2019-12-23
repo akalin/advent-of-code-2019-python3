@@ -1,3 +1,5 @@
+from util import *
+
 def parse_input(input):
     return [int(x) for x in input.strip()]
 
@@ -79,12 +81,6 @@ def apply_fft(nums, rounds):
 #  B(n+k-1, k) = ∑_{m=1}^n B(m+k-2, k-1),
 #
 # which follows from https://en.wikipedia.org/wiki/Hockey-stick_identity .
-
-def prod(it):
-    p = 1
-    for x in it:
-        p *= x
-    return p
 
 def binom(n, k):
     return prod([n - i for i in range(k)]) // prod(range(1, k+1))
