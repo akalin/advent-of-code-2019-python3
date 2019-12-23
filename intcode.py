@@ -191,5 +191,5 @@ def run_single_program(program, input=None):
     output = deque()
     if input is None:
         input = []
-    intputer.run(deque(input), output)
+    intputer.run_deque(deque(input), output)
     return list(output)
