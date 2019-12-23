@@ -121,7 +121,7 @@ def compute_day17(input):
     program[0] = 2
     intputer = Intputer(program)
 
-    (part2,) = intputer.run_print_ascii(ss)
+    (part2,) = intputer.run_print_ascii(ss, print_non_ascii=False)
     return part1, part2
 
 if __name__ == '__main__':

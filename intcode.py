@@ -30,21 +30,16 @@ class Intputer(object):
         self.run_emit(input, emit_next_output)
         return output
 
-    def run_print_ascii(self, input_it, emit_non_ascii=None):
+    def run_print_ascii(self, input_it, print_input=True, print_non_ascii=True):
         nonascii = []
 
-        if not emit_non_ascii:
-            def default_emit_non_ascii(v):
-                print(f'!!NONASCII({v})!!')
-
-            emit_non_ascii = default_emit_non_ascii
-
         def emit_next_output(v):
-            if v > 255:
-                emit_non_ascii(v)
+            if v <= 255:
+                print(chr(v), end='')
+            else:
+                if print_non_ascii:
+                    print(f'NONASCII({v})', end='')
                 nonascii.append(v)
-                return
-            print(chr(v), end='')
 
         self.run_emit(input_it, emit_next_output)
         return nonascii
