@@ -1,5 +1,5 @@
-from collections import defaultdict
-from more_itertools import sliced
+from collections import defaultdict, deque
+from more_itertools import chunked
 import itertools
 from intcode import *
 from util import *
@@ -9,8 +9,8 @@ def compute_day23(input):
     program = parse_intcode(input)
     int_count = 50
     intputers = [Intputer(program) for _ in range(int_count)]
-    inputs = [[i] for i in range(int_count)]
-    outputs = [[] for _ in range(int_count)]
+    inputs = [deque([i]) for i in range(int_count)]
+    outputs = [deque() for _ in range(int_count)]
 
     packet_queues = defaultdict(list)
 
@@ -18,11 +18,11 @@ def compute_day23(input):
     last_nat_packet = None
 
     for i, intputer in enumerate(intputers):
-        intputer.run(inputs[i], outputs[i])
+        intputer.run_deque(inputs[i], outputs[i])
 
     while True:
         for output in outputs:
-            for dest, x, y in sliced(output, 3):
+            for dest, x, y in chunked(output, 3):
                 packet_queues[dest].append((x, y))
             output.clear()
 
@@ -42,7 +42,7 @@ def compute_day23(input):
                 idle = False
             else:
                 inputs[i].append(-1)
-            intputer.run(inputs[i], outputs[i])
+            intputer.run_deque(inputs[i], outputs[i])
 
         for output in outputs:
             if len(output) > 0:

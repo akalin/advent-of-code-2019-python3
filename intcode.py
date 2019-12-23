@@ -1,4 +1,4 @@
-import collections
+from collections import deque
 
 class Intputer(object):
     def __init__(self, program):
