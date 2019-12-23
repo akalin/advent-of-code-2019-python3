@@ -1,8 +1,15 @@
 from util import *
 
-# A shuffle represents a sequence (a*i + b) % n for i in range(n).
+# A shuffle represents an operation on a deck of cards.
 class Shuffle(object):
     def __init__(self, n, a=1, b=0):
+        # n is the number of cards, which have numbers 0 to n-1.
+        # Given a and b, if the cards 0, 1, ... n-1 are the standard deck,
+        # then the deck after this shuffle is applied looks like
+        #
+        #   f(0) f(1) ... f(n - 1)
+        #
+        # where f(x) = (ax + b) % n.
         self.n = n
         self.a = a % n
         self.b = b % n
@@ -16,7 +23,30 @@ class Shuffle(object):
     def __mul__(self, other):
         if self.n != other.n:
             raise Exception(f'{self} and {other} have different values of n')
-        return Shuffle(self.n, self.a * other.a, self.a * other.b + self.b)
+        # self * other is composition, meaning that other is applied first,
+        # then self. If self is represented by f(x), ans other is represented
+        # by g(x), then other applied to the standard deck looks like
+        #
+        #   D1 = g(0) g(1) ... g(n - 1),
+        #
+        # so if self applied to the standard deck looks like
+        #
+        #   f(0) f(1) ... f(n - 1),
+        #
+        # then for example if f(0) = 3, then self applied to D1 puts
+        # the fourth card of D1 first, i.e. the first card of self applied
+        # to D1 is g(3) = g(f(0)). Similarly, self applied to D1 looks like
+        #
+        #   g(f(0)) g(f(1)) ... g(f(n - 1)),
+        #
+        # i.e. the representing functions compose in the opposite way
+        # than the shuffles do.
+        #
+        # therefore, if f(x) = ax + b and g(x) = cx + d, then
+        # the representing function of self * other is
+        #
+        #   g(f(x)) = c(ax + b) + d = (ca)x + (cb + d).
+        return Shuffle(self.n, other.a * self.a, other.a * self.b + other.b)
 
     def cards(self):
         for i in range(self.n):
@@ -31,23 +61,23 @@ class Shuffle(object):
     def new_stack(n):
         return Shuffle(n, -1, -1)
 
-    def parse(n, input):
-        shuffle = Shuffle(n)
-        for line in input.strip().split('\n'):
-            words = line.strip().split(' ')
-            if words[0] == 'cut':
-                N = int(words[1])
-                next_shuffle = Shuffle.cut(n, N)
-            elif words[0] == 'deal' and words[1] == 'with':
-                N = int(words[3])
-                next_shuffle = Shuffle.increment(n, N)
-            elif words[0] == 'deal' and words[1] == 'into':
-                next_shuffle = Shuffle.new_stack(n)
-            else:
-                raise Exception(f'could not parse line "{line}"')
-            shuffle = next_shuffle * shuffle
-            print(next_shuffle, shuffle)
-        return shuffle
+    def parse(n, line):
+        if line.find('\n') != -1:
+            raise Exception(f'parse called with multiple lines "{line}"')
+        words = line.strip().split(' ')
+        if words[0] == 'cut':
+            N = int(words[1])
+            return Shuffle.cut(n, N)
+        elif words[0] == 'deal' and words[1] == 'with':
+            N = int(words[3])
+            return Shuffle.increment(n, N)
+        elif words[0] == 'deal' and words[1] == 'into':
+            return Shuffle.new_stack(n)
+        raise Exception(f'could not parse line "{line}"')
+
+    def parse_multiple(n, input):
+        shuffles = [Shuffle.parse(n, line) for line in input.strip().split('\n')]
+        return prod(reversed(shuffles), Shuffle(n))
 
 # 7*(i + c)
 # 7*i + 0
