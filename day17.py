@@ -17,9 +17,7 @@ def do_bfs(start, get_neighbor_fn, visit_fn):
 
 def compute_day17(input):
     program = parse_intcode(input)
-    intputer = Intputer(program)
-    output = []
-    intputer.run([], output)
+    output = run_single_program(program)
     img = ''.join([chr(x) for x in output])
     lines = img.strip().split('\n')
     rows = len(lines)
@@ -119,9 +117,7 @@ def compute_day17(input):
 
     print(program[0])
     program[0] = 2
-    intputer = Intputer(program)
-    output = []
-    intputer.run(ss, output)
+    output = run_single_program(program, ss)
     part2 = output[-1]
     return part1, part2
 
