@@ -5,12 +5,16 @@ from util import *
 class Shuffle(object):
     def __init__(self, n, a=1, b=0):
         # n is the number of cards, which have numbers 0 to n-1.
-        # Given a and b, if the cards 0, 1, ... n-1 are the standard deck,
+        # Given a and b, if a deck looks like
+        #
+        #   x_0 x_1 ... x_n,
+        #
         # then the deck after this shuffle is applied looks like
         #
-        #   f(0) f(1) ... f(n - 1)
+        #   x_{f(0)} x_{f(1)} ... x_{f(n)}
         #
-        # where f(x) = (ax + b) % n.
+        # where f(x) = (ax + b) % n. In other words, f permutes the
+        # indices of the cards of the deck.
         self.n = n
         self.a = a % n
         self.b = b % n
@@ -24,30 +28,36 @@ class Shuffle(object):
     def __mul__(self, other):
         if self.n != other.n:
             raise Exception(f'{self} and {other} have different values of n')
-        # self * other is composition, meaning that other is applied first,
-        # then self. If self is represented by f(x), and other is represented
-        # by g(x), then other applied to the standard deck looks like
+        # Multiplication is defined as function application _on the right_,
+        # meaning that self * other means applying self to a deck first,
+        # then applying other to the resulting deck.
         #
-        #   D1 = g(0) g(1) ... g(n - 1),
+        # This is to match the behavior of the corresponding
+        # permutations. If f1 and f2 are the permutations of
+        # indices, then if a deck looks like
         #
-        # so if self applied to the standard deck looks like
+        #   x_0 x_1 ... x_n,
         #
-        #   f(0) f(1) ... f(n - 1),
+        # and the deck after self is applied looks like
         #
-        # then for example if f(0) = 3, then self applied to D1 puts
-        # the fourth card of D1 first, i.e. the first card of self applied
-        # to D1 is g(3) = g(f(0)). Similarly, self applied to D1 looks like
+        #   y_0 y_1 ... y_n
         #
-        #   g(f(0)) g(f(1)) ... g(f(n - 1)),
+        # such that y_k = x_{f1(k)}, then the deck after other is applied
+        # looks like
         #
-        # i.e. the representing functions compose in the opposite order
-        # than the shuffles do.
+        #   y_{f2(0)} y_{f2(1)} ... y{f2(n)},
         #
-        # therefore, if f(x) = ax + b and g(x) = cx + d, then
-        # the representing function of self * other is
+        # which, substituting in y_k above, looks like
         #
-        #   g(f(x)) = c(ax + b) + d = (ca)x + (cb + d).
-        return Shuffle(self.n, other.a * self.a, other.a * self.b + other.b)
+        #   x_{f1(f2(0))} x_{f1(f2(1))} ... x{f1(f2(n))}.
+        #
+        # Letting
+        #
+        #   f1 = ax + b    and    f2 = cx + d, we then have
+        #
+        #
+        #   f1 . f2 = a(cx + d) + b = (ac)x + (ad + b)
+        return Shuffle(self.n, self.a * other.a, self.a * other.b + self.b)
 
     def inverse(self):
         # Solving
@@ -59,6 +69,8 @@ class Shuffle(object):
         a_inv = modinv(self.a, self.n)
         return Shuffle(self.n, a_inv, -a_inv * self.b)
 
+    # Returns the cards resulting from this shuffle applied to the
+    # factory deck 0 1 2 ... n-1.
     def cards(self):
         for i in range(self.n):
             yield (self.a*i + self.b) % self.n
@@ -88,7 +100,7 @@ class Shuffle(object):
 
     def parse_multiple(n, input):
         shuffles = [Shuffle.parse(n, line) for line in input.strip().split('\n')]
-        return prod(reversed(shuffles), Shuffle(n))
+        return prod(shuffles, Shuffle(n))
 
 def compute_day22(input):
     n1 = 10007
