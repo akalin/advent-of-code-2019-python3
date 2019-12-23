@@ -5,56 +5,70 @@ from intcode import *
 from util import *
 from vec2 import *
 
+class Node(object):
+    def __init__(self, address, program):
+        self.address = address
+        self.intputer = Intputer(program)
+        self.input = deque()
+        self.output = deque()
+
+    def run(self):
+        self.intputer.run_deque(self.input, self.output)
+
+    def boot(self):
+        self.input.append(self.address)
+        self.run()
+
+    def fill_packet_queues(self, packet_queues):
+        for dest, x, y in chunked(self.output, 3):
+            packet_queues[dest].append((x, y))
+        self.output.clear()
+
+    def drain_packet_queue(self, packet_queues):
+        if not self.intputer.waiting_for_input:
+            return
+        queue = packet_queues[self.address]
+        if queue:
+            for x, y in queue:
+                self.input.extend([x, y])
+            queue.clear()
+            processed_input = True
+        else:
+            self.input.append(-1)
+            processed_input = False
+        self.run()
+        produced_output = len(self.output) > 0
+        return processed_input or produced_output
+
 def compute_day23(input):
     program = parse_intcode(input)
-    int_count = 50
-    intputers = [Intputer(program) for _ in range(int_count)]
-    inputs = [deque([i]) for i in range(int_count)]
-    outputs = [deque() for _ in range(int_count)]
+    node_count = 50
+    nodes = [Node(i, program) for i in range(node_count)]
 
-    packet_queues = defaultdict(list)
+    packet_queues = defaultdict(deque)
 
     nat_packet = None
     last_nat_packet = None
 
-    for i, intputer in enumerate(intputers):
-        intputer.run_deque(inputs[i], outputs[i])
+    for i, node in enumerate(nodes):
+        node.boot()
 
     while True:
-        for output in outputs:
-            for dest, x, y in chunked(output, 3):
-                packet_queues[dest].append((x, y))
-            output.clear()
+        for node in nodes:
+            node.fill_packet_queues(packet_queues)
 
-#        for i, intputer in enumerate(intputers):
-#            print(i, inputs[i], outputs[i], intputer.halted, intputer.waiting_for_input)
-
-        idle = True
-        for i, intputer in enumerate(intputers):
-            if not intputer.waiting_for_input:
-                continue
-            queue = packet_queues[i]
-            if queue:
-                for x, y in queue:
-                    inputs[i].append(x)
-                    inputs[i].append(y)
-                queue.clear()
-                idle = False
-            else:
-                inputs[i].append(-1)
-            intputer.run_deque(inputs[i], outputs[i])
-
-        for output in outputs:
-            if len(output) > 0:
-                idle = False
-
+        did_work = False
+        for node in nodes:
+            node_did_work = node.drain_packet_queue(packet_queues)
+            if node_did_work:
+                did_work = True
 
         if packet_queues[255]:
             nat_packet = packet_queues[255][-1]
             print(f'setting nat packet to {nat_packet}')
             packet_queues[255].clear()
 
-        if idle:
+        if not did_work:
             print(f'is idle, nat packet is {nat_packet}')
             if nat_packet is None:
                 raise
