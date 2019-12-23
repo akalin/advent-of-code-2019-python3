@@ -5,15 +5,12 @@ from util import *
 class Shuffle(object):
     def __init__(self, n, a=1, b=0):
         # n is the number of cards, which have numbers 0 to n-1.
-        # Given a and b, if a deck looks like
+        # Given a and b, if x is a list of cards, and y is the
+        # list of cards after this shuffle is applied, then
         #
-        #   x_0 x_1 ... x_n,
+        #   y[i] == x[f(i)]
         #
-        # then the deck after this shuffle is applied looks like
-        #
-        #   x_{f(0)} x_{f(1)} ... x_{f(n)}
-        #
-        # where f(x) = (ax + b) % n. In other words, f permutes the
+        # where f(i) = (ai + b) % n. In other words, f permutes the
         # indices of the cards of the deck.
         self.n = n
         self.a = a % n
@@ -33,58 +30,58 @@ class Shuffle(object):
         # then applying other to the resulting deck.
         #
         # This is to match the behavior of the corresponding
-        # permutations. If f1 and f2 are the permutations of
-        # indices, then if a deck looks like
+        # permutations on the indices. If f1 and f2 are the respective
+        # permutations of self and other, and x is a list of cards, y
+        # is the list of cards after self is applied to x, and z is the
+        # list of cards after other is applied to y, then
         #
-        #   x_0 x_1 ... x_n,
-        #
-        # and the deck after self is applied looks like
-        #
-        #   y_0 y_1 ... y_n
-        #
-        # such that y_k = x_{f1(k)}, then the deck after other is applied
-        # looks like
-        #
-        #   y_{f2(0)} y_{f2(1)} ... y{f2(n)},
-        #
-        # which, substituting in y_k above, looks like
-        #
-        #   x_{f1(f2(0))} x_{f1(f2(1))} ... x{f1(f2(n))}.
+        #   z[i] = y[f2(i)] = x[f1(f2(i))].
         #
         # Letting
         #
-        #   f1 = ax + b    and    f2 = cx + d,
+        #   f1(i) = ai + b    and    f2(i) = ci + d,
         #
         # we then have
         #
-        #   f1 . f2 = a(cx + d) + b = (ac)x + (ad + b)
+        #   f1(f2(i)) = a(ci + d) + b = (ac)i + (ad + b).
         return Shuffle(self.n, self.a * other.a, self.a * other.b + self.b)
 
     def inverse(self):
         # Solving
         #
-        #  y = ax + b,
+        #  j = ai + b,
         #
-        # we have x = y/a - b/a, which also works mod n, assuming a is
+        # we have i = j/a - b/a, which also works mod n, assuming a is
         # invertible mod n.
         a_inv = modinv(self.a, self.n)
         return Shuffle(self.n, a_inv, -a_inv * self.b)
 
     # Returns the cards resulting from this shuffle applied to the
-    # factory deck 0 1 2 ... n-1.
+    # factory deck x[i] = i.
     def cards(self):
         for i in range(self.n):
             yield (self.a*i + self.b) % self.n
 
     def cut(n, N):
+        # Given a deck x, the cut deck is defined by
+        #
+        #   y[i] = x[i + N].
         return Shuffle(n, 1, N)
 
     def increment(n, N):
-        # x_0 is fixed which means b=0, and x_1 is moved to index N,
-        # which means f(N) = a*N = 1, so a is the inverse of N mod n.
+        # Given a deck x, the incremented deck is defined by
+        #
+        #   y[N*i] = x[i].
+        #
+        # Therefore, y[i] = x[i/N], and thus f(i) = i/N.
         return Shuffle(n, modinv(N, n), 0)
 
     def new_stack(n):
+        # Given a deck x, the new stack is defined by
+        #
+        #   y[-i] = x[i].
+        #
+        # Therefore, y[i] = x[-i] = x[n - 1 - i], and thus f(i) = -i - 1.
         return Shuffle(n, -1, -1)
 
     def parse(n, line):
