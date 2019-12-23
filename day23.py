@@ -1,39 +1,40 @@
 from collections import defaultdict, deque
-from more_itertools import chunked
+from more_itertools import sliced
 from intcode import *
 
 class Node(object):
     def __init__(self, address, program):
         self.address = address
         self.intputer = Intputer(program)
-        self.input = deque()
-        self.output = deque()
+        self.output = []
 
-    def run(self):
-        self.intputer.run_deque(self.input, self.output)
+    def run(self, input):
+        if len(self.output) > 0:
+            raise
+        self.output = self.intputer.run_simple(input)
 
     def boot(self):
-        self.input.append(self.address)
-        self.run()
+        self.run([self.address])
 
     def fill_packet_queues(self, packet_queues):
-        for dest, x, y in chunked(self.output, 3):
+        for dest, x, y in sliced(self.output, 3):
             packet_queues[dest].append((x, y))
-        self.output.clear()
+        self.output = []
 
     def drain_packet_queue(self, packet_queues):
         if not self.intputer.waiting_for_input:
             return
         queue = packet_queues[self.address]
+        input = []
         if queue:
             for x, y in queue:
-                self.input.extend([x, y])
+                input.extend([x, y])
             queue.clear()
             processed_input = True
         else:
-            self.input.append(-1)
+            input = [-1]
             processed_input = False
-        self.run()
+        self.run(input)
         produced_output = len(self.output) > 0
         return processed_input or produced_output
 

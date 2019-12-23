@@ -1,4 +1,5 @@
 from collections import deque
+from more_itertools import spy
 
 class Intputer(object):
     def __init__(self, program):
@@ -23,30 +24,20 @@ class Intputer(object):
         if input is None:
             input = []
         output = []
-        self.run_deque(deque(input), output)
-        return output
-
-    def run_deque(self, input, output):
-        def has_next_input():
-            return len(input) > 0
-
-        def get_next_input():
-            if len(input) == 0:
-                return None
-            return input.popleft()
-
         def emit_next_output(v):
             output.append(v)
-            pass
 
-        self.run_fn(has_next_input, get_next_input, emit_next_output)
+        self.run_emit(iter(input), emit_next_output)
+        return output
 
-    def run_fn(self, has_next_input, get_next_input, emit_next_output):
+    def run_emit(self, input_it, emit_next_output):
         if self.halted:
             raise Exception('Called run when halted')
 
-        if self.waiting_for_input and not has_next_input():
-            raise Exception('Called run with empty input while waiting for input')
+        if self.waiting_for_input:
+            next_inputs, input_it = spy(input_it, 1)
+            if len(next_inputs) == 0:
+                raise Exception('Called run with empty input while waiting for input')
 
         modes = []
         nargs = 0
@@ -127,7 +118,7 @@ class Intputer(object):
             elif opcode == 3:
                 # Consume input
                 nargs = 1
-                v = get_next_input()
+                v = next(input_it, None)
                 if v is None:
                     self.waiting_for_input = True
                     self.ip -= 1
