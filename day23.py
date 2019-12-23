@@ -14,12 +14,12 @@ def compute_day23(input):
 
     packet_queues = defaultdict(list)
 
+    nat_packet = None
+
     for i, intputer in enumerate(intputers):
         intputer.run(inputs[i], outputs[i])
 
     while True:
-        for i, intputer in enumerate(intputers):
-            print(i, inputs[i], outputs[i], intputer.halted, intputer.waiting_for_input)
         for output in outputs:
             for dest, x, y in sliced(output, 3):
                 packet_queues[dest].append((x, y))
@@ -28,6 +28,7 @@ def compute_day23(input):
 #        for i, intputer in enumerate(intputers):
 #            print(i, inputs[i], outputs[i], intputer.halted, intputer.waiting_for_input)
 
+        idle = True
         for i, intputer in enumerate(intputers):
             if not intputer.waiting_for_input:
                 continue
@@ -37,13 +38,27 @@ def compute_day23(input):
                     inputs[i].append(x)
                     inputs[i].append(y)
                 queue.clear()
+                idle = False
             else:
                 inputs[i].append(-1)
             intputer.run(inputs[i], outputs[i])
 
+        for output in outputs:
+            if len(output) > 0:
+                idle = False
+
+
         if packet_queues[255]:
-            print(packet_queues[255])
-            break
+            nat_packet = packet_queues[255][-1]
+            print(f'setting nat packet to {nat_packet}')
+            packet_queues[255].clear()
+
+        if idle:
+            print(f'is idle, nat packet is {nat_packet}')
+            if nat_packet is None:
+                raise
+            packet_queues[0].append(nat_packet)
+            nat_packet = None
 
     return None, None
 
