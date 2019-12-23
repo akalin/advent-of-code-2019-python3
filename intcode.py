@@ -20,8 +20,8 @@ class Intputer(object):
         return c
 
     def run(self, input, output):
-        input_d = collections.deque(input)
-        output_d = collections.deque(output)
+        input_d = deque(input)
+        output_d = deque(output)
         self.run_deque(input_d, output_d)
         input.clear()
         input.extend(input_d)
