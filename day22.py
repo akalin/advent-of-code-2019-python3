@@ -10,9 +10,18 @@ class Shuffle(object):
     def __str__(self):
         return f'Shuffle(n={self.n}, a={self.a}, b={self.b})'
 
+    def __mul__(self, other):
+        # a(cx + d) + b = acx + ad + b
+        if self.n != other.n:
+            raise Exception(f'{self} and {other} have different values of n')
+        return Shuffle(self.n, self.a * other.a, self.a * other.b + self.b)
+
     def cards(self):
         for i in range(self.n):
             yield (self.a*i + self.b) % self.n
+
+    def cut(n, N):
+        return Shuffle(n, 1, N)
 
 # 7*(i + c)
 # 7*i + 0
