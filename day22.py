@@ -80,6 +80,8 @@ class Shuffle(object):
         return Shuffle(n, 1, N)
 
     def increment(n, N):
+        # x_0 is fixed which means b=0, and x_1 is moved to index N,
+        # which means f(N) = a*N = 1, so a is the inverse of N mod n.
         return Shuffle(n, modinv(N, n), 0)
 
     def new_stack(n):
