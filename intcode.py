@@ -27,7 +27,7 @@ class Intputer(object):
         def emit_next_output(v):
             output.append(v)
 
-        self.run_emit(iter(input), emit_next_output)
+        self.run_emit(input, emit_next_output)
         return output
 
     def run_print_ascii(self, input_it, emit_non_ascii=None):
