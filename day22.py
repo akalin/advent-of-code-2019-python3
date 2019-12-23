@@ -1,9 +1,18 @@
-from collections import deque
-import itertools
-from intcode import *
 from util import *
-from vec2 import *
-from vec3 import *
+
+# A shuffle represents a sequence (a*i + b) % n for i in range(n).
+class Shuffle(object):
+    def __init__(self, n, a=1, b=0):
+        self.n = n
+        self.a = a % n
+        self.b = b % n
+
+    def __str__(self):
+        return f'Shuffle(n={self.n}, a={self.a}, b={self.b})'
+
+    def cards(self):
+        for i in range(self.n):
+            yield (self.a*i + self.b) % self.n
 
 # 7*(i + c)
 # 7*i + 0
