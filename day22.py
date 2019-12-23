@@ -50,6 +50,12 @@ class Shuffle(object):
         return Shuffle(self.n, other.a * self.a, other.a * self.b + other.b)
 
     def inverse(self):
+        # Solving
+        #
+        #  y = ax + b,
+        #
+        # we have x = y/a - b/a, which also works mod n, assuming a is
+        # invertible mod n.
         a_inv = modinv(self.a, self.n)
         return Shuffle(self.n, a_inv, -a_inv * self.b)
 
