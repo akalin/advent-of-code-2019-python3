@@ -181,3 +181,6 @@ def parse_intcode(s):
 
 def run_intcode_program(program, input=None):
     return Intputer(program).run(input)
+
+def ascii_to_ints(str):
+    return [ord(x) for x in str]
