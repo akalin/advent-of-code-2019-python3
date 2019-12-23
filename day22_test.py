@@ -27,5 +27,13 @@ class TestDay22(unittest.TestCase):
         cards = list(sh.cards())
         self.assertEqual(cards, list(range(9, -1, -1)))
 
+    def test_mult(self):
+        n = 10
+        sh = (Shuffle.increment(n, 7) *
+              Shuffle.new_stack(n) *
+              Shuffle.new_stack(n))
+        cards = list(sh.cards())
+        self.assertEqual(cards, [0, 3, 6, 9, 2, 5, 8, 1, 4, 7])
+
 if __name__ == '__main__':
     unittest.main()
