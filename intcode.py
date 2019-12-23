@@ -29,10 +29,25 @@ class Intputer(object):
         output.extend(output_d)
 
     def run_deque(self, input, output):
+        def has_next_input():
+            return len(input) > 0
+
+        def get_next_input():
+            if len(input) == 0:
+                return None
+            return input.popleft()
+
+        def emit_next_output(v):
+            output.append(v)
+            pass
+
+        self.run_fn(has_next_input, get_next_input, emit_next_output)
+
+    def run_fn(self, has_next_input, get_next_input, emit_next_output):
         if self.halted:
             raise Exception('Called run when halted')
 
-        if self.waiting_for_input and len(input) == 0:
+        if self.waiting_for_input and not has_next_input():
             raise Exception('Called run with empty input while waiting for input')
 
         modes = []
@@ -114,12 +129,12 @@ class Intputer(object):
             elif opcode == 3:
                 # Consume input
                 nargs = 1
-                if len(input) == 0:
+                v = get_next_input()
+                if v is None:
                     self.waiting_for_input = True
                     self.ip -= 1
                     return
                 self.waiting_for_input = False
-                v = input.popleft()
                 setp(0, v)
                 adv()
 
@@ -127,7 +142,7 @@ class Intputer(object):
                 # Produce output
                 nargs = 1
                 v = getp(0)
-                output.append(v)
+                emit_next_output(v)
                 adv()
 
             elif opcode == 5:
