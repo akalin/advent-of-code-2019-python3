@@ -35,5 +35,30 @@ class TestDay22(unittest.TestCase):
         cards = list(sh.cards())
         self.assertEqual(cards, [0, 3, 6, 9, 2, 5, 8, 1, 4, 7])
 
+        sh = (Shuffle.cut(n, 6) *
+              Shuffle.increment(n, 7) *
+              Shuffle.new_stack(n))
+        cards = list(sh.cards())
+        self.assertEqual(cards, [3, 0, 7, 4, 1, 8, 5, 2, 9, 6])
+
+        sh = (Shuffle.increment(n, 7) *
+              Shuffle.increment(n, 9) *
+              Shuffle.cut(n, -2))
+        cards = list(sh.cards())
+        self.assertEqual(cards, [6, 3, 0, 7, 4, 1, 8, 5, 2, 9])
+
+        sh = (Shuffle.new_stack(n) *
+              Shuffle.cut(n, -2) *
+              Shuffle.increment(n, 7) *
+              Shuffle.cut(n, 8) *
+              Shuffle.cut(n, -4) *
+              Shuffle.increment(n, 7) *
+              Shuffle.cut(n, 3) *
+              Shuffle.increment(n, 9) *
+              Shuffle.increment(n, 3) *
+              Shuffle.cut(n, -1))
+        cards = list(sh.cards())
+        self.assertEqual(cards, [9, 2, 5, 8, 1, 4, 7, 0, 3, 6])
+
 if __name__ == '__main__':
     unittest.main()
