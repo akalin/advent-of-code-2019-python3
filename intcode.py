@@ -28,6 +28,11 @@ class Intputer(object):
         output.clear()
         output.extend(output_d)
 
+    def run_simple(self, input):
+        output = []
+        self.run(input[:], output)
+        return output
+
     def run_deque(self, input, output):
         def has_next_input():
             return len(input) > 0

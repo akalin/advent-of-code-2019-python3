@@ -27,8 +27,7 @@ def play_game(program):
     program[0] = 2
     intputer = Intputer(program)
 
-    output = []
-    intputer.run([], output)
+    output = intputer.run_simple([])
     walls = set()
     blocks = set()
     paddle = None
@@ -58,8 +57,7 @@ def play_game(program):
     while not intputer.halted:
         next_move = int_sgn(ball[0] - paddle[0])
 
-        output = []
-        intputer.run([next_move], output)
+        output = intputer.run_simple([next_move])
         for x, y, c in sliced(output, 3):
             if x == -1:
                 score = c

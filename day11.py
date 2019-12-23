@@ -12,8 +12,7 @@ def run_robot(program, initial_color):
     dir = Direction('U')
     while True:
         input = [grid[pos]]
-        output = []
-        intputer.run(input, output)
+        output = intputer.run_simple([grid[pos]])
         if intputer.halted:
             break
         color, turn = output
