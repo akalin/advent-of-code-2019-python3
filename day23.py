@@ -58,7 +58,6 @@ def compute_day23(input):
             if nat_packet is None:
                 raise
             packet_queues[0].append(nat_packet)
-            nat_packet = None
 
     return None, None
 
