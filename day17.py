@@ -117,8 +117,26 @@ def compute_day17(input):
 
     print(program[0])
     program[0] = 2
-    output = run_single_program(program, ss)
-    part2 = output[-1]
+    intputer = Intputer(program)
+
+    input = deque(ss)
+    def has_next_input():
+        return len(input) > 0
+
+    def get_next_input():
+        if len(input) == 0:
+            return None
+        return input.popleft()
+
+    part2 = None
+    def emit_next_output(v):
+        nonlocal part2
+        if v > 255:
+            part2 = v
+            return
+        print(chr(v), end='')
+
+    output = intputer.run_fn(has_next_input, get_next_input, emit_next_output)
     return part1, part2
 
 if __name__ == '__main__':
