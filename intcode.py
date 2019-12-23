@@ -184,3 +184,13 @@ def run_intcode_program(program, input=None):
 
 def ascii_to_ints(str):
     return [ord(x) for x in str]
+
+def ints_to_ascii(ints):
+    ascii = []
+    non_ascii = []
+    for i in ints:
+        if i <= 255:
+            ascii.append(chr(i))
+        else:
+            non_ascii.append(i)
+    return ''.join(ascii), non_ascii

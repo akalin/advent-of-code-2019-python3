@@ -27,11 +27,11 @@ OR T J
 RUN
 '''
     output = run_intcode_program(program, ascii_to_ints(input_s))
-    print(output[-1])
-    output_s = ''.join([chr(x) for x in output])
-    print(output_s)
+    output_ascii, output_non_ascii = ints_to_ascii(output)
+    if output_ascii:
+        print('ASCII output', output_ascii)
 
-    return None, None
+    return None, output_non_ascii[0]
 
 if __name__ == '__main__':
     with open('day21.input', 'r') as input_file:
