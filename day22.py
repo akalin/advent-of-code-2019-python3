@@ -7,11 +7,13 @@ class Shuffle(object):
         self.a = a % n
         self.b = b % n
 
-    def __str__(self):
+    def __repr__(self):
         return f'Shuffle(n={self.n}, a={self.a}, b={self.b})'
 
+    def __eq__(self, other):
+        return self.n == other.n and self.a == other.a and self.b == other.b
+
     def __mul__(self, other):
-        # a(cx + d) + b = acx + ad + b
         if self.n != other.n:
             raise Exception(f'{self} and {other} have different values of n')
         return Shuffle(self.n, self.a * other.a, self.a * other.b + self.b)
@@ -30,18 +32,21 @@ class Shuffle(object):
         return Shuffle(n, -1, -1)
 
     def parse(n, input):
-        SC = self.__class__
-        shuffle = SC(n)
+        shuffle = Shuffle(n)
         for line in input.strip().split('\n'):
             words = line.strip().split(' ')
             if words[0] == 'cut':
                 N = int(words[1])
-                shuffle = SC.cut(n, N) * shuffle
+                next_shuffle = Shuffle.cut(n, N)
             elif words[0] == 'deal' and words[1] == 'with':
                 N = int(words[3])
-                shuffle = SC.increment(n, N) * shuffle
+                next_shuffle = Shuffle.increment(n, N)
             elif words[0] == 'deal' and words[1] == 'into':
-                shuffle = SC.new_stack(n) * shuffle
+                next_shuffle = Shuffle.new_stack(n)
+            else:
+                raise Exception(f'could not parse line "{line}"')
+            shuffle = next_shuffle * shuffle
+            print(next_shuffle, shuffle)
         return shuffle
 
 # 7*(i + c)

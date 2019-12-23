@@ -60,5 +60,59 @@ class TestDay22(unittest.TestCase):
         cards = list(sh.cards())
         self.assertEqual(cards, [9, 2, 5, 8, 1, 4, 7, 0, 3, 6])
 
+    def test_parse(self):
+        n = 10
+        cases = [
+            ('''
+            deal with increment 7
+            deal into new stack
+            deal into new stack
+            ''',
+             Shuffle.increment(n, 7) *
+             Shuffle.new_stack(n) *
+             Shuffle.new_stack(n)),
+            ('''
+            cut 6
+            deal with increment 7
+            deal into new stack
+            ''',
+             Shuffle.cut(n, 6) *
+             Shuffle.increment(n, 7) *
+             Shuffle.new_stack(n)),
+            ('''
+            deal with increment 7
+            deal with increment 9
+            cut -2
+            ''',
+             Shuffle.increment(n, 7) *
+             Shuffle.increment(n, 9) *
+             Shuffle.cut(n, -2)),
+            ('''
+            deal into new stack
+            cut -2
+            deal with increment 7
+            cut 8
+            cut -4
+            deal with increment 7
+            cut 3
+            deal with increment 9
+            deal with increment 3
+            cut -1
+            ''',
+             Shuffle.new_stack(n) *
+             Shuffle.cut(n, -2) *
+             Shuffle.increment(n, 7) *
+             Shuffle.cut(n, 8) *
+             Shuffle.cut(n, -4) *
+             Shuffle.increment(n, 7) *
+             Shuffle.cut(n, 3) *
+             Shuffle.increment(n, 9) *
+             Shuffle.increment(n, 3) *
+             Shuffle.cut(n, -1)),
+        ]
+        for input, expected_sh in cases:
+            sh = Shuffle.parse(n, input)
+            self.assertEqual(sh, expected_sh, f'input was {input}')
+
 if __name__ == '__main__':
     unittest.main()
