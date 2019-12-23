@@ -4,7 +4,7 @@ from more_itertools import sliced
 import os
 
 def count_blocks(program):
-    output = run_single_program(program)
+    output = run_intcode_program(program)
     return len([c for _, _, c in sliced(output, 3) if c == 2])
 
 def maybe_show_game(walls, blocks, paddle, ball, score):

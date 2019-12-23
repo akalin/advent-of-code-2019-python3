@@ -16,7 +16,7 @@ def do_bfs(start, get_neighbor_fn, visit_fn):
                 queue.append(m)
 
 def is_tractor(program, x, y):
-    output = run_single_program(program, [x, y])
+    output = run_intcode_program(program, [x, y])
     return output[0] == 1
 
 def find_tractor_start(program, y, hint):
