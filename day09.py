@@ -9,13 +9,14 @@ class Intputer(object):
         self.waiting_for_input = False
         self.halted = False
 
-    def run(self, input, output):
+    def run(self, input):
         if self.halted:
             raise Exception('Called run when halted')
 
         if self.waiting_for_input and len(input) == 0:
             raise Exception('Called run with empty input while waiting for input')
 
+        output = []
         modes = []
         nargs = 0
 
@@ -94,7 +95,7 @@ class Intputer(object):
                 if len(input) == 0:
                     self.waiting_for_input = True
                     self.ip -= 1
-                    return
+                    break
                 self.waiting_for_input = False
                 v = input.pop(0)
                 setp(0, v)
@@ -144,15 +145,16 @@ class Intputer(object):
             elif opcode == 99:
                 # halt
                 self.halted = True
-                return
+                break
 
             else:
                 raise Exception(f'Unknown opcode {opcode}')
 
+        return output
+
 def run(program, input):
     intputer = Intputer(program)
-    output = []
-    intputer.run([input], output)
+    output = intputer.run([input])
     return output[0]
 
 def compute_day09(input):
