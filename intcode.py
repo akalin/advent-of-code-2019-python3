@@ -20,6 +20,15 @@ class Intputer(object):
         return c
 
     def run(self, input, output):
+        input_d = collections.deque(input)
+        output_d = collections.deque(output)
+        self.run_deque(input_d, output_d)
+        input.clear()
+        input.extend(input_d)
+        output.clear()
+        output.extend(output_d)
+
+    def run_deque(self, input, output):
         if self.halted:
             raise Exception('Called run when halted')
 
@@ -110,7 +119,7 @@ class Intputer(object):
                     self.ip -= 1
                     return
                 self.waiting_for_input = False
-                v = input.pop(0)
+                v = input.popleft()
                 setp(0, v)
                 adv()
 
