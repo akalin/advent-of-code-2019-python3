@@ -26,6 +26,9 @@ class Shuffle(object):
     def increment(n, N):
         return Shuffle(n, modinv(N, n), 0)
 
+    def new_stack(n):
+        return Shuffle(n, -1, -1)
+
 # 7*(i + c)
 # 7*i + 0
 # -7*(i - 1)

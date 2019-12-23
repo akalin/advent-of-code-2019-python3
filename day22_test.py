@@ -22,5 +22,10 @@ class TestDay22(unittest.TestCase):
         cards = list(sh.cards())
         self.assertEqual(cards, [0, 7, 4, 1, 8, 5, 2, 9, 6, 3])
 
+    def test_new_stack(self):
+        sh = Shuffle.new_stack(10)
+        cards = list(sh.cards())
+        self.assertEqual(cards, list(range(9, -1, -1)))
+
 if __name__ == '__main__':
     unittest.main()
