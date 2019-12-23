@@ -18,7 +18,9 @@ def do_bfs(start, get_neighbor_fn, visit_fn):
 def compute_day17(input):
     program = parse_intcode(input)
     output = run_intcode_program(program)
-    img = ''.join([chr(x) for x in output])
+    img, nonascii = ints_to_ascii(output)
+    if nonascii:
+        raise nonascii
     lines = img.strip().split('\n')
     rows = len(lines)
     cols = len(lines[0])
