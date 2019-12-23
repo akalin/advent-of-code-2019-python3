@@ -26,7 +26,7 @@ NOT A T
 OR T J
 RUN
 '''
-    output = run_intcode_program(program, [ord(x) for x in input_s])
+    output = run_intcode_program(program, ascii_to_ints(input_s))
     print(output[-1])
     output_s = ''.join([chr(x) for x in output])
     print(output_s)
