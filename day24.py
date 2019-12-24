@@ -6,6 +6,7 @@ from util import *
 def new_level():
     rows = cols = 5
     new_level = [['.'] * cols for _ in range(rows)]
+    new_level[2][2] = '?'
     return new_level
 
 class Grid(object):
@@ -24,7 +25,7 @@ class Grid(object):
     def to_string(self):
         s = ''
         for l, level in self.levels.items():
-            s += f'level {l}\n\n{self.to_string_level(level)}'
+            s += f'level {l}\n\n{self.to_string_level(level)}\n\n'
         return s
 
     def get_cell(self, x, y, l):
@@ -57,16 +58,16 @@ class Grid(object):
                 yield (x3, y3, l2)
         elif x2 == -1:
             l2 = l-1
-            yield (1, y2, l2)
+            yield (1, 2, l2)
         elif x2 == 5:
             l2 = l-1
-            yield (3, y2, l2)
+            yield (3, 2, l2)
         elif y2 == -1:
             l2 = l-1
-            yield (x2, 1, l2)
+            yield (2, 1, l2)
         elif y2 == 5:
             l2 = l-1
-            yield (x2, 3, l2)
+            yield (2, 3, l2)
         else:
             yield x2, y2, l
 
