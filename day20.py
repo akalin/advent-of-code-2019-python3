@@ -81,21 +81,26 @@ def compute_day20(input):
     G = nx.Graph()
     for parent, child in bfs_edges(start_pos, neighbors_part1):
         counts[child] = counts[parent] + 1
-        G.add_edge(parent, child)
+        if has_direction(child - parent):
+            G.add_edge(parent, child)
 
     part1 = counts[end_pos]
 
     H = nx.Graph()
-    labeled_nodes = [start_pos, end_pos] + list(collapse(portals.values(), levels=1))
-    for source in labeled_nodes:
-        lengths = nx.shortest_path_length(G, source)
-        for target in labeled_nodes:
-            if target in lengths:
-                H.add_edge(source, target, weight=lengths[target])
+    labeled_nodes = {
+        start_pos: frozenset(['A']),
+        end_pos: frozenset(['Z']),
+    }
+    for label, ends in portals.items():
+        for end in ends:
+            labeled_nodes[end] = label
 
-    part1_nx = H.edges[start_pos, end_pos]['weight']
-    if part1 != part1_nx:
-        raise Exception(f'computed {part1} for part 1, but NetworkX computed {part1_nx}')
+    for source, label in labeled_nodes.items():
+        H.add_node(source, label=label)
+        lengths = nx.shortest_path_length(G, source)
+        for target in labeled_nodes.keys():
+            if target != source and target in lengths:
+                H.add_edge(source, target, weight=lengths[target])
 
     start_pos3 = vec2to3(start_pos, 0)
     end_pos3 = vec2to3(end_pos, 0)
