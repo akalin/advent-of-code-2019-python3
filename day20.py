@@ -72,12 +72,6 @@ def parse_input(input):
 
     return walkables, start_pos, end_pos, portals, portal_sides
 
-def vec3to2(v3):
-    return Vec2(v3[0], v3[1]), v3[2]
-
-def vec2to3(v2, z):
-    return Vec3(v2[0], v2[1], z)
-
 def local_neighbors(n, walkables):
     possible_neighbors = [n + d.vec() for d in all_directions]
     return (m for m in possible_neighbors if m in walkables)
@@ -85,12 +79,12 @@ def local_neighbors(n, walkables):
 def compute_part1(walkables, start_pos, end_pos, portals, portal_sides):
     counts = {start_pos: 0}
 
-    def neighbors_part1(n):
+    def neighbors(n):
         yield from local_neighbors(n, walkables)
         if n in portal_sides:
             yield portal_sides[n][0]
 
-    for parent, child in bfs_edges(start_pos, neighbors_part1):
+    for parent, child in bfs_edges(start_pos, neighbors):
         counts[child] = counts[parent] + 1
 
     return counts[end_pos]
@@ -130,6 +124,12 @@ def dijkstra_singlesource(source, target, weighted_neighbors):
 
     return dist
 
+def vec3to2(v3):
+    return Vec2(v3[0], v3[1]), v3[2]
+
+def vec2to3(v2, z):
+    return Vec3(v2[0], v2[1], z)
+
 def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
     local = compute_local_graph(walkables)
 
@@ -151,7 +151,7 @@ def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
     start_pos3 = vec2to3(start_pos, 0)
     end_pos3 = vec2to3(end_pos, 0)
 
-    def neighbors_part2(n3):
+    def weighted_neighbors(n3):
         n, z = vec3to2(n3)
         for m in G[n]:
             yield vec2to3(m, z), G.edges[n, m]['weight']
@@ -161,7 +161,7 @@ def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
             if new_z >= 0:
                 yield vec2to3(other_side, new_z), 1
 
-    counts3 = dijkstra_singlesource(start_pos3, end_pos3, neighbors_part2)
+    counts3 = dijkstra_singlesource(start_pos3, end_pos3, weighted_neighbors)
     return counts3[end_pos3]
 
 if __name__ == '__main__':
