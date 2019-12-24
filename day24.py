@@ -49,7 +49,7 @@ class Grid(object):
             c = Vec2(2, 2)
             m = c + idir.vec() + idir.vec()
             ldir = idir.turn_left()
-            rdir = idir.turn_left()
+            rdir = idir.turn_right()
             lef1 = m + ldir.vec()
             lef2 = lef1 + ldir.vec()
             r1 = m + rdir.vec()
@@ -84,7 +84,7 @@ class Grid(object):
             c = self.get_cell(x2, y2, l2)
             if c == '#':
                 bug_count += 1
-#        print(f'gnbc: {x},{y},{l} {bug_count}')
+#        print(f'gnbc: {x},{y},{l} {list(self.get_neighbors(x, y, l))} {bug_count}')
         return bug_count
 
     def next_cell(self, x, y, l):
