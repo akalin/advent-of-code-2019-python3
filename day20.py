@@ -126,6 +126,42 @@ def dijkstra(source, target, weighted_neighbors):
 
     return dist
 
+def astar(start, target, get_neighbor_fn, h):
+    open_set = set([start])
+    came_from = {start: None}
+
+    g_score = {start: 0}
+    f_score = {start: h(start)}
+
+    def get_g_score(n):
+        if n not in g_score:
+            return (1, 0)
+        return (0, g_score[n])
+
+    def get_f_score(n):
+        if n not in f_score:
+            return (1, 0)
+        return (0, f_score[n])
+
+    while len(open_set) > 0:
+        n = min(open_set, key=get_f_score)
+        if n == target:
+            return g_score
+        open_set.remove(n)
+
+        for m, m_len in get_neighbor_fn(n):
+            if n not in g_score:
+                continue
+
+            tentative_g_score = g_score[n] + m_len
+            if (0, tentative_g_score) < get_g_score(m):
+                came_from[m] = n
+                g_score[m] = tentative_g_score
+                f_score[m] = g_score[m] + h(m)
+                open_set.add(m)
+
+    raise
+
 def vec3to2(v3):
     return Vec2(v3[0], v3[1]), v3[2]
 
@@ -163,7 +199,10 @@ def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
             if new_z >= 0:
                 yield vec2to3(other_side, new_z), 1
 
-    counts3 = dijkstra(start_pos3, end_pos3, weighted_neighbors)
+    def heuristic(n3):
+        return 0
+
+    counts3 = astar(start_pos3, end_pos3, weighted_neighbors, heuristic)
     return counts3[end_pos3]
 
 if __name__ == '__main__':
