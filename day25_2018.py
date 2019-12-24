@@ -1,6 +1,3 @@
-from collections import defaultdict, deque
-from more_itertools import sliced
-from intcode import *
 from util import *
 
 def is_close(p1, p2):
