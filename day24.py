@@ -144,8 +144,21 @@ class Grid(object):
             i += 1
         return score
 
+    def compute_bug_count(self):
+        bug_count = 0
+        rows = cols = 5
+        for l, level in self.levels.items():
+            for y in range(rows):
+                for x in range(cols):
+                    if x == 2 and y == 2:
+                        continue
+                    c = self.get_cell(x, y, l)
+                    if c == '#':
+                        bug_count += 1
+        return bug_count
+
 def compute_day24(input):
-    input = '''
+    input2 = '''
 ....#
 #..#.
 #.?##
@@ -154,11 +167,14 @@ def compute_day24(input):
 '''
     grid = Grid(input)
 
-    for i in range(11):
+    for i in range(200):
         print(f'i={i}')
-        print(grid.to_string())
+#        print(grid.to_string())
         print('')
         grid = grid.next_tick()
+
+    print(grid.to_string())
+    print(grid.compute_bug_count())
 
     return None, None
 
