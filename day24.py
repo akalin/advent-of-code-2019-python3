@@ -32,11 +32,11 @@ class Grid(object):
         rows = len(level)
         cols = len(level[0])
         if y < 0 or y >= rows:
-            return None
+            raise Exception('f {x} {y} {l}')
         if x < 0 or x >= cols:
-            return None
+            raise Exception('f {x} {y} {l}')
         if x == 2 and y == 2:
-            raise
+            raise Exception('f {x} {y} {l}')
         return level[y][x]
 
     def get_neighbors_from(self, x, y, l, dir):
