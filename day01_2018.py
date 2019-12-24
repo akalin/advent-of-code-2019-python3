@@ -35,7 +35,18 @@ def compute_day01(input):
     lines = input.strip().split('\n')
     ints = [int(line.strip()) for line in lines]
     part1 = sum(ints)
-    return part1, None
+
+    freq = 0
+    frequencies = set([0])
+    found_freq = None
+    while not found_freq:
+        for i in ints:
+            freq += i
+            if freq in frequencies:
+                found_freq = freq
+                break
+            frequencies.add(freq)
+    return part1, found_freq
 
 if __name__ == '__main__':
     with open('day01_2018.input', 'r') as input_file:
