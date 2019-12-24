@@ -90,6 +90,10 @@ def compute_day15(input):
 
     part2 = max(oxygen_distances.values())
 
+    part2_nx = max(nx.shortest_path_length(G, oxygen).values())
+    if part2 != part2_nx:
+        raise Exception(f'computed {part2} for part 2, but NetworkX computed {part2_nx}')
+
     return part1, part2
 
 if __name__ == '__main__':
