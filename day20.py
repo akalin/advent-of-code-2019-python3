@@ -93,8 +93,16 @@ def compute_part1(walkables, start_pos, end_pos, portals, portal_sides):
 
     return counts[end_pos]
 
+def compute_local_graph(walkables):
+    return nx.Graph([(n, m) for n in walkables for m in local_neighbors(n, walkables)])
+
+def compute_part1_nx(walkables, start_pos, end_pos, portals, portal_sides):
+    G = compute_local_graph(walkables)
+    G.add_edges_from((n, m) for n, (m, _) in portal_sides.items())
+    return nx.shortest_path_length(G, source=start_pos, target=end_pos)
+
 def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
-    G = nx.Graph([(n, m) for n in walkables for m in local_neighbors(n, walkables)])
+    G = compute_local_graph(walkables)
 
     H = nx.Graph()
     labeled_nodes = {
@@ -154,12 +162,20 @@ if __name__ == '__main__':
             global part1
             part1 = compute_part1(walkables, start_pos, end_pos, portals, portal_sides)
 
+        part1_nx = None
+        def do_part1_nx():
+            global part1_nx
+            part1_nx = compute_part1_nx(walkables, start_pos, end_pos, portals, portal_sides)
+
         part2 = None
         def do_part2():
             global part2
             part2 = compute_part2(walkables, start_pos, end_pos, portals, portal_sides)
 
         part1_duration = timeit.timeit(do_part1, number=1)
+        part1_nx_duration = timeit.timeit(do_part1_nx, number=1)
         part2_duration = timeit.timeit(do_part2, number=1)
-        print(f'part1: {part1} ({part1_duration:.2f}s), part2: {part2} ({part2_duration:.2f}s)')
+        if part1 != part1_nx:
+            raise Exception(f'computed {part1} for part 1, but NetworkX computed {part1_nx}')
+        print(f'part1: {part1} ({part1_duration:.2f}s, nx={part1_nx_duration:.2f}s), part2: {part2} ({part2_duration:.2f}s)')
 
