@@ -84,6 +84,7 @@ class Grid(object):
             c = self.get_cell(x2, y2, l2)
             if c == '#':
                 bug_count += 1
+#        print(f'gnbc: {x},{y},{l} {bug_count}')
         return bug_count
 
     def next_cell(self, x, y, l):
@@ -121,12 +122,12 @@ class Grid(object):
         if self.to_string_level(one_below) != self.to_string_level(new_level()):
             g.levels[min_l-1] = one_below
         if self.to_string_level(one_above) != self.to_string_level(new_level()):
-            g.levels[max_l-1] = one_above
+            g.levels[max_l+1] = one_above
         return g
 
     def level_bounds(self):
         min_level = min(self.levels.keys())
-        max_level = min(self.levels.keys())
+        max_level = max(self.levels.keys())
         return min_level, max_level
 
     def compute_biodiversity(self, l):
@@ -156,8 +157,8 @@ def compute_day24(input):
     for i in range(11):
         print(f'i={i}')
         print(grid.to_string())
-        grid = grid.next_tick()
         print('')
+        grid = grid.next_tick()
 
     return None, None
 
