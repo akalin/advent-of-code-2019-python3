@@ -99,7 +99,7 @@ def compute_part1_nx(walkables, start_pos, end_pos, portals, portal_sides):
 
 # Adapted from _dijkstra_multisource in
 # https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/shortest_paths/weighted.html#dijkstra_path .
-def dijkstra_singlesource(source, target, weighted_neighbors):
+def dijkstra(source, target, weighted_neighbors):
     dist = {}
     seen = {}
     c = count()
@@ -161,7 +161,7 @@ def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
             if new_z >= 0:
                 yield vec2to3(other_side, new_z), 1
 
-    counts3 = dijkstra_singlesource(start_pos3, end_pos3, weighted_neighbors)
+    counts3 = dijkstra(start_pos3, end_pos3, weighted_neighbors)
     return counts3[end_pos3]
 
 if __name__ == '__main__':
