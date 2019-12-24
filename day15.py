@@ -64,6 +64,10 @@ def compute_day15(input):
     if oxygen is None:
         raise Exception('oxygen not found')
 
+    # G might not contain all edges, just the ones in the BFS
+    # traversal, but it turns out that it's the whole graph (at least
+    # on my input).
+
     part1 = origin_distances[oxygen]
     part1_nx = nx.shortest_path_length(G, source=origin, target=oxygen)
     if part1 != part1_nx:
