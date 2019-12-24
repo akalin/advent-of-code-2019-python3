@@ -74,7 +74,19 @@ class Grid(object):
         g.levels = {}
         for l, level in self.levels.items():
             g.levels[l] = self.next_level(l)
+        min_l, max_l = self.level_bounds()
+        one_below = self.next_level(min_l-1)
+        one_above = self.next_level(max_l-1)
+        if self.to_string_level(one_below) != self.to_string_level(new_level()):
+            g.levels[min_l-1] = one_below
+        if self.to_string_level(one_above) != self.to_string_level(new_level()):
+            g.levels[max_l-1] = one_above
         return g
+
+    def level_bounds(self):
+        min_level = min(self.levels.keys())
+        max_level = min(self.levels.keys())
+        return min_level, max_level
 
     def compute_biodiversity(self, l):
         score = 0
