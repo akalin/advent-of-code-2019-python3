@@ -4,17 +4,6 @@ from intcode import *
 from util import *
 from vec2 import *
 
-def do_bfs(start, get_neighbor_fn, visit_fn):
-    visited = set([start])
-    queue = deque([start])
-    while queue:
-        n = queue.popleft()
-        for m in get_neighbor_fn(n):
-            if m not in visited:
-                visited.add(m)
-                visit_fn(m, n)
-                queue.append(m)
-
 def is_tractor(program, x, y):
     output = run_intcode_program(program, [x, y])
     return output[0] == 1
