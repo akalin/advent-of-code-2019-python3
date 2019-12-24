@@ -3,39 +3,33 @@ from more_itertools import sliced
 from intcode import *
 from util import *
 
-def is_close(c1, c2):
-    return manhattan_norm([x1 - x2 for x1, x2 in zip(c1, c2)]) <= 3
+def is_close(p1, p2):
+    return manhattan_norm([x1 - x2 for x1, x2 in zip(p1, p2)]) <= 3
 
-def in_same_constellation(i, c, constellations):
-    for c2, i2 in constellations.items():
-        if i2 != i:
-            continue
-        if is_close(c, c2):
-            return True
-    return False
+def is_same_constellation(c1, c2):
+    return any([is_close(p1, p2) for p1 in c1 for p2 in c2])
 
 def parse_input(input):
     lines = input.strip().split('\n')
     return [tuple(int(x) for x in line.strip().split(',')) for line in lines]
 
 def get_constellation_count(points):
-    constellations = {p: i for i, p in enumerate(points)}
+    constellations = [set([p]) for p in points]
 
     while True:
         did_work = False
-        for c1, i1 in constellations.items():
-            for c2, i2 in constellations.items():
-                if i1 == i2:
-                    continue
-                if in_same_constellation(i1, c2, constellations):
+        for i1, c1 in enumerate(constellations):
+            if len(c1) == 0:
+                continue
+            for c2 in constellations[i1+1:]:
+                if is_same_constellation(c1, c2):
                     did_work = True
-                    for c3, i3 in constellations.items():
-                        if i3 == i2:
-                            constellations[c3] = i1
+                    c1 |= c2
+                    c2.clear()
         if not did_work:
             break
 
-    return len(set(constellations.values()))
+    return len([c for c in constellations if len(c) > 0])
 
 def compute_day25(input):
     points = parse_input(input)
