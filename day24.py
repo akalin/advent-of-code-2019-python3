@@ -35,14 +35,51 @@ class Grid(object):
             return None
         if x < 0 or x >= cols:
             return None
+        if x == 2 and y == 2:
+            raise
         return level[y][x]
+
+    def get_neighbors_from(self, x, y, l, dir):
+        v = Vec2(x, y)
+        x2, y2 = v + dir.vec()
+        if x2 == 2 and y2 == 2:
+            l2 = l+1
+            idir = dir.turn_right().turn_right()
+            c = Vec2(2, 2)
+            m = c + idir.vec() + idir.vec()
+            ldir = idir.turn_left()
+            rdir = idir.turn_left()
+            l1 = m + ldir.vec()
+            l2 = l1 + ldir.vec()
+            r1 = m + rdir.vec()
+            r2 = l1 + rdir.vec()
+            for x3, y3 in [m, l1, l2, r1, r2]:
+                yield (x3, y3, l2)
+        elif x2 == -1:
+            l2 = l-1
+            yield (1, y2, l2)
+        elif x2 == 5:
+            l2 = l-1
+            yield (3, y2, l2)
+        elif y2 == -1:
+            l2 = l-1
+            yield (x2, 1, l2)
+        elif y2 == 5:
+            l2 = l-1
+            yield (x2, 3, l2)
+        else:
+            yield x2, y2, l
+
+    def get_neighbors(self, x, y, l):
+        v = Vec2(x, y)
+        for dir in all_directions:
+            yield from self.get_neighbors_from(x, y, l, dir)
 
     def get_neighbor_bug_count(self, x, y, l):
         v = Vec2(x, y)
         bug_count = 0
-        for dir in all_directions:
-            x2, y2 = v + dir.vec()
-            c = self.get_cell(x2, y2, l)
+        for x2, y2, l2 in self.get_neighbors(x, y, l):
+            c = self.get_cell(x2, y2, l2)
             if c == '#':
                 bug_count += 1
         return bug_count
@@ -66,6 +103,8 @@ class Grid(object):
         new_lev = new_level()
         for y in range(rows):
             for x in range(cols):
+                if x == 2 and y == 2:
+                    continue
                 new_lev[y][x] = self.next_cell(x, y, l)
         return new_lev
 
