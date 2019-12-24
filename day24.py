@@ -42,7 +42,7 @@ class Grid(object):
         bug_count = 0
         for dir in all_directions:
             x2, y2 = v + dir.vec()
-            c = get_cell(grid, x2, y2, l)
+            c = self.get_cell(x2, y2, l)
             if c == '#':
                 bug_count += 1
         return bug_count
@@ -66,8 +66,15 @@ class Grid(object):
         new_lev = new_level()
         for y in range(rows):
             for x in range(cols):
-                new_lev[y][x] = self.next_cell(grid, x, y, l)
+                new_lev[y][x] = self.next_cell(x, y, l)
         return new_lev
+
+    def next_tick(self):
+        g = Grid('')
+        g.levels = {}
+        for l, level in self.levels.items():
+            g.levels[l] = self.next_level(l)
+        return g
 
     def compute_biodiversity(self, l):
         score = 0
@@ -89,6 +96,8 @@ def compute_day24(input):
     for i in range(10):
         print(f'i={i}')
         print(grid.to_string())
+        grid = grid.next_tick()
+        print('')
 
     return None, None
 
