@@ -1,5 +1,4 @@
 from collections import deque
-import itertools
 from intcode import *
 from util import *
 from vec2 import *
