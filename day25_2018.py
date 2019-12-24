@@ -11,20 +11,11 @@ def in_same_constellation(i, c, constellations):
             return True
     return False
 
-def compute_day25(input):
-    input = '''
- 0,0,0,0
- 3,0,0,0
- 0,3,0,0
- 0,0,3,0
- 0,0,0,3
- 0,0,0,6
- 9,0,0,0
-12,0,0,0
-'''
+def parse_input(input):
     lines = input.strip().split('\n')
-    points = [tuple(int(x) for x in line.strip().split(',')) for line in lines]
+    return [tuple(int(x) for x in line.strip().split(',')) for line in lines]
 
+def get_constellation_count(points):
     constellations = {p: i for i, p in enumerate(points)}
 
     while True:
@@ -41,7 +32,11 @@ def compute_day25(input):
         if not did_work:
             break
 
-    part1 = len(set(constellations.values()))
+    return len(set(constellations.values()))
+
+def compute_day25(input):
+    points = parse_input(input)
+    part1 = get_constellation_count(points)
 
     return part1, None
 
