@@ -1,7 +1,8 @@
-from intcode import *
 from util import *
 from vec2 import *
 from vec3 import *
+import networkx as nx
+from more_itertools import collapse
 
 def get_label(lines, p):
     rows = len(lines)
@@ -77,10 +78,24 @@ def compute_day20(input):
             other_side = next(iter(portals[res[0]] - set([n])))
             yield other_side
 
+    G = nx.Graph()
     for parent, child in bfs_edges(start_pos, neighbors_part1):
         counts[child] = counts[parent] + 1
-        if child == end_pos:
-            break
+        G.add_edge(parent, child)
+
+    part1 = counts[end_pos]
+
+    H = nx.Graph()
+    labeled_nodes = [start_pos, end_pos] + list(collapse(portals.values(), levels=1))
+    for source in labeled_nodes:
+        lengths = nx.shortest_path_length(G, source)
+        for target in labeled_nodes:
+            if target in lengths:
+                H.add_edge(source, target, weight=lengths[target])
+
+    part1_nx = H.edges[start_pos, end_pos]['weight']
+    if part1 != part1_nx:
+        raise Exception(f'computed {part1} for part 1, but NetworkX computed {part1_nx}')
 
     start_pos3 = vec2to3(start_pos, 0)
     end_pos3 = vec2to3(end_pos, 0)
@@ -105,7 +120,9 @@ def compute_day20(input):
         if child == end_pos3:
             break
 
-    return counts[end_pos], counts3[end_pos3]
+    part2 = counts3[end_pos3]
+
+    return part1, part2
 
 if __name__ == '__main__':
     with open('day20.input', 'r') as input_file:
