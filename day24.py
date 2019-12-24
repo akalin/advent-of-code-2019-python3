@@ -3,79 +3,92 @@ from more_itertools import sliced
 from intcode import *
 from util import *
 
-def get_cell(grid, x, y):
-    rows = len(grid)
-    cols = len(grid[0])
-    if y < 0 or y >= rows:
-        return None
-    if x < 0 or x >= cols:
-        return None
-    return grid[y][x]
+def new_level():
+    rows = cols = 5
+    new_level = [['.'] * cols for _ in range(rows)]
+    return new_level
 
-def get_neighbor_bug_count(grid, x, y):
-    v = Vec2(x, y)
-    bug_count = 0
-    for dir in all_directions:
-        x2, y2 = v + dir.vec()
-        c = get_cell(grid, x2, y2)
+class Grid(object):
+    def __init__(self, input):
+        self.levels = {}
+        self.levels[0] = [[x for x in line.strip()] for line in input.strip().split('\n')]
+
+    def get_level(self, level):
+        if level in self.levels:
+            return self.levels[level]
+        return new_level()
+
+    def to_string_level(self, level):
+        return '\n'.join([''.join(line) for line in level])
+
+    def to_string(self):
+        s = ''
+        for l, level in self.levels.items():
+            s += f'level {l}\n\n{self.to_string_level(level)}'
+        return s
+
+    def get_cell(self, x, y, l):
+        level = self.get_level(l)
+        rows = len(level)
+        cols = len(level[0])
+        if y < 0 or y >= rows:
+            return None
+        if x < 0 or x >= cols:
+            return None
+        return level[y][x]
+
+    def get_neighbor_bug_count(self, x, y, l):
+        v = Vec2(x, y)
+        bug_count = 0
+        for dir in all_directions:
+            x2, y2 = v + dir.vec()
+            c = get_cell(grid, x2, y2, l)
+            if c == '#':
+                bug_count += 1
+        return bug_count
+
+    def next_cell(self, x, y, l):
+        c = self.get_cell(x, y, l)
+        bug_count = self.get_neighbor_bug_count(x, y, l)
         if c == '#':
-            bug_count += 1
-    return bug_count
+            if bug_count == 1:
+                return '#'
+            return '.'
+        else:
+            if bug_count == 1 or bug_count == 2:
+                return '#'
+            return '.'
 
-def next_cell(grid, x, y):
-    c = get_cell(grid, x, y)
-    bug_count = get_neighbor_bug_count(grid, x, y)
-    if c == '#':
-        if bug_count == 1:
-            return '#'
-        return '.'
-    else:
-        if bug_count == 1 or bug_count == 2:
-            return '#'
-        return '.'
+    def next_level(self, l):
+        level = self.get_level(l)
+        rows = len(level)
+        cols = len(level[0])
+        new_lev = new_level()
+        for y in range(rows):
+            for x in range(cols):
+                new_lev[y][x] = self.next_cell(grid, x, y, l)
+        return new_lev
 
-def next_grid(grid):
-    rows = len(grid)
-    cols = len(grid[0])
-    new_grid = [['.'] * cols for _ in range(rows)]
-    for y in range(rows):
-        for x in range(cols):
-            new_grid[y][x] = next_cell(grid, x, y)
-    return new_grid
-
-def compute_biodiversity(grid):
-    score = 0
-    rows = len(grid)
-    cols = len(grid[0])
-    i = 0
-    for y in range(rows):
-        for x in range(cols):
-            if get_cell(grid, x, y) == '#':
-                print(score, i)
-                score += (1 << i)
+    def compute_biodiversity(self, l):
+        score = 0
+        level = self.get_level(l)
+        rows = len(level)
+        cols = len(level[0])
+        i = 0
+        for y in range(rows):
+            for x in range(cols):
+                if self.get_cell(x, y, l) == '#':
+                    print(score, i)
+                    score += (1 << i)
             i += 1
-    return score
-
-def grid_to_string(grid):
-    return '\n'.join([''.join(line) for line in grid])
+        return score
 
 def compute_day24(input):
-    grid = [[x for x in line.strip()] for line in input.strip().split('\n')]
-    print(input, grid)
+    grid = Grid(input)
 
-    grids = {}
-    
-    for i in range(1000):
-        grids[grid_to_string(grid)] = i
+    for i in range(10):
         print(f'i={i}')
-        print(grid_to_string(grid))
-        print('')
-        grid = next_grid(grid)
-        if grid_to_string(grid) in grids:
-            print('repeated', grids[grid_to_string(grid)])
-            print(grid_to_string(grid))
-            print(compute_biodiversity(grid))
-            break
+        print(grid.to_string())
 
     return None, None
 
