@@ -3,8 +3,9 @@ from more_itertools import sliced
 from intcode import *
 from util import *
 
+rows = cols = 5
+
 def new_level():
-    rows = cols = 5
     new_level = [['.'] * cols for _ in range(rows)]
     new_level[2][2] = '?'
     return new_level
@@ -29,15 +30,15 @@ class Grid(object):
         return s
 
     def get_cell(self, x, y, l):
-        level = self.get_level(l)
-        rows = len(level)
-        cols = len(level[0])
         if y < 0 or y >= rows:
             raise Exception('f {x} {y} {l}')
         if x < 0 or x >= cols:
             raise Exception('f {x} {y} {l}')
         if x == 2 and y == 2:
             raise Exception('f {x} {y} {l}')
+        if l not in self.levels:
+            return '.'
+        level = self.levels[l]
         return level[y][x]
 
     def get_neighbors_from(self, x, y, l, dir):
