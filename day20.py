@@ -137,10 +137,8 @@ def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
     for parent3, child3 in bfs_edges(start_pos3, neighbors_part2):
         parent, zp = vec3to2(parent3)
         child, zc = vec3to2(child3)
-        if zp == zc:
-            counts3[child3] = counts3[parent3] + G.edges[parent, child]['weight']
-        else:
-            counts3[child3] = counts3[parent3] + 1
+        dist = G.edges[parent, child]['weight'] if zp == zc else 1
+        counts3[child3] = counts3[parent3] + dist
         if child3 == end_pos3:
             break
 
