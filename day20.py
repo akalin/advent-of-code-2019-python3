@@ -1,8 +1,10 @@
 from util import *
 from vec2 import *
 from vec3 import *
+from heapq import heappush, heappop
 import timeit
 import networkx as nx
+from itertools import count
 from more_itertools import collapse
 
 def get_label(lines, p):
@@ -101,6 +103,33 @@ def compute_part1_nx(walkables, start_pos, end_pos, portals, portal_sides):
     G.add_edges_from((n, m) for n, (m, _) in portal_sides.items())
     return nx.shortest_path_length(G, source=start_pos, target=end_pos)
 
+# Adapted from _dijkstra_multisource in
+# https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/shortest_paths/weighted.html#dijkstra_path .
+def dijkstra_singlesource(source, target, weighted_neighbors):
+    dist = {}
+    seen = {}
+    c = count()
+    fringe = []
+    seen[source] = 0
+    heappush(fringe, (0, next(c), source))
+    while fringe:
+        (d, _, v) = heappop(fringe)
+        if v in dist:
+            continue # already searched this node
+        dist[v] = d
+        if v == target:
+            break
+        for u, cost in weighted_neighbors(v):
+            vu_dist = dist[v] + cost
+            if u in dist:
+                if vu_dist < dist[u]:
+                    raise ValueError(f'Contradictory paths found: negative weights? v={v} u={u} vu_dist={vu_dist} dist[u]={dist[u]}')
+            elif u not in seen or vu_dist < seen[u]:
+                seen[u] = vu_dist
+                heappush(fringe, (vu_dist, next(c), u))
+
+    return dist
+
 def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
     local = compute_local_graph(walkables)
 
@@ -122,26 +151,17 @@ def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
     start_pos3 = vec2to3(start_pos, 0)
     end_pos3 = vec2to3(end_pos, 0)
 
-    counts3 = {start_pos3: 0}
-
     def neighbors_part2(n3):
         n, z = vec3to2(n3)
         for m in G[n]:
-            yield vec2to3(m, z)
+            yield vec2to3(m, z), G.edges[n, m]['weight']
         if n in portal_sides:
             other_side, dz = portal_sides[n]
             new_z = z + dz
             if new_z >= 0:
-                yield vec2to3(other_side, new_z)
+                yield vec2to3(other_side, new_z), 1
 
-    for parent3, child3 in bfs_edges(start_pos3, neighbors_part2):
-        parent, zp = vec3to2(parent3)
-        child, zc = vec3to2(child3)
-        dist = G.edges[parent, child]['weight'] if zp == zc else 1
-        counts3[child3] = counts3[parent3] + dist
-        if child3 == end_pos3:
-            break
-
+    counts3 = dijkstra_singlesource(start_pos3, end_pos3, neighbors_part2)
     return counts3[end_pos3]
 
 if __name__ == '__main__':
