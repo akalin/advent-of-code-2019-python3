@@ -50,11 +50,11 @@ class Grid(object):
             m = c + idir.vec() + idir.vec()
             ldir = idir.turn_left()
             rdir = idir.turn_left()
-            l1 = m + ldir.vec()
-            ll2 = l1 + ldir.vec()
+            lef1 = m + ldir.vec()
+            lef2 = lef1 + ldir.vec()
             r1 = m + rdir.vec()
-            r2 = l1 + rdir.vec()
-            for x3, y3 in [m, l1, ll2, r1, r2]:
+            r2 = r1 + rdir.vec()
+            for x3, y3 in [m, lef1, lef2, r1, r2]:
                 yield (x3, y3, l2)
         elif x2 == -1:
             l2 = l-1
