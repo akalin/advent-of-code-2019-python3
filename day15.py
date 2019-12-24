@@ -2,6 +2,7 @@ from collections import deque
 from intcode import *
 from util import *
 from vec2 import *
+import networkx as nx
 
 # Roughly equivalent to
 # https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/traversal/breadth_first_search.html#bfs_edges
@@ -50,6 +51,8 @@ def compute_day15(input):
         possible_neighbors = [n + d.vec() for d in all_directions]
         return (m for m in possible_neighbors if (m not in walls))
 
+    G = nx.Graph()
+
     for parent, child in bfs_edges(origin, neighbors):
         intputer = intputers[parent].copy()
         dir = Direction(child - parent)
@@ -66,15 +69,19 @@ def compute_day15(input):
             raise Exception(f'unknown status {status}')
 
         if status != 0:
+            G.add_edge(parent, child)
             intputers[child] = intputer
             origin_distances[child] = origin_distances[parent] + 1
 
-    show_map()
+    # show_map()
 
     if oxygen is None:
         raise Exception('oxygen not found')
 
     part1 = origin_distances[oxygen]
+    part1_nx = nx.shortest_path_length(G, source=origin, target=oxygen)
+    if part1 != part1_nx:
+        raise Exception(f'computed {part1} for part 1, but NetworkX computed {part1_nx}')
 
     oxygen_distances = {oxygen: 0}
 
