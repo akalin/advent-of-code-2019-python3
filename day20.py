@@ -126,12 +126,16 @@ def dijkstra(source, target, weighted_neighbors):
 
     return dist
 
-def astar(start, target, get_neighbor_fn, h):
-    open_set = set([start])
-    came_from = {start: None}
+def astar(source, target, get_neighbor_fn, h):
+    # Use a counter to avoid comparing the nodes themselves in the
+    # heap.
+    c = count()
+    open_set = []
+    heappush(open_set, (0, next(c), source))
+    came_from = {source: None}
 
-    g_score = {start: 0}
-    f_score = {start: h(start)}
+    g_score = {source: 0}
+    f_score = {source: h(source)}
 
     def get_g_score(n):
         if n not in g_score:
@@ -143,11 +147,10 @@ def astar(start, target, get_neighbor_fn, h):
             return (1, 0)
         return (0, f_score[n])
 
-    while len(open_set) > 0:
-        n = min(open_set, key=get_f_score)
+    while open_set:
+        (_, _, n) = heappop(open_set)
         if n == target:
             return g_score
-        open_set.remove(n)
 
         for m, m_len in get_neighbor_fn(n):
             if n not in g_score:
@@ -158,7 +161,7 @@ def astar(start, target, get_neighbor_fn, h):
                 came_from[m] = n
                 g_score[m] = tentative_g_score
                 f_score[m] = g_score[m] + h(m)
-                open_set.add(m)
+                heappush(open_set, (f_score[m], next(c), m))
 
     raise
 
