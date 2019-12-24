@@ -84,10 +84,7 @@ def compute_day20(input):
 
     part1 = counts[end_pos]
 
-    G = nx.Graph()
-    for n in walkables:
-        for m in local_neighbors(n):
-            G.add_edge(n, m)
+    G = nx.Graph([(n, m) for n in walkables for m in local_neighbors(n)])
 
     H = nx.Graph()
     labeled_nodes = {
