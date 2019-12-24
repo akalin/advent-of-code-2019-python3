@@ -102,6 +102,8 @@ def compute_part1_nx(walkables, start_pos, end_pos, portals, portal_sides):
 def dijkstra(source, target, weighted_neighbors):
     dist = {}
     seen = {}
+    # Use a counter to avoid comparing the nodes themselves in the
+    # heap.
     c = count()
     fringe = []
     seen[source] = 0
