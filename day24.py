@@ -50,10 +50,10 @@ class Grid(object):
             ldir = idir.turn_left()
             rdir = idir.turn_left()
             l1 = m + ldir.vec()
-            l2 = l1 + ldir.vec()
+            ll2 = l1 + ldir.vec()
             r1 = m + rdir.vec()
             r2 = l1 + rdir.vec()
-            for x3, y3 in [m, l1, l2, r1, r2]:
+            for x3, y3 in [m, l1, ll2, r1, r2]:
                 yield (x3, y3, l2)
         elif x2 == -1:
             l2 = l-1
@@ -79,6 +79,7 @@ class Grid(object):
         v = Vec2(x, y)
         bug_count = 0
         for x2, y2, l2 in self.get_neighbors(x, y, l):
+#            print(f'gnbc: {x},{y},{l} {x2},{y2},{l2}')
             c = self.get_cell(x2, y2, l2)
             if c == '#':
                 bug_count += 1
@@ -115,7 +116,7 @@ class Grid(object):
             g.levels[l] = self.next_level(l)
         min_l, max_l = self.level_bounds()
         one_below = self.next_level(min_l-1)
-        one_above = self.next_level(max_l-1)
+        one_above = self.next_level(max_l+1)
         if self.to_string_level(one_below) != self.to_string_level(new_level()):
             g.levels[min_l-1] = one_below
         if self.to_string_level(one_above) != self.to_string_level(new_level()):
@@ -142,9 +143,16 @@ class Grid(object):
         return score
 
 def compute_day24(input):
+    input = '''
+....#
+#..#.
+#.?##
+..#..
+#....
+'''
     grid = Grid(input)
 
-    for i in range(10):
+    for i in range(11):
         print(f'i={i}')
         print(grid.to_string())
         grid = grid.next_tick()
