@@ -104,9 +104,6 @@ class Grid(object):
             return '.'
 
     def next_level(self, l):
-        level = self.get_level(l)
-        rows = len(level)
-        cols = len(level[0])
         new_lev = new_level()
         has_bug = False
         for y in range(rows):
@@ -180,7 +177,7 @@ def compute_day24(input):
 #        print('')
         grid = grid.next_tick()
 
-    print(grid.to_string())
+#    print(grid.to_string())
     print(grid.compute_bug_count())
 
     return None, None
