@@ -19,13 +19,7 @@ def get_label(lines, p):
             return s, +1
     return None
 
-def vec3to2(v3):
-    return Vec2(v3[0], v3[1]), v3[2]
-
-def vec2to3(v2, z):
-    return Vec3(v2[0], v2[1], z)
-
-def compute_day20(input):
+def parse_input(input):
     lines = [x for x in input.split('\n')][:-1]
     rows = len(lines)
     cols = len(lines[0])
@@ -66,6 +60,24 @@ def compute_day20(input):
     if bad_labels:
         raise Exception(f'{bad_labels}')
 
+    portal_sides = {}
+    for x, y in portals.values():
+        _, xdz = get_label(lines, x)
+        _, ydz = get_label(lines, y)
+        portal_sides[x] = (y, xdz)
+        portal_sides[y] = (x, ydz)
+
+    return walkables, start_pos, end_pos, portals, portal_sides
+
+def vec3to2(v3):
+    return Vec2(v3[0], v3[1]), v3[2]
+
+def vec2to3(v2, z):
+    return Vec3(v2[0], v2[1], z)
+
+def compute_day20(input):
+    walkables, start_pos, end_pos, portals, portal_sides = parse_input(input)
+
     counts = {start_pos: 0}
 
     def local_neighbors(n):
@@ -74,10 +86,8 @@ def compute_day20(input):
 
     def neighbors_part1(n):
         yield from local_neighbors(n)
-        res = get_label(lines, n)
-        if res and res[0] in portals:
-            other_side = next(iter(portals[res[0]] - set([n])))
-            yield other_side
+        if n in portal_sides:
+            yield portal_sides[n][0]
 
     for parent, child in bfs_edges(start_pos, neighbors_part1):
         counts[child] = counts[parent] + 1
@@ -113,11 +123,10 @@ def compute_day20(input):
         for m in H[n]:
 #            print('m', m, labeled_nodes[m])
             yield vec2to3(m, z)
-        res = get_label(lines, n)
 #        print('n label', res)
-        if res and res[0] in portals:
-            other_side = next(iter(portals[res[0]] - set([n])))
-            new_z = z + res[1]
+        if n in portal_sides:
+            other_side, dz = portal_sides[n]
+            new_z = z + dz
             if new_z >= 0:
 #                print('mos', other_side, labeled_nodes[other_side])
                 yield vec2to3(other_side, new_z)
