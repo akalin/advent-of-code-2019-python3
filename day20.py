@@ -75,26 +75,25 @@ def vec3to2(v3):
 def vec2to3(v2, z):
     return Vec3(v2[0], v2[1], z)
 
-def compute_day20(input):
-    walkables, start_pos, end_pos, portals, portal_sides = parse_input(input)
+def local_neighbors(n, walkables):
+    possible_neighbors = [n + d.vec() for d in all_directions]
+    return (m for m in possible_neighbors if m in walkables)
 
+def compute_part1(walkables, start_pos, end_pos, portals, portal_sides):
     counts = {start_pos: 0}
 
-    def local_neighbors(n):
-        possible_neighbors = [n + d.vec() for d in all_directions]
-        return (m for m in possible_neighbors if m in walkables)
-
     def neighbors_part1(n):
-        yield from local_neighbors(n)
+        yield from local_neighbors(n, walkables)
         if n in portal_sides:
             yield portal_sides[n][0]
 
     for parent, child in bfs_edges(start_pos, neighbors_part1):
         counts[child] = counts[parent] + 1
 
-    part1 = counts[end_pos]
+    return counts[end_pos]
 
-    G = nx.Graph([(n, m) for n in walkables for m in local_neighbors(n)])
+def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
+    G = nx.Graph([(n, m) for n in walkables for m in local_neighbors(n, walkables)])
 
     H = nx.Graph()
     labeled_nodes = {
@@ -142,12 +141,13 @@ def compute_day20(input):
         if child3 == end_pos3:
             break
 
-    part2 = counts3[end_pos3]
-
-    return part1, part2
+    return counts3[end_pos3]
 
 if __name__ == '__main__':
     with open('day20.input', 'r') as input_file:
         input = input_file.read()
-        part1, part2 = compute_day20(input)
+        walkables, start_pos, end_pos, portals, portal_sides = parse_input(input)
+
+        part1 = compute_part1(walkables, start_pos, end_pos, portals, portal_sides)
+        part2 = compute_part2(walkables, start_pos, end_pos, portals, portal_sides)
         print(f'part1: {part1}, part2: {part2}')
