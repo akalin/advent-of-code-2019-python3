@@ -3,11 +3,14 @@ from more_itertools import sliced
 from intcode import *
 from util import *
 
+def is_close(c1, c2):
+    return manhattan_norm([x1 - x2 for x1, x2 in zip(c1, c2)]) <= 3
+
 def in_same_constellation(i, c, constellations):
     for c2, i2 in constellations.items():
         if i2 != i:
             continue
-        if manhattan_norm([c[i] - c2[i] for i in range(len(c))]) <= 3:
+        if is_close(c, c2):
             return True
     return False
 
