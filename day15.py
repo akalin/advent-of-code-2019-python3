@@ -1,21 +1,7 @@
-from collections import deque
 from intcode import *
 from util import *
 from vec2 import *
 import networkx as nx
-
-# Roughly equivalent to
-# https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/traversal/breadth_first_search.html#bfs_edges
-def bfs_edges(source, neighbors):
-    visited = set([source])
-    queue = deque([source])
-    while queue:
-        parent = queue.popleft()
-        for child in neighbors(parent):
-            if child not in visited:
-                yield parent, child
-                visited.add(child)
-                queue.append(child)
 
 def compute_day15(input):
     program = parse_intcode(input)

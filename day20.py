@@ -1,22 +1,7 @@
-from collections import deque
-import itertools
 from intcode import *
 from util import *
 from vec2 import *
 from vec3 import *
-
-def do_bfs(start, get_neighbor_fn, visit_fn):
-    visited = set([start])
-    queue = deque([start])
-    while queue:
-        n = queue.popleft()
-        for m in get_neighbor_fn(n):
-            if m not in visited:
-                visited.add(m)
-                should_continue = visit_fn(m, n)
-                if not should_continue:
-                    return
-                queue.append(m)
 
 def get_label(lines, p):
     rows = len(lines)
@@ -85,10 +70,6 @@ def compute_day20(input):
 
     counts = {start_pos3: 0}
 
-    def visit_fn(n3, parent):
-        counts[n3] = counts[parent] + 1
-        return n3 != end_pos3
-
     def get_neighbor_fn(n3):
         n, z = vec3to2(n3)
         if n not in walkables:
@@ -104,7 +85,10 @@ def compute_day20(input):
 #        print(n, neighbors)
         return neighbors
 
-    do_bfs(start_pos3, get_neighbor_fn, visit_fn)
+    for parent, child in bfs_edges(start_pos3, get_neighbor_fn):
+        counts[child] = counts[parent] + 1
+        if child == end_pos3:
+            break
 
     return counts[end_pos3], None
 

@@ -1,4 +1,5 @@
 from vec2 import *
+from collections import deque
 import os
 
 def cls():
@@ -150,3 +151,16 @@ def prod(iterable, start=1):
     for x in iterable:
         p *= x
     return p
+
+# Roughly equivalent to
+# https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/traversal/breadth_first_search.html#bfs_edges
+def bfs_edges(source, neighbors):
+    visited = set([source])
+    queue = deque([source])
+    while queue:
+        parent = queue.popleft()
+        for child in neighbors(parent):
+            if child not in visited:
+                yield parent, child
+                visited.add(child)
+                queue.append(child)
