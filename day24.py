@@ -104,24 +104,27 @@ class Grid(object):
         rows = len(level)
         cols = len(level[0])
         new_lev = new_level()
+        has_bug = False
         for y in range(rows):
             for x in range(cols):
                 if x == 2 and y == 2:
                     continue
                 new_lev[y][x] = self.next_cell(x, y, l)
-        return new_lev
+                if new_lev[y][x] == '#':
+                    has_bug = True
+        return new_lev, has_bug
 
     def next_tick(self):
         g = Grid('')
         g.levels = {}
         for l, level in self.levels.items():
-            g.levels[l] = self.next_level(l)
+            g.levels[l] = self.next_level(l)[0]
         min_l, max_l = self.level_bounds()
-        one_below = self.next_level(min_l-1)
-        one_above = self.next_level(max_l+1)
-        if self.to_string_level(one_below) != self.to_string_level(new_level()):
+        one_below, below_has_bug = self.next_level(min_l-1)
+        one_above, above_has_bug = self.next_level(max_l+1)
+        if below_has_bug:
             g.levels[min_l-1] = one_below
-        if self.to_string_level(one_above) != self.to_string_level(new_level()):
+        if above_has_bug:
             g.levels[max_l+1] = one_above
         return g
 
@@ -168,9 +171,9 @@ def compute_day24(input):
     grid = Grid(input)
 
     for i in range(200):
-        print(f'i={i}')
+#        print(f'i={i}')
 #        print(grid.to_string())
-        print('')
+#        print('')
         grid = grid.next_tick()
 
     print(grid.to_string())
