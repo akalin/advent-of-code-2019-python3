@@ -16,18 +16,18 @@ def parse_input(input):
 def get_constellation_count(points):
     constellations = [set([p]) for p in points]
 
-    while True:
-        did_work = False
-        for i1, c1 in enumerate(constellations):
-            if len(c1) == 0:
-                continue
+    for i1, c1 in enumerate(constellations):
+        if len(c1) == 0:
+            continue
+        while True:
+            did_work = False
             for c2 in constellations[i1+1:]:
                 if is_same_constellation(c1, c2):
                     did_work = True
                     c1 |= c2
                     c2.clear()
-        if not did_work:
-            break
+            if not did_work:
+                break
 
     return len([c for c in constellations if len(c) > 0])
 
