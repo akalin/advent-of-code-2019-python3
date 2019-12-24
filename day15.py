@@ -4,16 +4,18 @@ from intcode import *
 from util import *
 from vec2 import *
 
-def do_bfs(start, get_neighbor_fn, visit_fn):
-    visited = set([start])
-    queue = deque([start])
+# Roughly equivalent to
+# https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/traversal/breadth_first_search.html#bfs_edges
+def bfs_edges(source, neighbors):
+    visited = set([source])
+    queue = deque([source])
     while queue:
-        n = queue.popleft()
-        for m in get_neighbor_fn(n):
-            if m not in visited:
-                visited.add(m)
-                visit_fn(m, n)
-                queue.append(m)
+        parent = queue.popleft()
+        for child in neighbors(parent):
+            if child not in visited:
+                yield parent, child
+                visited.add(child)
+                queue.append(child)
 
 def compute_day15(input):
     program = parse_intcode(input)
@@ -43,33 +45,30 @@ def compute_day15(input):
     intputers = {origin: Intputer(program)}
     origin_distances = {origin: 0}
 
-    def visit_fn(n, parent):
-        nonlocal oxygen
-        intputer = intputers[parent].copy()
-        dir = Direction(n - parent)
-        input = dir_to_input[dir.str()]
-        output = intputer.run([input])
-        status = output[0]
-        if status == 0:
-            walls.add(n)
-        elif status == 1:
-            pass
-        elif status == 2:
-            oxygen = n
-        else:
-            raise Exception(f'unknown status {status}')
-
-        if status != 0:
-            intputers[n] = intputer
-            origin_distances[n] = origin_distances[parent] + 1
-
-    def get_neighbor_fn(n):
+    def neighbors(n):
         if n in walls:
             return []
         possible_neighbors = [n + d.vec() for d in all_directions]
         return [m for m in possible_neighbors if (m not in walls)]
 
-    do_bfs(origin, get_neighbor_fn, visit_fn)
+    for parent, child in bfs_edges(origin, neighbors):
+        intputer = intputers[parent].copy()
+        dir = Direction(child - parent)
+        input = dir_to_input[dir.str()]
+        output = intputer.run([input])
+        status = output[0]
+        if status == 0:
+            walls.add(child)
+        elif status == 1:
+            pass
+        elif status == 2:
+            oxygen = child
+        else:
+            raise Exception(f'unknown status {status}')
+
+        if status != 0:
+            intputers[child] = intputer
+            origin_distances[child] = origin_distances[parent] + 1
 
     show_map()
 
@@ -80,10 +79,9 @@ def compute_day15(input):
 
     oxygen_distances = {oxygen: 0}
 
-    def visit_fn(n, parent):
-        oxygen_distances[n] = oxygen_distances[parent] + 1
+    for parent, child in bfs_edges(oxygen, neighbors):
+        oxygen_distances[child] = oxygen_distances[parent] + 1
 
-    do_bfs(oxygen, get_neighbor_fn, visit_fn)
     part2 = max(oxygen_distances.values())
 
     return part1, part2
