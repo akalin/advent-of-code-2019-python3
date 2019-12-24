@@ -126,22 +126,17 @@ def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
 
     def neighbors_part2(n3):
         n, z = vec3to2(n3)
-#        print('n3', n3, labeled_nodes[n])
         for m in G[n]:
-#            print('m', m, labeled_nodes[m])
             yield vec2to3(m, z)
-#        print('n label', res)
         if n in portal_sides:
             other_side, dz = portal_sides[n]
             new_z = z + dz
             if new_z >= 0:
-#                print('mos', other_side, labeled_nodes[other_side])
                 yield vec2to3(other_side, new_z)
 
     for parent3, child3 in bfs_edges(start_pos3, neighbors_part2):
         parent, zp = vec3to2(parent3)
         child, zc = vec3to2(child3)
-#        print(labeled_nodes[parent], zp, labeled_nodes[child], zc)
         if zp == zc:
             counts3[child3] = counts3[parent3] + G.edges[parent, child]['weight']
         else:
