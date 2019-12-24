@@ -77,7 +77,7 @@ class Grid(object):
         for dir in all_directions:
             yield from self.get_neighbors_from(x, y, l, dir)
 
-    def get_neighbor_bug_count(self, x, y, l):
+    def get_neighbor_bug_count(self, x, y, l, bound):
         v = Vec2(x, y)
         bug_count = 0
         for x2, y2, l2 in self.get_neighbors(x, y, l):
@@ -85,17 +85,20 @@ class Grid(object):
             c = self.get_cell(x2, y2, l2)
             if c == '#':
                 bug_count += 1
+                if bug_count > bound:
+                    return bug_count
 #        print(f'gnbc: {x},{y},{l} {list(self.get_neighbors(x, y, l))} {bug_count}')
         return bug_count
 
     def next_cell(self, x, y, l):
         c = self.get_cell(x, y, l)
-        bug_count = self.get_neighbor_bug_count(x, y, l)
         if c == '#':
+            bug_count = self.get_neighbor_bug_count(x, y, l, 1)
             if bug_count == 1:
                 return '#'
             return '.'
         else:
+            bug_count = self.get_neighbor_bug_count(x, y, l, 2)
             if bug_count == 1 or bug_count == 2:
                 return '#'
             return '.'
