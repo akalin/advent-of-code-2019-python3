@@ -24,7 +24,7 @@ class Grid(object):
 
     def to_string(self):
         s = ''
-        for l, level in self.levels.items():
+        for l, level in sorted(self.levels.items(),key=lambda x: x[0]):
             s += f'level {l}\n\n{self.to_string_level(level)}\n\n'
         return s
 
