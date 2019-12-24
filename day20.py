@@ -65,32 +65,47 @@ def compute_day20(input):
     if bad_labels:
         raise Exception(f'{bad_labels}')
 
+    counts = {start_pos: 0}
+
+    def neighbors_part1(n):
+        if n not in walkables:
+            return
+        possible_neighbors = [n + d.vec() for d in all_directions]
+        yield from (m for m in possible_neighbors if m in walkables)
+        res = get_label(lines, n)
+        if res and res[0] in portals:
+            other_side = next(iter(portals[res[0]] - set([n])))
+            yield other_side
+
+    for parent, child in bfs_edges(start_pos, neighbors_part1):
+        counts[child] = counts[parent] + 1
+        if child == end_pos:
+            break
+
     start_pos3 = vec2to3(start_pos, 0)
     end_pos3 = vec2to3(end_pos, 0)
 
-    counts = {start_pos3: 0}
+    counts3 = {start_pos3: 0}
 
-    def get_neighbor_fn(n3):
+    def neighbors_part2(n3):
         n, z = vec3to2(n3)
         if n not in walkables:
-            return []
+            return
         possible_neighbors = [n + d.vec() for d in all_directions]
-        neighbors = [vec2to3(m, z) for m in possible_neighbors if m in walkables]
+        yield from (vec2to3(m, z) for m in possible_neighbors if m in walkables)
         res = get_label(lines, n)
         if res and res[0] in portals:
             other_side = next(iter(portals[res[0]] - set([n])))
             new_z = z + res[1]
             if new_z >= 0:
-                neighbors.append(vec2to3(other_side, new_z))
-#        print(n, neighbors)
-        return neighbors
+                yield vec2to3(other_side, new_z)
 
-    for parent, child in bfs_edges(start_pos3, get_neighbor_fn):
-        counts[child] = counts[parent] + 1
+    for parent, child in bfs_edges(start_pos3, neighbors_part2):
+        counts3[child] = counts3[parent] + 1
         if child == end_pos3:
             break
 
-    return counts[end_pos3], None
+    return counts[end_pos], counts3[end_pos3]
 
 if __name__ == '__main__':
     with open('day20.input', 'r') as input_file:
