@@ -102,9 +102,9 @@ def compute_part1_nx(walkables, start_pos, end_pos, portals, portal_sides):
     return nx.shortest_path_length(G, source=start_pos, target=end_pos)
 
 def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
-    G = compute_local_graph(walkables)
+    local = compute_local_graph(walkables)
 
-    H = nx.Graph()
+    G = nx.Graph()
     labeled_nodes = {
         start_pos: frozenset(['A']),
         end_pos: frozenset(['Z']),
@@ -113,12 +113,11 @@ def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
         for end in ends:
             labeled_nodes[end] = label
 
-    for source, label in labeled_nodes.items():
-        H.add_node(source, label=label)
-        lengths = nx.shortest_path_length(G, source)
+    for source in labeled_nodes.keys():
+        local_lengths = nx.shortest_path_length(local, source)
         for target in labeled_nodes.keys():
-            if target != source and target in lengths:
-                H.add_edge(source, target, weight=lengths[target])
+            if target != source and target in local_lengths:
+                G.add_edge(source, target, weight=local_lengths[target])
 
     start_pos3 = vec2to3(start_pos, 0)
     end_pos3 = vec2to3(end_pos, 0)
@@ -128,7 +127,7 @@ def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
     def neighbors_part2(n3):
         n, z = vec3to2(n3)
 #        print('n3', n3, labeled_nodes[n])
-        for m in H[n]:
+        for m in G[n]:
 #            print('m', m, labeled_nodes[m])
             yield vec2to3(m, z)
 #        print('n label', res)
@@ -144,7 +143,7 @@ def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
         child, zc = vec3to2(child3)
 #        print(labeled_nodes[parent], zp, labeled_nodes[child], zc)
         if zp == zc:
-            counts3[child3] = counts3[parent3] + H.edges[parent, child]['weight']
+            counts3[child3] = counts3[parent3] + G.edges[parent, child]['weight']
         else:
             counts3[child3] = counts3[parent3] + 1
         if child3 == end_pos3:
