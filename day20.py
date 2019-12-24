@@ -1,6 +1,7 @@
 from util import *
 from vec2 import *
 from vec3 import *
+import timeit
 import networkx as nx
 from more_itertools import collapse
 
@@ -148,6 +149,17 @@ if __name__ == '__main__':
         input = input_file.read()
         walkables, start_pos, end_pos, portals, portal_sides = parse_input(input)
 
-        part1 = compute_part1(walkables, start_pos, end_pos, portals, portal_sides)
-        part2 = compute_part2(walkables, start_pos, end_pos, portals, portal_sides)
-        print(f'part1: {part1}, part2: {part2}')
+        part1 = None
+        def do_part1():
+            global part1
+            part1 = compute_part1(walkables, start_pos, end_pos, portals, portal_sides)
+
+        part2 = None
+        def do_part2():
+            global part2
+            part2 = compute_part2(walkables, start_pos, end_pos, portals, portal_sides)
+
+        part1_duration = timeit.timeit(do_part1, number=1)
+        part2_duration = timeit.timeit(do_part2, number=1)
+        print(f'part1: {part1} ({part1_duration:.2f}s), part2: {part2} ({part2_duration:.2f}s)')
+
