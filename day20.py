@@ -69,8 +69,6 @@ def compute_day20(input):
     counts = {start_pos: 0}
 
     def neighbors_part1(n):
-        if n not in walkables:
-            return
         possible_neighbors = [n + d.vec() for d in all_directions]
         yield from (m for m in possible_neighbors if m in walkables)
         res = get_label(lines, n)
@@ -109,8 +107,6 @@ def compute_day20(input):
 
     def neighbors_part2(n3):
         n, z = vec3to2(n3)
-        if n not in walkables:
-            return
         possible_neighbors = [n + d.vec() for d in all_directions]
         yield from (vec2to3(m, z) for m in possible_neighbors if m in walkables)
         res = get_label(lines, n)
