@@ -74,8 +74,8 @@ def compute_day15(input):
     if part1 != part1_nx:
         raise Exception(f'computed {part1} for part 1, but NetworkX computed {part1_nx}')
 
-    oxygen_distances = bfs_distances(oxygen, neighbors)
-    part2 = max(oxygen_distances.values())
+    oxygen_path_lengths = bfs_path_lengths(oxygen, neighbors)
+    part2 = max(d for _, d in oxygen_path_lengths)
 
     part2_nx = max(nx.shortest_path_length(G, oxygen).values())
     if part2 != part2_nx:

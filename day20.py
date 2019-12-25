@@ -83,8 +83,9 @@ def compute_part1(walkables, start_pos, end_pos, portals, portal_sides):
         if n in portal_sides:
             yield portal_sides[n][0]
 
-    distances = bfs_distances(start_pos, neighbors)
-    return distances[end_pos]
+    for n, d in bfs_path_lengths(start_pos, neighbors):
+        if n == end_pos:
+            return d
 
 def compute_local_graph(walkables):
     return nx.Graph([(n, m) for n in walkables for m in local_neighbors(n, walkables)])
