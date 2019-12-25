@@ -85,4 +85,4 @@ def dijkstra_path_length(source, target, weighted_successors):
                 seen[u] = vu_dist
                 heappush(fringe, (vu_dist, next(c), u))
 
-    raise Exception(f'No path between {source} and {target}')
+    raise ValueError(f'No path between {source} and {target}')
