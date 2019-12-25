@@ -9,13 +9,18 @@ def bfs_edges(source, successors):
         parent = queue.popleft()
         for child in successors(parent):
             if child not in visited:
-                yield parent, child
                 visited.add(child)
+                yield parent, child
                 queue.append(child)
 
 def bfs_path_lengths(source, successors):
-    distances = {source: 0}
+    lengths = {source: 0}
+    queue = deque([source])
     yield source, 0
-    for parent, child in bfs_edges(source, successors):
-        distances[child] = distances[parent] + 1
-        yield child, distances[child]
+    while queue:
+        parent = queue.popleft()
+        for child in successors(parent):
+            if child not in lengths:
+                lengths[child] = lengths[parent] + 1
+                yield child, lengths[child]
+                queue.append(child)
