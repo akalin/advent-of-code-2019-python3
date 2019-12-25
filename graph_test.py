@@ -20,29 +20,29 @@ class TestGraph(unittest.TestCase):
             lengths = dict(bfs_path_lengths(source=n, successors=G.neighbors))
             self.assertEqual(lengths, expected_lengths)
 
-    XG = nx.DiGraph(name='XG')
-    XG.add_weighted_edges_from([('s', 'u', 10), ('s', 'x', 5),
+    DG = nx.DiGraph(name='DG')
+    DG.add_weighted_edges_from([('s', 'u', 10), ('s', 'x', 5),
                                 ('u', 'v', 1), ('u', 'x', 2),
                                 ('v', 'y', 1), ('x', 'u', 3),
                                 ('x', 'v', 5), ('x', 'y', 2),
                                 ('y', 's', 7), ('y', 'v', 6)])
 
-    XG2 = nx.DiGraph(name='XG2')
-    XG2.add_weighted_edges_from([[1, 4, 1], [4, 5, 1],
+    DG2 = nx.DiGraph(name='DG2')
+    DG2.add_weighted_edges_from([[1, 4, 1], [4, 5, 1],
                                  [5, 6, 1], [6, 3, 1],
                                  [1, 3, 50], [1, 2, 100],
                                  [2, 3, 100]])
 
-    XG3 = nx.Graph(name='XG3')
-    XG3.add_weighted_edges_from([[0, 1, 2], [1, 2, 12],
-                                 [2, 3, 1], [3, 4, 5],
-                                 [4, 5, 1], [5, 0, 10]])
+    G3 = nx.Graph(name='G3')
+    G3.add_weighted_edges_from([[0, 1, 2], [1, 2, 12],
+                                [2, 3, 1], [3, 4, 5],
+                                [4, 5, 1], [5, 0, 10]])
 
-    XG4 = nx.Graph(name='XG4')
-    XG4.add_weighted_edges_from([[0, 1, 2], [1, 2, 2],
-                                 [2, 3, 1], [3, 4, 1],
-                                 [4, 5, 1], [5, 6, 1],
-                                 [6, 7, 1], [7, 0, 1]])
+    G4 = nx.Graph(name='G4')
+    G4.add_weighted_edges_from([[0, 1, 2], [1, 2, 2],
+                                [2, 3, 1], [3, 4, 1],
+                                [4, 5, 1], [5, 6, 1],
+                                [6, 7, 1], [7, 0, 1]])
 
     # no weights
     UWG = nx.DiGraph([('s', 'u'), ('s', 'x'),
@@ -52,9 +52,9 @@ class TestGraph(unittest.TestCase):
                       ('y', 's'), ('y', 'v')], name='UWG')
 
     def test_dijkstra(self):
-        XG = TestGraph.XG
+        DG = TestGraph.DG
 
-        GG = XG.to_undirected()
+        GG = DG.to_undirected()
         GG.graph['name'] = 'GG'
         # make sure we get lower weight
         # to_undirected might choose either edge with weight 2 or weight 3
@@ -62,11 +62,11 @@ class TestGraph(unittest.TestCase):
 
         for G in [
                 TestGraph.G,
-                XG,
+                DG,
                 GG,
-                TestGraph.XG2,
-                TestGraph.XG3,
-                TestGraph.XG4,
+                TestGraph.DG2,
+                TestGraph.G3,
+                TestGraph.G4,
                 TestGraph.UWG,
         ]:
             def nodes_and_weights(it):
