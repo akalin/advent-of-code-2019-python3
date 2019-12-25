@@ -95,7 +95,7 @@ def compute_part1_nx(walkables, start_pos, end_pos, portals, portal_sides):
 
 # Adapted from _dijkstra_multisource in
 # https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/shortest_paths/weighted.html .
-def dijkstra(source, target, weighted_successors):
+def dijkstra_shortest_path_length(source, target, weighted_successors):
     dist = {}
     seen = {source: 0}
     # Use a counter to avoid comparing the nodes themselves in the
@@ -109,7 +109,7 @@ def dijkstra(source, target, weighted_successors):
             continue # already searched this node
         dist[v] = d
         if v == target:
-            break
+            return dist[v]
         for u, cost in weighted_successors(v):
             vu_dist = dist[v] + cost
             if u in dist:
@@ -119,7 +119,7 @@ def dijkstra(source, target, weighted_successors):
                 seen[u] = vu_dist
                 heappush(fringe, (vu_dist, next(c), u))
 
-    return dist
+    raise Exception(f'No path between {source} and {target}')
 
 # Adapted from bidirectional_dijkstra in
 # https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/shortest_paths/weighted.html#bidirectional_dijkstra .
@@ -228,8 +228,7 @@ def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
     def heuristic(n3):
         return 0
 
-    counts3 = bidirectional_dijkstra(start_pos3, end_pos3, weighted_neighbors, weighted_neighbors)
-    return counts3[end_pos3]
+    return dijkstra_shortest_path_length(start_pos3, end_pos3, weighted_neighbors)
 
 if __name__ == '__main__':
     with open('day20.input', 'r') as input_file:
