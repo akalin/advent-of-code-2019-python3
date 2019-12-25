@@ -1,6 +1,7 @@
 from intcode import *
 from util import *
 from vec2 import *
+from graph import *
 import networkx as nx
 
 def compute_day15(input):
