@@ -31,7 +31,7 @@ class TestGraph(unittest.TestCase):
         XG = TestGraph.XG
 
         def weighted_successors(v):
-            for w, attributes in XG._succ[v].items():
+            for w, attributes in XG[v].items():
                 yield w, attributes['weight']
 
         length = dijkstra_shortest_path_length('s', 'v', weighted_successors=weighted_successors)
