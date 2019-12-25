@@ -86,3 +86,35 @@ def dijkstra_path_length(source, target, weighted_successors):
                 heappush(fringe, (vu_dist, next(c), u))
 
     raise ValueError(f'No path between {source} and {target}')
+
+# Adapted from bidirectional_dijkstra in
+# https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/shortest_paths/weighted.html#bidirectional_dijkstra .
+def bidirectional_dijkstra_path_length(source, target, weighted_successors, weighted_predecessors):
+    dist = [{}, {}]
+    seen = [{source: 0}, {target: 0}]
+    # Use a counter to avoid comparing the nodes themselves in the
+    # heap.
+    c = count()
+    fringe = [[], []]
+    heappush(fringe[0], (0, next(c), source))
+    heappush(fringe[1], (0, next(c), target))
+    dir = 0
+    weighted_next = [weighted_successors, weighted_predecessors]
+    while fringe[0] and fringe[1]:
+        (d, _, v) = heappop(fringe[dir])
+        if v in dist[1 - dir]:
+            return d + dist[1 - dir][v]
+        if v in dist[dir]:
+            continue # already searched this node
+        dist[dir][v] = d
+        for u, cost in weighted_next[dir](v):
+            vu_dist = dist[dir][v] + cost
+            if u in dist[dir]:
+                if vu_dist < dist[dir][u]:
+                    raise ValueError(f'Contradictory paths found: negative weights? v={v} u={u} vu_dist={vu_dist} dist[{dir}][u]={dist[dir][u]}')
+            elif u not in seen[dir] or vu_dist < seen[dir][u]:
+                seen[dir][u] = vu_dist
+                heappush(fringe[dir], (vu_dist, next(c), u))
+        dir = 1 - dir
+
+    raise Exception(f'No path between {source} and {target}')

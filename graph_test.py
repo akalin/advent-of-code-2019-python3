@@ -79,10 +79,17 @@ class TestGraph(unittest.TestCase):
                     length = None
 
                 try:
+                    bi_length = bidirectional_dijkstra_path_length(source, target, weighted_successors=weighted_successors, weighted_predecessors=weighted_successors)
+                except ValueError:
+                    bi_length = None
+
+                try:
                     expected_length = nx.dijkstra_path_length(G, source, target)
                 except nx.NetworkXNoPath:
                     expected_length = None
+
                 self.assertEqual(length, expected_length)
+                self.assertEqual(bi_length, expected_length)
 
 if __name__ == '__main__':
     unittest.main()
