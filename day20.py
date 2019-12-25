@@ -121,6 +121,34 @@ def dijkstra(source, target, weighted_successors):
 
     return dist
 
+# Adapted from bidirectional_dijkstra in
+# https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/shortest_paths/weighted.html#bidirectional_dijkstra .
+def bidirectional_dijkstra(source, target, weighted_successors, weighted_predecessors):
+    forward_dist = {}
+    forward_seen = {source: 0}
+    # Use a counter to avoid comparing the nodes themselves in the
+    # heap.
+    c = count()
+    forward_fringe = []
+    heappush(forward_fringe, (0, next(c), source))
+    while forward_fringe:
+        (d, _, v) = heappop(forward_fringe)
+        if v in forward_dist:
+            continue # already searched this node
+        forward_dist[v] = d
+        if v == target:
+            break
+        for u, cost in weighted_successors(v):
+            vu_dist = forward_dist[v] + cost
+            if u in forward_dist:
+                if vu_dist < forward_dist[u]:
+                    raise ValueError(f'Contradictory paths found: negative weights? v={v} u={u} vu_dist={vu_dist} dist[u]={forward_dist[u]}')
+            elif u not in forward_seen or vu_dist < forward_seen[u]:
+                forward_seen[u] = vu_dist
+                heappush(forward_fringe, (vu_dist, next(c), u))
+
+    return forward_dist
+
 def astar(source, target, get_neighbor_fn, h):
     # Use a counter to avoid comparing the nodes themselves in the
     # heap.
@@ -187,7 +215,7 @@ def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
     start_pos3 = vec2to3(start_pos, 0)
     end_pos3 = vec2to3(end_pos, 0)
 
-    def weighted_successors(n3):
+    def weighted_neighbors(n3):
         n, z = vec3to2(n3)
         for m in G[n]:
             yield vec2to3(m, z), G.edges[n, m]['weight']
@@ -200,7 +228,7 @@ def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
     def heuristic(n3):
         return 0
 
-    counts3 = astar(start_pos3, end_pos3, weighted_successors, heuristic)
+    counts3 = bidirectional_dijkstra(start_pos3, end_pos3, weighted_neighbors, weighted_neighbors)
     return counts3[end_pos3]
 
 if __name__ == '__main__':
