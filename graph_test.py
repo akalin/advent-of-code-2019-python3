@@ -28,6 +28,30 @@ class TestGraph(unittest.TestCase):
                                 ('x', 'v', 5), ('x', 'y', 2),
                                 ('y', 's', 7), ('y', 'v', 6)])
 
+    XG2 = nx.DiGraph()
+    XG2.add_weighted_edges_from([[1, 4, 1], [4, 5, 1],
+                                 [5, 6, 1], [6, 3, 1],
+                                 [1, 3, 50], [1, 2, 100],
+                                 [2, 3, 100]])
+
+    XG3 = nx.Graph()
+    XG3.add_weighted_edges_from([[0, 1, 2], [1, 2, 12],
+                                 [2, 3, 1], [3, 4, 5],
+                                 [4, 5, 1], [5, 0, 10]])
+
+    XG4 = nx.Graph()
+    XG4.add_weighted_edges_from([[0, 1, 2], [1, 2, 2],
+                                 [2, 3, 1], [3, 4, 1],
+                                 [4, 5, 1], [5, 6, 1],
+                                 [6, 7, 1], [7, 0, 1]])
+
+    UWG = nx.DiGraph()  # no weights
+    UWG.add_edges_from([('s', 'u'), ('s', 'x'),
+                        ('u', 'v'), ('u', 'x'),
+                        ('v', 'y'), ('x', 'u'),
+                        ('x', 'v'), ('x', 'y'),
+                        ('y', 's'), ('y', 'v')])
+
     def test_dijkstra(self):
         XG = TestGraph.XG
 
@@ -36,7 +60,14 @@ class TestGraph(unittest.TestCase):
         # to_undirected might choose either edge with weight 2 or weight 3
         GG['u']['x']['weight'] = 2
 
-        for G in [XG, GG]:
+        for G in [
+                XG,
+                GG,
+                TestGraph.XG2,
+                TestGraph.XG3,
+                TestGraph.XG4,
+                TestGraph.UWG,
+        ]:
             def weighted_successors(v):
                 for w, attributes in G[v].items():
                     yield w, attributes['weight']
