@@ -1,5 +1,4 @@
 from util import *
-from vec2 import *
 from graph import *
 from heapq import heappush, heappop
 import timeit
@@ -8,18 +7,28 @@ from itertools import count
 from more_itertools import collapse
 
 def get_label(lines, p):
-    rows = len(lines)
-    cols = len(lines[0])
-    for d in all_directions:
-        x1, y1 = d.vec() + p
-        ch1 = lines[y1][x1]
-        if 'A' <= ch1 <= 'Z':
-            x2, y2 = Vec2(x1, y1) + d.vec()
-            ch2 = lines[y2][x2]
-            s = frozenset([ch1, ch2])
-            if x2 == 0 or x2 == cols-1 or y2 == 0 or y2 == rows-1:
-                return s, -1
-            return s, +1
+    x0, y0 = p
+
+    # Left
+    if 'A' <= lines[y0][x0 - 1] <= 'Z':
+        label = lines[y0][x0-2:x0]
+        return label, -1 if x0 == 2 else +1
+
+    # Right
+    if 'A' <= lines[y0][x0 + 1] <= 'Z':
+        label = lines[y0][x0+1:x0+3]
+        return label, -1 if x0 == len(lines[y0])-3 else +1
+
+    # Up
+    if 'A' <= lines[y0 - 1][x0] <= 'Z':
+        label = lines[y0 - 2][x0] + lines[y0 - 1][x0]
+        return label, -1 if y0 == 2 else +1
+
+    # Down
+    if 'A' <= lines[y0 + 1][x0] <= 'Z':
+        label = lines[y0 + 1][x0] + lines[y0 + 2][x0]
+        return label, -1 if y0 == len(lines) - 3 else +1
+
     return None
 
 def parse_input(input):
@@ -44,9 +53,9 @@ def parse_input(input):
                     continue
 
                 label = res[0]
-                if label == frozenset(['A']):
+                if label == 'AA':
                     start_pos = p
-                elif label == frozenset(['Z']):
+                elif label == 'ZZ':
                     end_pos = p
                 else:
                     if label in portals:
@@ -59,7 +68,7 @@ def parse_input(input):
     if start_pos is None or end_pos is None:
         raise
 
-    bad_labels = [v for v in portals.values() if len(v) != 2]
+    bad_labels = [(label, v) for label, v in portals.items() if len(v) != 2]
     if bad_labels:
         raise Exception(f'{bad_labels}')
 
@@ -201,8 +210,8 @@ def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
 
     G = nx.Graph()
     labeled_nodes = {
-        start_pos: frozenset(['A']),
-        end_pos: frozenset(['Z']),
+        start_pos: 'AA',
+        end_pos: 'ZZ',
     }
     for label, ends in portals.items():
         for end in ends:
