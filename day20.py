@@ -94,8 +94,8 @@ def compute_part1_nx(walkables, start_pos, end_pos, portals, portal_sides):
     return nx.shortest_path_length(G, source=start_pos, target=end_pos)
 
 # Adapted from _dijkstra_multisource in
-# https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/shortest_paths/weighted.html#dijkstra_path .
-def dijkstra(source, target, weighted_neighbors):
+# https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/shortest_paths/weighted.html .
+def dijkstra(source, target, weighted_successors):
     dist = {}
     seen = {}
     # Use a counter to avoid comparing the nodes themselves in the
@@ -111,7 +111,7 @@ def dijkstra(source, target, weighted_neighbors):
         dist[v] = d
         if v == target:
             break
-        for u, cost in weighted_neighbors(v):
+        for u, cost in weighted_successors(v):
             vu_dist = dist[v] + cost
             if u in dist:
                 if vu_dist < dist[u]:
@@ -188,7 +188,7 @@ def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
     start_pos3 = vec2to3(start_pos, 0)
     end_pos3 = vec2to3(end_pos, 0)
 
-    def weighted_neighbors(n3):
+    def weighted_successors(n3):
         n, z = vec3to2(n3)
         for m in G[n]:
             yield vec2to3(m, z), G.edges[n, m]['weight']
@@ -201,7 +201,7 @@ def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
     def heuristic(n3):
         return 0
 
-    counts3 = astar(start_pos3, end_pos3, weighted_neighbors, heuristic)
+    counts3 = astar(start_pos3, end_pos3, weighted_successors, heuristic)
     return counts3[end_pos3]
 
 if __name__ == '__main__':
