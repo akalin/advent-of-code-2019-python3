@@ -4,7 +4,7 @@ import networkx as nx
 import unittest
 
 class TestGraph(unittest.TestCase):
-    G = nx.Graph([(0, 1), (1, 2), (1, 3), (2, 4), (3, 4)])
+    G = nx.Graph([(0, 1), (1, 2), (1, 3), (2, 4), (3, 4)], name='G')
 
     def test_bfs_edges(self):
         G = TestGraph.G
@@ -20,25 +20,25 @@ class TestGraph(unittest.TestCase):
             lengths = dict(bfs_path_lengths(source=n, successors=G.neighbors))
             self.assertEqual(lengths, expected_lengths)
 
-    XG = nx.DiGraph()
+    XG = nx.DiGraph(name='XG')
     XG.add_weighted_edges_from([('s', 'u', 10), ('s', 'x', 5),
                                 ('u', 'v', 1), ('u', 'x', 2),
                                 ('v', 'y', 1), ('x', 'u', 3),
                                 ('x', 'v', 5), ('x', 'y', 2),
                                 ('y', 's', 7), ('y', 'v', 6)])
 
-    XG2 = nx.DiGraph()
+    XG2 = nx.DiGraph(name='XG2')
     XG2.add_weighted_edges_from([[1, 4, 1], [4, 5, 1],
                                  [5, 6, 1], [6, 3, 1],
                                  [1, 3, 50], [1, 2, 100],
                                  [2, 3, 100]])
 
-    XG3 = nx.Graph()
+    XG3 = nx.Graph(name='XG3')
     XG3.add_weighted_edges_from([[0, 1, 2], [1, 2, 12],
                                  [2, 3, 1], [3, 4, 5],
                                  [4, 5, 1], [5, 0, 10]])
 
-    XG4 = nx.Graph()
+    XG4 = nx.Graph(name='XG4')
     XG4.add_weighted_edges_from([[0, 1, 2], [1, 2, 2],
                                  [2, 3, 1], [3, 4, 1],
                                  [4, 5, 1], [5, 6, 1],
@@ -49,12 +49,13 @@ class TestGraph(unittest.TestCase):
                       ('u', 'v'), ('u', 'x'),
                       ('v', 'y'), ('x', 'u'),
                       ('x', 'v'), ('x', 'y'),
-                      ('y', 's'), ('y', 'v')])
+                      ('y', 's'), ('y', 'v')], name='UWG')
 
     def test_dijkstra(self):
         XG = TestGraph.XG
 
         GG = XG.to_undirected()
+        GG.graph['name'] = 'GG'
         # make sure we get lower weight
         # to_undirected might choose either edge with weight 2 or weight 3
         GG['u']['x']['weight'] = 2
@@ -88,8 +89,8 @@ class TestGraph(unittest.TestCase):
                 except nx.NetworkXNoPath:
                     expected_length = None
 
-                self.assertEqual(length, expected_length)
-                self.assertEqual(bi_length, expected_length)
+                self.assertEqual(length, expected_length, f'graph is {G}')
+                self.assertEqual(bi_length, expected_length, f'graph is {G}')
 
 if __name__ == '__main__':
     unittest.main()
