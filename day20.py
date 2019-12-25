@@ -192,10 +192,10 @@ def astar(source, target, get_neighbor_fn, h):
     raise
 
 def vec3to2(v3):
-    return Vec2(v3[0], v3[1]), v3[2]
+    return (v3[0], v3[1]), v3[2]
 
 def vec2to3(v2, z):
-    return Vec3(v2[0], v2[1], z)
+    return (v2[0], v2[1], z)
 
 def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
     local = compute_local_graph(walkables)
