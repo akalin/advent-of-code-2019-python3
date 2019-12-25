@@ -105,11 +105,11 @@ def dijkstra_shortest_path_length(source, target, weighted_successors):
     heappush(fringe, (0, next(c), source))
     while fringe:
         (d, _, v) = heappop(fringe)
+        if v == target:
+            return d
         if v in dist:
             continue # already searched this node
         dist[v] = d
-        if v == target:
-            return dist[v]
         for u, cost in weighted_successors(v):
             vu_dist = dist[v] + cost
             if u in dist:
