@@ -191,10 +191,10 @@ def astar(source, target, get_neighbor_fn, h):
 
     raise
 
-def vec3to2(v3):
+def tuple3to2(v3):
     return (v3[0], v3[1]), v3[2]
 
-def vec2to3(v2, z):
+def tuple2to3(v2, z):
     return (v2[0], v2[1], z)
 
 def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
@@ -215,18 +215,18 @@ def compute_part2(walkables, start_pos, end_pos, portals, portal_sides):
             if target != source and target in local_lengths:
                 G.add_edge(source, target, weight=local_lengths[target])
 
-    start_pos3 = vec2to3(start_pos, 0)
-    end_pos3 = vec2to3(end_pos, 0)
+    start_pos3 = tuple2to3(start_pos, 0)
+    end_pos3 = tuple2to3(end_pos, 0)
 
     def weighted_neighbors(n3):
-        n, z = vec3to2(n3)
+        n, z = tuple3to2(n3)
         for m in G[n]:
-            yield vec2to3(m, z), G.edges[n, m]['weight']
+            yield tuple2to3(m, z), G.edges[n, m]['weight']
         if n in portal_sides:
             other_side, dz = portal_sides[n]
             new_z = z + dz
             if new_z >= 0:
-                yield vec2to3(other_side, new_z), 1
+                yield tuple2to3(other_side, new_z), 1
 
     def heuristic(n3):
         return 0
