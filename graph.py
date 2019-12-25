@@ -25,12 +25,12 @@ def bfs_path_lengths(source, successors):
                 yield child, lengths[child]
                 queue.append(child)
 
-def bidirectional_shortest_path_helper(source, target, successors, predecessors):
-    pred = {source: None}
-    succ = {target: None}
-
+def bidirectional_shortest_path_length(source, target, successors, predecessors):
     if source == target:
-        return (pred, succ, source)
+        return 0
+
+    source_lengths = {source: 0}
+    target_lengths = {target: 0}
 
     forward_fringe = [source]
     reverse_fringe = [target]
@@ -41,37 +41,20 @@ def bidirectional_shortest_path_helper(source, target, successors, predecessors)
             forward_fringe = []
             for v in this_level:
                 for w in successors(v):
-                    if w not in pred:
+                    if w not in source_lengths:
                         forward_fringe.append(w)
-                        pred[w] = v
-                    if w in succ: # path found
-                        return pred, succ, w
+                        source_lengths[w] = source_lengths[v] + 1
+                    if w in target_lengths: # path found
+                        return source_lengths[w] + target_lengths[w]
         else:
             this_level = reverse_fringe
             reverse_fringe = []
             for v in this_level:
                 for w in predecessors(v):
-                    if w not in succ:
+                    if w not in target_lengths:
                         reverse_fringe.append(w)
-                        succ[w] = v
-                    if w in pred: # path found
-                        return pred, succ, w
+                        target_lengths[w] = target_lengths[v] + 1
+                    if w in source_lengths: # path found
+                        return source_lengths[w] + target_lengths[w]
 
     raise Exception(f'No path between {source} and {target}')
-
-def bidirectional_shortest_path_length(source, target, successors, predecessors):
-    pred, succ, w = bidirectional_shortest_path_helper(source, target, successors, predecessors)
-
-    length = 0
-
-    v = pred[w]
-    while v is not None:
-        length += 1
-        v = pred[v]
-
-    v = succ[w]
-    while v is not None:
-        length += 1
-        v = succ[v]
-
-    return length
