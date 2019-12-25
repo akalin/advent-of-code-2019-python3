@@ -64,10 +64,10 @@ all_directions = [Direction(d) for d in _dir_to_vec.keys()]
 
 def dir_neighbors(v):
     return [
-        Vec2(v.x, v.y + 1),
-        Vec2(v.x, v.y - 1),
-        Vec2(v.x + 1, v.y),
-        Vec2(v.x - 1, v.y),
+        (v[0], v[1] + 1),
+        (v[0], v[1] - 1),
+        (v[0] + 1, v[1]),
+        (v[0] - 1, v[1]),
     ]
 
 class ASCIICanvas(object):

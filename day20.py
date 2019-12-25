@@ -12,7 +12,7 @@ def get_label(lines, p):
     rows = len(lines)
     cols = len(lines[0])
     for d in all_directions:
-        x1, y1 = p + d.vec()
+        x1, y1 = d.vec() + p
         ch1 = lines[y1][x1]
         if 'A' <= ch1 <= 'Z':
             x2, y2 = Vec2(x1, y1) + d.vec()
@@ -37,7 +37,7 @@ def parse_input(input):
     for y in range(rows):
         for x in range(cols):
             c = lines[y][x]
-            p = Vec2(x, y)
+            p = (x, y)
             if c == '.':
                 walkables.add(p)
                 res = get_label(lines, p)

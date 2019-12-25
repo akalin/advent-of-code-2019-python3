@@ -9,7 +9,7 @@ def compute_day15(input):
 
     walls = set()
     oxygen = None
-    origin = Vec2(0, 0)
+    origin = (0, 0)
 
     dir_to_input = {
         'U': 1,
@@ -41,7 +41,7 @@ def compute_day15(input):
 
     for parent, child in bfs_edges(origin, neighbors):
         intputer = intputers[parent].copy()
-        dir = Direction(child - parent)
+        dir = Direction(Vec2(child) - parent)
         input = dir_to_input[dir.str()]
         output = intputer.run([input])
         status = output[0]
