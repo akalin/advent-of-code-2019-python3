@@ -1,6 +1,5 @@
 from util import *
 from vec2 import *
-from vec3 import *
 from graph import *
 from heapq import heappush, heappop
 import timeit
