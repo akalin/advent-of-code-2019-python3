@@ -82,7 +82,7 @@ def parse_input(input):
     return walkables, start_pos, end_pos, portals, portal_sides
 
 def local_neighbors(n, walkables):
-    return (m for m in dir_neighbors(n) if m in walkables)
+    return [m for m in dir_neighbors(n) if m in walkables]
 
 def compute_part1(walkables, start_pos, end_pos, portals, portal_sides):
     def neighbors(n):
