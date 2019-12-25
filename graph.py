@@ -56,3 +56,31 @@ def bidirectional_shortest_path_length(source, target, successors, predecessors)
                     return lengths[w] + other_lengths[w]
 
     raise Exception(f'No path between {source} and {target}')
+
+# Adapted from _dijkstra_multisource in
+# https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/shortest_paths/weighted.html .
+def dijkstra_shortest_path_length(source, target, weighted_successors):
+    dist = {}
+    seen = {source: 0}
+    # Use a counter to avoid comparing the nodes themselves in the
+    # heap.
+    c = count()
+    fringe = []
+    heappush(fringe, (0, next(c), source))
+    while fringe:
+        (d, _, v) = heappop(fringe)
+        if v == target:
+            return d
+        if v in dist:
+            continue # already searched this node
+        dist[v] = d
+        for u, cost in weighted_successors(v):
+            vu_dist = dist[v] + cost
+            if u in dist:
+                if vu_dist < dist[u]:
+                    raise ValueError(f'Contradictory paths found: negative weights? v={v} u={u} vu_dist={vu_dist} dist[u]={dist[u]}')
+            elif u not in seen or vu_dist < seen[u]:
+                seen[u] = vu_dist
+                heappush(fringe, (vu_dist, next(c), u))
+
+    raise Exception(f'No path between {source} and {target}')
