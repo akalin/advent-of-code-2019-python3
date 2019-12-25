@@ -4,8 +4,7 @@ import networkx as nx
 import unittest
 
 class TestGraph(unittest.TestCase):
-    G = nx.Graph()
-    G.add_edges_from([(0, 1), (1, 2), (1, 3), (2, 4), (3, 4)])
+    G = nx.Graph([(0, 1), (1, 2), (1, 3), (2, 4), (3, 4)])
 
     def test_bfs_edges(self):
         G = TestGraph.G
@@ -45,12 +44,12 @@ class TestGraph(unittest.TestCase):
                                  [4, 5, 1], [5, 6, 1],
                                  [6, 7, 1], [7, 0, 1]])
 
-    UWG = nx.DiGraph()  # no weights
-    UWG.add_edges_from([('s', 'u'), ('s', 'x'),
-                        ('u', 'v'), ('u', 'x'),
-                        ('v', 'y'), ('x', 'u'),
-                        ('x', 'v'), ('x', 'y'),
-                        ('y', 's'), ('y', 'v')])
+    # no weights
+    UWG = nx.DiGraph([('s', 'u'), ('s', 'x'),
+                      ('u', 'v'), ('u', 'x'),
+                      ('v', 'y'), ('x', 'u'),
+                      ('x', 'v'), ('x', 'y'),
+                      ('y', 's'), ('y', 'v')])
 
     def test_dijkstra(self):
         XG = TestGraph.XG
