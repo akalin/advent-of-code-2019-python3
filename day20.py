@@ -266,5 +266,5 @@ if __name__ == '__main__':
         part2_duration = timeit.timeit(do_part2, number=1)
         if part1 != part1_nx:
             raise Exception(f'computed {part1} for part 1, but NetworkX computed {part1_nx}')
-        print(f'part1: {part1} ({part1_duration:.2f}s, nx={part1_nx_duration:.2f}s), part2: {part2} ({part2_duration:.2f}s)')
+        print(f'part1: {part1} ({part1_duration:.3f}s, nx={part1_nx_duration:.3f}s), part2: {part2} ({part2_duration:.3f}s)')
 
