@@ -83,9 +83,7 @@ def compute_part1(walkables, start_pos, end_pos, portals, portal_sides):
         if n in portal_sides:
             yield portal_sides[n][0]
 
-    for n, d in bfs_path_lengths(start_pos, neighbors):
-        if n == end_pos:
-            return d
+    return bidirectional_shortest_path_length(start_pos, end_pos, neighbors, neighbors)
 
 def compute_local_graph(walkables):
     return nx.Graph([(n, m) for n in walkables for m in local_neighbors(n, walkables)])
