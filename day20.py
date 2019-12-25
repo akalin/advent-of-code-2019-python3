@@ -11,25 +11,25 @@ def get_label(lines, p):
 
     # Left
     if 'A' <= lines[y0][x0 - 1] <= 'Z':
-        label = lines[y0][x0-2:x0]
-        return label, -1 if x0 == 2 else +1
+        return lines[y0][x0-2:x0]
 
     # Right
     if 'A' <= lines[y0][x0 + 1] <= 'Z':
-        label = lines[y0][x0+1:x0+3]
-        return label, -1 if x0 == len(lines[y0])-3 else +1
+        return lines[y0][x0+1:x0+3]
 
     # Up
     if 'A' <= lines[y0 - 1][x0] <= 'Z':
-        label = lines[y0 - 2][x0] + lines[y0 - 1][x0]
-        return label, -1 if y0 == 2 else +1
+        return lines[y0 - 2][x0] + lines[y0 - 1][x0]
 
     # Down
     if 'A' <= lines[y0 + 1][x0] <= 'Z':
-        label = lines[y0 + 1][x0] + lines[y0 + 2][x0]
-        return label, -1 if y0 == len(lines) - 3 else +1
+        return lines[y0 + 1][x0] + lines[y0 + 2][x0]
 
     return None
+
+def get_dz(lines, p):
+    x0, y0 = p
+    return -1 if x0 == 2 or x0 == len(lines[y0])-3 or y0 == 2 or y0 == len(lines) - 3 else +1
 
 def parse_input(input):
     lines = [x for x in input.split('\n')][:-1]
@@ -48,11 +48,10 @@ def parse_input(input):
             p = (x, y)
             if c == '.':
                 walkables.add(p)
-                res = get_label(lines, p)
-                if res is None:
+                label = get_label(lines, p)
+                if label is None:
                     continue
 
-                label = res[0]
                 if label == 'AA':
                     start_pos = p
                 elif label == 'ZZ':
@@ -73,11 +72,11 @@ def parse_input(input):
         raise Exception(f'{bad_labels}')
 
     portal_sides = {}
-    for x, y in portals.values():
-        _, xdz = get_label(lines, x)
-        _, ydz = get_label(lines, y)
-        portal_sides[x] = (y, xdz)
-        portal_sides[y] = (x, ydz)
+    for v, w in portals.values():
+        vdz = get_dz(lines, v)
+        wdz = get_dz(lines, w)
+        portal_sides[v] = (w, vdz)
+        portal_sides[w] = (v, wdz)
 
     return walkables, start_pos, end_pos, portals, portal_sides
 
