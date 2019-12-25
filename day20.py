@@ -97,12 +97,11 @@ def compute_part1_nx(walkables, start_pos, end_pos, portals, portal_sides):
 # https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/shortest_paths/weighted.html .
 def dijkstra(source, target, weighted_successors):
     dist = {}
-    seen = {}
+    seen = {source: 0}
     # Use a counter to avoid comparing the nodes themselves in the
     # heap.
     c = count()
     fringe = []
-    seen[source] = 0
     heappush(fringe, (0, next(c), source))
     while fringe:
         (d, _, v) = heappop(fringe)
