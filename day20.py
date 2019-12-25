@@ -4,7 +4,6 @@ from heapq import heappush, heappop
 import timeit
 import networkx as nx
 from itertools import count
-from more_itertools import collapse
 
 def get_label(lines, p):
     x0, y0 = p
