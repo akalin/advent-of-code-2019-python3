@@ -152,8 +152,8 @@ def prod(iterable, start=1):
         p *= x
     return p
 
-# Roughly equivalent to
-# https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/traversal/breadth_first_search.html#bfs_edges
+# Roughly equivalent to generic_bfs_edges from
+# https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/traversal/breadth_first_search.html .
 def bfs_edges(source, neighbors):
     visited = set([source])
     queue = deque([source])
