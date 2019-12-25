@@ -61,6 +61,7 @@ class TestGraph(unittest.TestCase):
         GG['u']['x']['weight'] = 2
 
         for G in [
+                TestGraph.G,
                 XG,
                 GG,
                 TestGraph.XG2,
@@ -70,11 +71,18 @@ class TestGraph(unittest.TestCase):
         ]:
             def weighted_successors(v):
                 for w, attributes in G[v].items():
-                    yield w, attributes['weight']
+                    yield w, attributes['weight'] if 'weight' in attributes else 1
 
             for source, target in itertools.product(G.nodes(), repeat=2):
-                length = dijkstra_path_length(source, target, weighted_successors=weighted_successors)
-                expected_length = nx.dijkstra_path_length(G, source, target)
+                try:
+                    length = dijkstra_path_length(source, target, weighted_successors=weighted_successors)
+                except ValueError:
+                    length = None
+
+                try:
+                    expected_length = nx.dijkstra_path_length(G, source, target)
+                except nx.NetworkXNoPath:
+                    expected_length = None
                 self.assertEqual(length, expected_length)
 
 if __name__ == '__main__':
