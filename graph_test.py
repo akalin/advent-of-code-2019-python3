@@ -20,5 +20,22 @@ class TestGraph(unittest.TestCase):
             lengths = dict(bfs_path_lengths(source=n, successors=G.neighbors))
             self.assertEqual(lengths, expected_lengths)
 
+    XG = nx.DiGraph()
+    XG.add_weighted_edges_from([('s', 'u', 10), ('s', 'x', 5),
+                                ('u', 'v', 1), ('u', 'x', 2),
+                                ('v', 'y', 1), ('x', 'u', 3),
+                                ('x', 'v', 5), ('x', 'y', 2),
+                                ('y', 's', 7), ('y', 'v', 6)])
+
+    def test_dijkstra(self):
+        XG = TestGraph.XG
+
+        def weighted_successors(v):
+            for w, attributes in XG._succ[v].items():
+                yield w, attributes['weight']
+
+        length = dijkstra_shortest_path_length('s', 'v', weighted_successors=weighted_successors)
+        self.assertEqual(length, 9)
+
 if __name__ == '__main__':
     unittest.main()
