@@ -90,6 +90,9 @@ def dijkstra_path_length(source, target, weighted_successors):
 # Adapted from bidirectional_dijkstra in
 # https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/shortest_paths/weighted.html#bidirectional_dijkstra .
 def bidirectional_dijkstra_path_length(source, target, weighted_successors, weighted_predecessors):
+    if source == target:
+        return 0
+
     dist = [{}, {}]
     seen = [{source: 0}, {target: 0}]
     # Use a counter to avoid comparing the nodes themselves in the
