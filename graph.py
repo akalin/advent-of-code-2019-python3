@@ -103,10 +103,13 @@ def bidirectional_dijkstra_path_length(source, target, weighted_successors, weig
     heappush(fringe[1], (0, next(c), target))
     dir = 0
     weighted_next = [weighted_successors, weighted_predecessors]
+    shortest_length = None
     while fringe[0] and fringe[1]:
         (d, _, v) = heappop(fringe[dir])
         if v in dist[1 - dir]:
-            return d + dist[1 - dir][v]
+            if shortest_length is None:
+                raise Exception(f'shortest_length unexpectedly None (v={v})')
+            return shortest_length
         if v in dist[dir]:
             continue # already searched this node
         dist[dir][v] = d
@@ -118,6 +121,10 @@ def bidirectional_dijkstra_path_length(source, target, weighted_successors, weig
             elif u not in seen[dir] or vu_dist < seen[dir][u]:
                 seen[dir][u] = vu_dist
                 heappush(fringe[dir], (vu_dist, next(c), u))
+                if u in seen[0] and u in seen[1]:
+                    length = seen[0][u] + seen[1][u]
+                    if shortest_length is None or length < shortest_length:
+                        shortest_length = length
         dir = 1 - dir
 
     raise ValueError(f'No path between {source} and {target}')
