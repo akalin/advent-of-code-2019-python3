@@ -38,23 +38,21 @@ def bidirectional_shortest_path_length(source, target, successors, predecessors)
     while forward_fringe and reverse_fringe:
         if len(forward_fringe) <= len(reverse_fringe):
             this_level = forward_fringe
-            forward_fringe = []
-            for v in this_level:
-                for w in successors(v):
-                    if w not in source_lengths:
-                        forward_fringe.append(w)
-                        source_lengths[w] = source_lengths[v] + 1
-                    if w in target_lengths: # path found
-                        return source_lengths[w] + target_lengths[w]
+            fringe = forward_fringe = []
+            neighbors = successors
+            lengths, other_lengths = source_lengths, target_lengths
         else:
             this_level = reverse_fringe
-            reverse_fringe = []
-            for v in this_level:
-                for w in predecessors(v):
-                    if w not in target_lengths:
-                        reverse_fringe.append(w)
-                        target_lengths[w] = target_lengths[v] + 1
-                    if w in source_lengths: # path found
-                        return source_lengths[w] + target_lengths[w]
+            fringe = reverse_fringe = []
+            neighbors = predecessors
+            lengths, other_lengths = target_lengths, source_lengths
+            
+        for v in this_level:
+            for w in neighbors(v):
+                if w not in lengths:
+                    fringe.append(w)
+                    lengths[w] = lengths[v] + 1
+                if w in other_lengths: # path found
+                    return lengths[w] + other_lengths[w]
 
     raise Exception(f'No path between {source} and {target}')
