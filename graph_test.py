@@ -69,9 +69,15 @@ class TestGraph(unittest.TestCase):
                 TestGraph.XG4,
                 TestGraph.UWG,
         ]:
-            def weighted_successors(v):
-                for w, attributes in G[v].items():
+            def nodes_and_weights(it):
+                for w, attributes in it:
                     yield w, attributes['weight'] if 'weight' in attributes else 1
+
+            def weighted_successors(v):
+                return nodes_and_weights(G[v].items())
+
+            def weighted_predecessors(v):
+                return nodes_and_weights(((w, G[w][v]) for w in G.predecessors(v)) if G.is_directed() else G[v].items())
 
             for source, target in itertools.product(G.nodes(), repeat=2):
                 try:
@@ -80,7 +86,7 @@ class TestGraph(unittest.TestCase):
                     length = None
 
                 try:
-                    bi_length = bidirectional_dijkstra_path_length(source, target, weighted_successors=weighted_successors, weighted_predecessors=weighted_successors)
+                    bi_length = bidirectional_dijkstra_path_length(source, target, weighted_successors=weighted_successors, weighted_predecessors=weighted_predecessors)
                 except ValueError:
                     bi_length = None
 
@@ -89,8 +95,9 @@ class TestGraph(unittest.TestCase):
                 except nx.NetworkXNoPath:
                     expected_length = None
 
-                self.assertEqual(length, expected_length, f'graph is {G}')
-                self.assertEqual(bi_length, expected_length, f'graph is {G}')
+                desc = f'G={G}, source={source}, target={target}'
+                self.assertEqual(length, expected_length, desc)
+                self.assertEqual(bi_length, expected_length, desc)
 
 if __name__ == '__main__':
     unittest.main()

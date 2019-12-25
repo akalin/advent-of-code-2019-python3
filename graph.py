@@ -117,4 +117,4 @@ def bidirectional_dijkstra_path_length(source, target, weighted_successors, weig
                 heappush(fringe[dir], (vu_dist, next(c), u))
         dir = 1 - dir
 
-    raise Exception(f'No path between {source} and {target}')
+    raise ValueError(f'No path between {source} and {target}')
