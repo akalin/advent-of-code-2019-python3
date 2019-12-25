@@ -62,6 +62,14 @@ class Direction(object):
 
 all_directions = [Direction(d) for d in _dir_to_vec.keys()]
 
+def dir_neighbors(v):
+    return [
+        Vec2(v.x, v.y + 1),
+        Vec2(v.x, v.y - 1),
+        Vec2(v.x + 1, v.y),
+        Vec2(v.x - 1, v.y),
+    ]
+
 class ASCIICanvas(object):
     def __init__(self, default_c = ' '):
         self._default_c = default_c

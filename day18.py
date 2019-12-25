@@ -89,8 +89,7 @@ def compute_day18(input):
         def get_neighbor_fn(n):
             if n in walls:
                 return []
-            possible_neighbors = [n + d.vec() for d in all_directions]
-            return [m for m in possible_neighbors if (m not in walls)]
+            return [m for m in dir_neighbors(n) if (m not in walls)]
 
         def visit_fn(n, parent):
             dists[n] = dists[parent] + 1

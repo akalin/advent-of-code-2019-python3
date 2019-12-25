@@ -74,8 +74,7 @@ def parse_input(input):
     return walkables, start_pos, end_pos, portals, portal_sides
 
 def local_neighbors(n, walkables):
-    possible_neighbors = [n + d.vec() for d in all_directions]
-    return (m for m in possible_neighbors if m in walkables)
+    return (m for m in dir_neighbors(n) if m in walkables)
 
 def compute_part1(walkables, start_pos, end_pos, portals, portal_sides):
     def neighbors(n):

@@ -35,8 +35,7 @@ def compute_day15(input):
     def neighbors(n):
         if n in walls:
             return []
-        possible_neighbors = [n + d.vec() for d in all_directions]
-        return [m for m in possible_neighbors if (m not in walls)]
+        return [m for m in dir_neighbors(n) if (m not in walls)]
 
     G = nx.Graph()
 
