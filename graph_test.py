@@ -1,4 +1,5 @@
 from graph import *
+import itertools
 import networkx as nx
 import unittest
 
@@ -30,12 +31,20 @@ class TestGraph(unittest.TestCase):
     def test_dijkstra(self):
         XG = TestGraph.XG
 
-        def weighted_successors(v):
-            for w, attributes in XG[v].items():
-                yield w, attributes['weight']
+        GG = XG.to_undirected()
+        # make sure we get lower weight
+        # to_undirected might choose either edge with weight 2 or weight 3
+        GG['u']['x']['weight'] = 2
 
-        length = dijkstra_shortest_path_length('s', 'v', weighted_successors=weighted_successors)
-        self.assertEqual(length, 9)
+        for G in [XG, GG]:
+            def weighted_successors(v):
+                for w, attributes in G[v].items():
+                    yield w, attributes['weight']
+
+            for source, target in itertools.product(G.nodes(), repeat=2):
+                length = dijkstra_path_length(source, target, weighted_successors=weighted_successors)
+                expected_length = nx.dijkstra_path_length(G, source, target)
+                self.assertEqual(length, expected_length)
 
 if __name__ == '__main__':
     unittest.main()

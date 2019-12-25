@@ -61,7 +61,7 @@ def bidirectional_shortest_path_length(source, target, successors, predecessors)
 
 # Adapted from _dijkstra_multisource in
 # https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/shortest_paths/weighted.html .
-def dijkstra_shortest_path_length(source, target, weighted_successors):
+def dijkstra_path_length(source, target, weighted_successors):
     dist = {}
     seen = {source: 0}
     # Use a counter to avoid comparing the nodes themselves in the
