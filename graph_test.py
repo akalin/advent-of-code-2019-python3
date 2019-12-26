@@ -86,12 +86,20 @@ class TestGraph(unittest.TestCase):
                 self.assertEqual(length, expected_length, desc)
 
     def test_dijkstra(self):
-        def _dijkstra_path_length(source, target, weighted_successors, weighted_predecessors):
+        def path_length(source, target, weighted_successors, weighted_predecessors):
             return dijkstra_path_length(source, target, weighted_successors)
-        self._test_path_length(_dijkstra_path_length)
+        self._test_path_length(path_length)
 
     def test_bidirectional_dijkstra(self):
         self._test_path_length(bidirectional_dijkstra_path_length)
+
+    def test_astar_zero_heuristic(self):
+        def zero_heuristic(n):
+            return 0
+
+        def path_length(source, target, weighted_successors, weighted_predecessors):
+            return astar(source, target, weighted_successors, zero_heuristic)
+        self._test_path_length(path_length)
 
 if __name__ == '__main__':
     unittest.main()

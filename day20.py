@@ -98,45 +98,6 @@ def compute_part1_nx(walkables, start_pos, end_pos, portals):
     G.add_edges_from((n, m) for n, (m, _) in portals.items())
     return nx.shortest_path_length(G, source=start_pos, target=end_pos)
 
-def astar(source, target, get_neighbor_fn, h):
-    # Use a counter to avoid comparing the nodes themselves in the
-    # heap.
-    c = count()
-    open_set = []
-    heappush(open_set, (0, next(c), source))
-    came_from = {source: None}
-
-    g_score = {source: 0}
-    f_score = {source: h(source)}
-
-    def get_g_score(n):
-        if n not in g_score:
-            return (1, 0)
-        return (0, g_score[n])
-
-    def get_f_score(n):
-        if n not in f_score:
-            return (1, 0)
-        return (0, f_score[n])
-
-    while open_set:
-        (_, _, n) = heappop(open_set)
-        if n == target:
-            return g_score
-
-        for m, m_len in get_neighbor_fn(n):
-            if n not in g_score:
-                continue
-
-            tentative_g_score = g_score[n] + m_len
-            if (0, tentative_g_score) < get_g_score(m):
-                came_from[m] = n
-                g_score[m] = tentative_g_score
-                f_score[m] = g_score[m] + h(m)
-                heappush(open_set, (f_score[m], next(c), m))
-
-    raise
-
 def tuple3to2(v3):
     return (v3[0], v3[1]), v3[2]
 
