@@ -72,10 +72,11 @@ def dijkstra_edges(source, weighted_successors):
     fringe = []
     heappush(fringe, (0, next(c), source, None))
     while fringe:
-        (dist_to_child, _, child, parent) = heappop(fringe)
+        (_, _, child, parent) = heappop(fringe)
         if child in final_dist:
             continue # already processed this node
 
+        dist_to_child = dist_so_far[child]
         final_dist[child] = dist_to_child
         yield child, parent, dist_to_child
 
@@ -151,7 +152,7 @@ def astar_edges(source, weighted_successors, heuristic):
     while fringe:
         (_, _, child, parent) = heappop(fringe)
         if child in final_dist:
-            continue
+            continue # already processed this node
 
         dist_to_child = dist_so_far[child]
         final_dist[child] = dist_to_child
