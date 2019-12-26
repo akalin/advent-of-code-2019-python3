@@ -27,7 +27,7 @@ def dijkstra_path_length_fn(source, is_target, weighted_successors):
                 seen[u] = vu_dist
                 heappush(fringe, (vu_dist, next(c), u))
 
-    raise ValueError(f'No path between {source} and {target}')
+    raise ValueError(f'No path from {source} to a target node')
 
 def compute_shortest_steps(input):
     lines = [x.strip() for x in input.strip().split('\n')]
@@ -70,6 +70,13 @@ def compute_shortest_steps(input):
 
     local = nx.Graph([(n, m) for n in walkables for m in local_neighbors(n, walkables)])
 
+    blockers = {start_pos: frozenset()}
+    for parent, child in nx.bfs_edges(local, start_pos):
+        new_blockers = blockers[parent]
+        if child in pos_to_door:
+            new_blockers |= frozenset(pos_to_door[child].lower())
+        blockers[child] = new_blockers
+
     G = nx.Graph()
 
     labeled_nodes = [ start_pos ] + list(pos_to_key.keys())
@@ -84,9 +91,10 @@ def compute_shortest_steps(input):
         for new_pos, attributes in G[pos].items():
             if new_pos == start_pos:
                 continue
-            new_inventory = inventory | frozenset([pos_to_key[new_pos]])
-            new_state = (new_pos, new_inventory)
-            yield (new_state, attributes['weight'])
+            if inventory.issuperset(blockers[new_pos]):
+                new_inventory = inventory | frozenset([pos_to_key[new_pos]])
+                new_state = (new_pos, new_inventory)
+                yield (new_state, attributes['weight'])
 
     all_keys = frozenset(key_to_pos.keys())
     def is_target(state):
