@@ -38,10 +38,7 @@ def compute_shortest_steps(input):
     if start_pos is None:
         raise
 
-    def local_neighbors(n, walkables):
-        return [m for m in dir_neighbors(n) if m in walkables]
-
-    local = nx.Graph([(n, m) for n in walkables for m in local_neighbors(n, walkables)])
+    local = nx.Graph([(n, m) for n in walkables for m in dir_neighbors(n) if m in walkables])
 
     blockers = {start_pos: frozenset()}
     for parent, child in nx.bfs_edges(local, start_pos):
