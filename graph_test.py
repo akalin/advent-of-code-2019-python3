@@ -108,7 +108,7 @@ class TestGraph(unittest.TestCase):
                     return dijkstra_path_length(n, target, weighted_successors)
                 except ValueError:
                     return 1000000
-            return astar(source, target, weighted_successors, ideal_heuristic)
+            return astar_path_length(source, target, weighted_successors, ideal_heuristic)
         self._test_path_length(path_length)
 
 if __name__ == '__main__':

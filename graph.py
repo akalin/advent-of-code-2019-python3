@@ -130,7 +130,7 @@ def bidirectional_dijkstra_path_length(source, target, weighted_successors, weig
 
     raise ValueError(f'No path between {source} and {target}')
 
-def astar(source, target, weighted_successors, heuristic):
+def astar_path_length(source, target, weighted_successors, heuristic):
     g_score = {source: 0}
     f_score = {source: heuristic(source)}
 

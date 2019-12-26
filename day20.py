@@ -3,7 +3,7 @@ from graph import *
 from heapq import heappush, heappop
 import timeit
 import networkx as nx
-from itertools import count
+from itertools import count, combinations
 
 def get_label(lines, p):
     x0, y0 = p
@@ -129,8 +129,30 @@ def compute_part2(walkables, start_pos, end_pos, portals):
             if new_z >= 0:
                 yield tuple2to3(other_side, new_z), 1
 
+    up_nodes = [p for p, (_, dz) in portals.items() if dz > 0]
+    down_nodes = [p for p, (_, dz) in portals.items() if dz < 0]
+
+    # n -> minimum distance from n to an up portal
+    min_to_up = {n: 0 if n in up_nodes else min((G[n][p]['weight'] for p in up_nodes if G.has_edge(n, p))) for n in G.nodes()}
+
+    # n -> minimum distance from n to a down portal
+    min_to_down = {n: 0 if n in down_nodes else min((G[n][p]['weight'] for p in down_nodes if G.has_edge(n, p))) for n in G.nodes()}
+
+    # minimum distance from an up portal to a down portal
+    min_up_to_down = min(min_to_down[p] for p in up_nodes)
+
+    # minimum distance from a down portal to another down portal
+    min_down_to_other_down = min(G[n][p]['weight'] for n, p in combinations(G.nodes(), 2) if G.has_edge(n, p))
+
     def heuristic(n3):
-        return 0
+        n, z = tuple3to2(n3)
+        if z == 0:
+            if G.has_edge(n, end_pos):
+                return G.edges[n, end_pos]['weight']
+            min_down_to_down = 0
+            return min_to_up[n] + 1 + min_down_to_down + 1 + min_to_up[end_pos]
+        else:
+            return min_to_down[n] + (1 + min_up_to_down) * (z - 1) + 1 + min_to_up[end_pos]
 
     return astar_path_length(start_pos3, end_pos3, weighted_neighbors, heuristic)
 
