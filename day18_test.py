@@ -45,6 +45,35 @@ class TestDay18(unittest.TestCase):
             #cB#Ab#
             #######
             ''', 4, 8),
+            ('''
+            ###############
+            #d.ABC.#.....a#
+            ######@#@######
+            ###############
+            ######@#@######
+            #b.....#.....c#
+            ###############
+            ''', 4, 24),
+            ('''
+            #############
+            #DcBa.#.GhKl#
+            #.###@#@#I###
+            #e#d#####j#k#
+            ###C#@#@###J#
+            #fEbA.#.FgHi#
+            #############
+            ''', 4, 32),
+            ('''
+            #############
+            #g#f.D#..h#l#
+            #F###e#E###.#
+            #dCba@#@BcIJ#
+            #############
+            #nK.L@#@G...#
+            #M###N#H###.#
+            #o#m..#i#jk.#
+            #############
+            ''', 4, 72),
         ]
         for input, start_count, expected_shortest_steps in cases:
             shortest_steps = compute_shortest_steps(input, start_count)
