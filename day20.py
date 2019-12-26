@@ -104,7 +104,7 @@ def tuple3to2(v3):
 def tuple2to3(v2, z):
     return (v2[0], v2[1], z)
 
-def compute_part2(walkables, start_pos, end_pos, portals):
+def compute_part2(walkables, start_pos, end_pos, portals, path_length):
     local = compute_local_graph(walkables)
 
     G = nx.Graph()
@@ -129,6 +129,21 @@ def compute_part2(walkables, start_pos, end_pos, portals):
             if new_z >= 0:
                 yield tuple2to3(other_side, new_z), 1
 
+    return path_length(G, portals, start_pos3, end_pos3, weighted_neighbors, weighted_neighbors)
+
+def dijkstra(G, portals, start, end, succ, pred):
+    return dijkstra_path_length(start, end, succ)
+
+def bidir_dijkstra(G, portals, start, end, succ, pred):
+    return bidirectional_dijkstra_path_length(start, end, succ, pred)
+
+def zero_heuristic(n):
+    return 0
+
+def astar_zero(G, portals, start, end, succ, pred):
+    return astar_path_length(start, end, succ, zero_heuristic)
+
+def astar_real(G, portals, start, end, succ, pred):
     up_nodes = [p for p, (_, dz) in portals.items() if dz > 0]
     down_nodes = [p for p, (_, dz) in portals.items() if dz < 0]
 
@@ -158,9 +173,7 @@ def compute_part2(walkables, start_pos, end_pos, portals):
             # go to the ground floor, then go to end_pos.
             return min_to_down[n] + (1 + min_up_to_down) * (z - 1) + 1 + min_to_up[end_pos]
 
-#    return dijkstra_path_length(start_pos3, end_pos3, weighted_neighbors)
-    return bidirectional_dijkstra_path_length(start_pos3, end_pos3, weighted_neighbors, weighted_neighbors)
-#    return astar_path_length(start_pos3, end_pos3, weighted_neighbors, heuristic)
+    return astar_path_length(start, end, succ, heuristic)
 
 if __name__ == '__main__':
     with open('day20.input', 'r') as input_file:
@@ -177,15 +190,31 @@ if __name__ == '__main__':
             global part1_nx
             part1_nx = compute_part1_nx(*args)
 
-        part2 = None
-        def do_part2():
-            global part2
-            part2 = compute_part2(*args)
+
+        part2_dijkstra = None
+        def do_part2_dijkstra():
+            global part2_dijkstra
+            part2_dijkstra = compute_part2(*args, dijkstra)
+
+        part2_bidir_dijkstra = None
+        def do_part2_bidir_dijkstra():
+            global part2_bidir_dijkstra
+            part2_bidir_dijkstra = compute_part2(*args, bidir_dijkstra)
+
+        part2_astar_zero = None
+        def do_part2_astar_zero():
+            global part2_astar_zero
+            part2_astar_zero = compute_part2(*args, astar_zero)
 
         part1_duration = timeit.timeit(do_part1, number=1)
         part1_nx_duration = timeit.timeit(do_part1_nx, number=1)
-        part2_duration = timeit.timeit(do_part2, number=1)
+        part2_dijkstra_duration = timeit.timeit(do_part2_dijkstra, number=1)
+        part2_bidir_dijkstra_duration = timeit.timeit(do_part2_bidir_dijkstra, number=1)
+        part2_astar_zero_duration = timeit.timeit(do_part2_astar_zero, number=1)
         if part1 != part1_nx:
             raise Exception(f'computed {part1} for part 1, but NetworkX computed {part1_nx}')
-        print(f'part1: {part1} ({part1_duration:.3f}s, nx={part1_nx_duration:.3f}s), part2: {part2} ({part2_duration:.3f}s)')
+        print(f'part1: {part1} ({part1_duration:.3f}s, nx={part1_nx_duration:.3f}s)')
+        print(f'part2 (dijkstra): {part2_dijkstra} ({part2_dijkstra_duration:.3f}s)')
+        print(f'part2 (bidir dijkstra): {part2_bidir_dijkstra} ({part2_bidir_dijkstra_duration:.3f}s)')
+        print(f'part2 (A* zero): {part2_astar_zero} ({part2_astar_zero_duration:.3f}s)')
 
