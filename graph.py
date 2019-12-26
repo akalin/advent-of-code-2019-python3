@@ -140,34 +140,36 @@ def bidirectional_dijkstra_path_length(source, target, weighted_successors, weig
 
     raise ValueError(f'No path between {source} and {target}')
 
-def astar_path_lengths(source, weighted_successors, heuristic):
+def astar_edges(source, weighted_successors, heuristic):
     final_dist = {}
     dist_so_far = {source: 0}
-
     # Use a counter to avoid comparing the nodes themselves in the
     # heap.
     c = count()
     fringe = []
-    heappush(fringe, (0, next(c), source))
+    heappush(fringe, (0, next(c), source, None))
 
     while fringe:
-        (d, _, v) = heappop(fringe)
-        if v in final_dist:
+        (_, _, child, parent) = heappop(fringe)
+        if child in final_dist:
             continue
 
-        final_dist[v] = dist_so_far[v]
-        yield v, final_dist[v]
+        dist_to_child = dist_so_far[child]
+        final_dist[child] = dist_to_child
+        yield child, parent, dist_to_child
 
-        for u, cost in weighted_successors(v):
-            vu_dist_so_far = dist_so_far[v] + cost
-            if u not in dist_so_far or vu_dist_so_far < dist_so_far[u]:
-                dist_so_far[u] = vu_dist_so_far
-                f_score_u = dist_so_far[u] + heuristic(u)
-                heappush(fringe, (f_score_u, next(c), u))
+        for grandchild, weight in weighted_successors(child):
+            dist_to_grandchild = dist_to_child + weight
+            if grandchild in final_dist:
+                if dist_to_grandchild < final_dist[grandchild]:
+                    raise ValueError(f'Contradictory paths found: negative weights? child={child} distance to {grandchild}={dist_to_grandchild} < final distance to {grandchild}={final_dist[grandchild]}')
+            elif grandchild not in dist_so_far or dist_to_grandchild < dist_so_far[grandchild]:
+                dist_so_far[grandchild] = dist_to_grandchild
+                heappush(fringe, (dist_to_grandchild + heuristic(grandchild), next(c), grandchild, child))
 
 def astar_path_length(source, target, weighted_successors, heuristic):
-    for v, d in astar_path_lengths(source, weighted_successors, heuristic):
-        if v == target:
-            return d
+    for child, _, dist_to_child in astar_edges(source, weighted_successors, heuristic):
+        if child == target:
+            return dist_to_child
 
     raise ValueError(f'No path between {source} and {target}')
