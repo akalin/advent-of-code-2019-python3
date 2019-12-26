@@ -27,6 +27,12 @@ class TestGraph(unittest.TestCase):
                                 ('x', 'v', 5), ('x', 'y', 2),
                                 ('y', 's', 7), ('y', 'v', 6)])
 
+    GG = DG.to_undirected()
+    GG.graph['name'] = 'GG'
+    # make sure we get lower weight
+    # to_undirected might choose either edge with weight 2 or weight 3
+    GG['u']['x']['weight'] = 2
+
     DG2 = nx.DiGraph(name='DG2')
     DG2.add_weighted_edges_from([[1, 4, 1], [4, 5, 1],
                                  [5, 6, 1], [6, 3, 1],
@@ -51,24 +57,10 @@ class TestGraph(unittest.TestCase):
                       ('x', 'v'), ('x', 'y'),
                       ('y', 's'), ('y', 'v')], name='UWG')
 
+    all_graphs = [ G, GG, DG, DG2, G3, G4, UWG ]
+
     def test_dijkstra(self):
-        DG = TestGraph.DG
-
-        GG = DG.to_undirected()
-        GG.graph['name'] = 'GG'
-        # make sure we get lower weight
-        # to_undirected might choose either edge with weight 2 or weight 3
-        GG['u']['x']['weight'] = 2
-
-        for G in [
-                TestGraph.G,
-                DG,
-                GG,
-                TestGraph.DG2,
-                TestGraph.G3,
-                TestGraph.G4,
-                TestGraph.UWG,
-        ]:
+        for G in TestGraph.all_graphs:
             def nodes_and_weights(it):
                 for w, attributes in it:
                     yield w, attributes['weight'] if 'weight' in attributes else 1
