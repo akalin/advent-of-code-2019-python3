@@ -76,7 +76,7 @@ def dijkstra_path_lengths(source, weighted_successors):
         dist[v] = d
         yield v, d
         for u, cost in weighted_successors(v):
-            vu_dist = dist[v] + cost
+            vu_dist = d + cost
             if u in dist:
                 if vu_dist < dist[u]:
                     raise ValueError(f'Contradictory paths found: negative weights? v={v} u={u} vu_dist={vu_dist} dist[u]={dist[u]}')
