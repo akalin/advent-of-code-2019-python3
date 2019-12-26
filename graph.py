@@ -141,11 +141,6 @@ def astar(source, target, get_neighbor_fn, h):
     g_score = {source: 0}
     f_score = {source: h(source)}
 
-    def get_g_score(n):
-        if n not in g_score:
-            return (1, 0)
-        return (0, g_score[n])
-
     while open_set:
         (_, _, n) = heappop(open_set)
         if n == target:
@@ -153,7 +148,7 @@ def astar(source, target, get_neighbor_fn, h):
 
         for m, m_len in get_neighbor_fn(n):
             tentative_g_score = g_score[n] + m_len
-            if (0, tentative_g_score) < get_g_score(m):
+            if m not in g_score or tentative_g_score < g_score[m]:
                 came_from[m] = n
                 g_score[m] = tentative_g_score
                 f_score[m] = g_score[m] + h(m)
