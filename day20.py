@@ -143,7 +143,7 @@ def zero_heuristic(n):
 def astar_zero(G, portals, start, end, succ, pred):
     return astar_path_length(start, end, succ, zero_heuristic)
 
-def astar_real(G, portals, start, end, succ, pred):
+def astar(G, portals, start, end, succ, pred):
     up_nodes = [p for p, (_, dz) in portals.items() if dz > 0]
     down_nodes = [p for p, (_, dz) in portals.items() if dz < 0]
 
@@ -159,19 +159,21 @@ def astar_real(G, portals, start, end, succ, pred):
     # minimum distance from a down portal to another down portal
     min_down_to_other_down = min(G[n][p]['weight'] for n, p in combinations(G.nodes(), 2) if G.has_edge(n, p))
 
+    end2, _ = tuple3to2(end)
+
     def heuristic(n3):
         n, z = tuple3to2(n3)
         if z == 0:
-            if G.has_edge(n, end_pos):
-                return G.edges[n, end_pos]['weight']
+            if G.has_edge(n, end2):
+                return G.edges[n, end2]['weight']
             # If we're on the ground floor and we don't have a direct
-            # edge to end_pos, then we at least have to go up, go to
-            # another portal, come back down, and go to end_pos.
-            return min_to_up[n] + 1 + min_down_to_other_down + 1 + min_to_up[end_pos]
+            # edge to end, then we at least have to go up, go to
+            # another portal, come back down, and go to end.
+            return min_to_up[n] + 1 + min_down_to_other_down + 1 + min_to_up[end2]
         else:
             # Otherwise, we have at least have to go to a down portal,
-            # go to the ground floor, then go to end_pos.
-            return min_to_down[n] + (1 + min_up_to_down) * (z - 1) + 1 + min_to_up[end_pos]
+            # go to the ground floor, then go to end.
+            return min_to_down[n] + (1 + min_up_to_down) * (z - 1) + 1 + min_to_up[end2]
 
     return astar_path_length(start, end, succ, heuristic)
 
@@ -206,15 +208,22 @@ if __name__ == '__main__':
             global part2_astar_zero
             part2_astar_zero = compute_part2(*args, astar_zero)
 
+        part2_astar = None
+        def do_part2_astar():
+            global part2_astar
+            part2_astar = compute_part2(*args, astar)
+
         part1_duration = timeit.timeit(do_part1, number=1)
         part1_nx_duration = timeit.timeit(do_part1_nx, number=1)
         part2_dijkstra_duration = timeit.timeit(do_part2_dijkstra, number=1)
         part2_bidir_dijkstra_duration = timeit.timeit(do_part2_bidir_dijkstra, number=1)
         part2_astar_zero_duration = timeit.timeit(do_part2_astar_zero, number=1)
+        part2_astar_duration = timeit.timeit(do_part2_astar, number=1)
         if part1 != part1_nx:
             raise Exception(f'computed {part1} for part 1, but NetworkX computed {part1_nx}')
         print(f'part1: {part1} ({part1_duration:.3f}s, nx={part1_nx_duration:.3f}s)')
         print(f'part2 (dijkstra): {part2_dijkstra} ({part2_dijkstra_duration:.3f}s)')
         print(f'part2 (bidir dijkstra): {part2_bidir_dijkstra} ({part2_bidir_dijkstra_duration:.3f}s)')
         print(f'part2 (A* zero): {part2_astar_zero} ({part2_astar_zero_duration:.3f}s)')
+        print(f'part2 (A*): {part2_astar} ({part2_astar_duration:.3f}s)')
 
