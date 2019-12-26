@@ -98,7 +98,7 @@ class TestGraph(unittest.TestCase):
             return 0
 
         def path_length(source, target, weighted_successors, weighted_predecessors):
-            return astar(source, target, weighted_successors, zero_heuristic)
+            return astar_path_length(source, target, weighted_successors, zero_heuristic)
         self._test_path_length(path_length)
 
     def test_astar_ideal_heuristic(self):
