@@ -84,7 +84,7 @@ def dijkstra_edges(source, weighted_successors):
             dist_to_grandchild = dist_to_child + weight
             if grandchild in final_dist:
                 if dist_to_grandchild < final_dist[grandchild]:
-                    raise ValueError(f'Contradictory paths found: negative weights? child={child} distance to {grandchild}={dist_to_grandchild} < final distance to {grandchild}={final_dist[grandchild]}')
+                    raise ValueError(f'Contradictory paths found: negative weights? child={child} distance to {grandchild}={dist_to_child} + {weight} = {dist_to_grandchild} < final distance to {grandchild}={final_dist[grandchild]}')
             elif grandchild not in dist_so_far or dist_to_grandchild < dist_so_far[grandchild]:
                 dist_so_far[grandchild] = dist_to_grandchild
                 heappush(fringe, (dist_to_grandchild, next(c), grandchild, child))
@@ -129,7 +129,7 @@ def bidirectional_dijkstra_path_length(source, target, weighted_successors, weig
             vu_dist = dist[dir][v] + cost
             if u in dist[dir]:
                 if vu_dist < dist[dir][u]:
-                    raise ValueError(f'Contradictory paths found: negative weights? v={v} u={u} vu_dist={vu_dist} dist[{dir}][u]={dist[dir][u]}')
+                    raise ValueError(f'Contradictory paths found: negative weights? child={child} distance to {grandchild}={dist_to_child} + {weight} = {dist_to_grandchild} < final distance to {grandchild}={final_dist[grandchild]}')
             elif u not in seen[dir] or vu_dist < seen[dir][u]:
                 seen[dir][u] = vu_dist
                 heappush(fringe[dir], (vu_dist, next(c), u))
@@ -162,7 +162,7 @@ def astar_edges(source, weighted_successors, heuristic):
             dist_to_grandchild = dist_to_child + weight
             if grandchild in final_dist:
                 if dist_to_grandchild < final_dist[grandchild]:
-                    raise ValueError(f'Contradictory paths found: negative weights? child={child} distance to {grandchild}={dist_to_grandchild} < final distance to {grandchild}={final_dist[grandchild]}')
+                    raise ValueError(f'Contradictory paths found: negative weights? child={child} distance to {grandchild}={dist_to_child} + {weight} = {dist_to_grandchild} < final distance to {grandchild}={final_dist[grandchild]}')
             elif grandchild not in dist_so_far or dist_to_grandchild < dist_so_far[grandchild]:
                 dist_so_far[grandchild] = dist_to_grandchild
                 heappush(fringe, (dist_to_grandchild + heuristic(grandchild), next(c), grandchild, child))
