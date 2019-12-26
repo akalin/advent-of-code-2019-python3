@@ -136,7 +136,7 @@ def bidirectional_dijkstra_path_length(source, target, weighted_successors, weig
 
     raise ValueError(f'No path between {source} and {target}')
 
-def astar_path_length(source, target, weighted_successors, heuristic):
+def astar_path_lengths(source, weighted_successors, heuristic):
     g_score = {source: 0}
     f_score = {source: heuristic(source)}
 
@@ -148,13 +148,17 @@ def astar_path_length(source, target, weighted_successors, heuristic):
 
     while fringe:
         (_, _, v) = heappop(fringe)
-        if v == target:
-            return g_score[v]
+        yield v, g_score[v]
         for u, cost in weighted_successors(v):
             vu_g_score = g_score[v] + cost
             if u not in g_score or vu_g_score < g_score[u]:
                 g_score[u] = vu_g_score
                 f_score[u] = g_score[u] + heuristic(u)
                 heappush(fringe, (f_score[u], next(c), u))
+
+def astar_path_length(source, target, weighted_successors, heuristic):
+    for v, d in astar_path_lengths(source, weighted_successors, heuristic):
+        if v == target:
+            return d
 
     raise ValueError(f'No path between {source} and {target}')
