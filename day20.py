@@ -158,7 +158,9 @@ def compute_part2(walkables, start_pos, end_pos, portals):
             # go to the ground floor, then go to end_pos.
             return min_to_down[n] + (1 + min_up_to_down) * (z - 1) + 1 + min_to_up[end_pos]
 
-    return astar_path_length(start_pos3, end_pos3, weighted_neighbors, heuristic)
+#    return dijkstra_path_length(start_pos3, end_pos3, weighted_neighbors)
+    return bidirectional_dijkstra_path_length(start_pos3, end_pos3, weighted_neighbors, weighted_neighbors)
+#    return astar_path_length(start_pos3, end_pos3, weighted_neighbors, heuristic)
 
 if __name__ == '__main__':
     with open('day20.input', 'r') as input_file:
