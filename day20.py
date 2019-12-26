@@ -164,6 +164,8 @@ def astar(G, portals, start, end, succ, pred):
     def heuristic(n3):
         n, z = tuple3to2(n3)
         if z == 0:
+            if n == end2:
+                return 0
             if G.has_edge(n, end2):
                 return G.edges[n, end2]['weight']
             # If we're on the ground floor and we don't have a direct
