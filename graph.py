@@ -61,33 +61,33 @@ def bidirectional_shortest_path_length(source, target, successors, predecessors)
 
 # Adapted from _dijkstra_multisource in
 # https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/shortest_paths/weighted.html .
-def dijkstra_path_lengths(source, weighted_successors):
-    dist = {}
+def dijkstra_edges(source, weighted_successors):
+    final_cost = {}
     seen = {source: 0}
     # Use a counter to avoid comparing the nodes themselves in the
     # heap.
     c = count()
     fringe = []
-    heappush(fringe, (0, next(c), source))
+    heappush(fringe, (0, next(c), source, None))
     while fringe:
-        (d, _, v) = heappop(fringe)
-        if v in dist:
-            continue # already searched this node
-        dist[v] = d
-        yield v, d
+        (d, _, v, parent) = heappop(fringe)
+        if v in final_cost:
+            continue # already processed this node
+        final_cost[v] = d
+        yield v, d, parent
         for u, cost in weighted_successors(v):
             vu_dist = d + cost
-            if u in dist:
-                if vu_dist < dist[u]:
+            if u in final_cost:
+                if vu_dist < final_cost[u]:
                     raise ValueError(f'Contradictory paths found: negative weights? v={v} u={u} vu_dist={vu_dist} dist[u]={dist[u]}')
             elif u not in seen or vu_dist < seen[u]:
                 seen[u] = vu_dist
-                heappush(fringe, (vu_dist, next(c), u))
+                heappush(fringe, (vu_dist, next(c), u, v))
 
 # Adapted from _dijkstra_multisource in
 # https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/shortest_paths/weighted.html .
 def dijkstra_path_length(source, target, weighted_successors):
-    for v, d in dijkstra_path_lengths(source, weighted_successors):
+    for v, d, _ in dijkstra_edges(source, weighted_successors):
         if v == target:
             return d
 
