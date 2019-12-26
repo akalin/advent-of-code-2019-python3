@@ -1,33 +1,6 @@
+from graph import *
 from util import *
-from heapq import heappush, heappop
-from itertools import count
 import networkx as nx
-
-def dijkstra_path_length_fn(source, is_target, weighted_successors):
-    dist = {}
-    seen = {source: 0}
-    # Use a counter to avoid comparing the nodes themselves in the
-    # heap.
-    c = count()
-    fringe = []
-    heappush(fringe, (0, next(c), source))
-    while fringe:
-        (d, _, v) = heappop(fringe)
-        if is_target(v):
-            return d
-        if v in dist:
-            continue # already searched this node
-        dist[v] = d
-        for u, cost in weighted_successors(v):
-            vu_dist = dist[v] + cost
-            if u in dist:
-                if vu_dist < dist[u]:
-                    raise ValueError(f'Contradictory paths found: negative weights? v={v} u={u} vu_dist={vu_dist} dist[u]={dist[u]}')
-            elif u not in seen or vu_dist < seen[u]:
-                seen[u] = vu_dist
-                heappush(fringe, (vu_dist, next(c), u))
-
-    raise ValueError(f'No path from {source} to a target node')
 
 def compute_shortest_steps(input):
     lines = [x.strip() for x in input.strip().split('\n')]
@@ -97,11 +70,12 @@ def compute_shortest_steps(input):
                 yield (new_state, attributes['weight'])
 
     all_keys = frozenset(key_to_pos.keys())
-    def is_target(state):
-        return state[1] == all_keys
-
     start_state = (start_pos, frozenset())
-    return dijkstra_path_length_fn(start_state, is_target, weighted_neighbors)
+    for state, length in dijkstra_path_lengths(start_state, weighted_neighbors):
+        if state[1] == all_keys:
+            return length
+
+    raise
 
 def compute_day18(input):
     part1 = compute_shortest_steps(input)
