@@ -101,5 +101,15 @@ class TestGraph(unittest.TestCase):
             return astar(source, target, weighted_successors, zero_heuristic)
         self._test_path_length(path_length)
 
+    def test_astar_ideal_heuristic(self):
+        def path_length(source, target, weighted_successors, weighted_predecessors):
+            def ideal_heuristic(n):
+                try:
+                    return dijkstra_path_length(n, target, weighted_successors)
+                except ValueError:
+                    return 1000000
+            return astar(source, target, weighted_successors, ideal_heuristic)
+        self._test_path_length(path_length)
+
 if __name__ == '__main__':
     unittest.main()
