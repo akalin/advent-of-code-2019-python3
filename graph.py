@@ -130,26 +130,25 @@ def bidirectional_dijkstra_path_length(source, target, weighted_successors, weig
 
     raise ValueError(f'No path between {source} and {target}')
 
-def astar(source, target, get_neighbor_fn, h):
+def astar(source, target, weighted_successors, heuristic):
+    g_score = {source: 0}
+    f_score = {source: heuristic(source)}
+
     # Use a counter to avoid comparing the nodes themselves in the
     # heap.
     c = count()
-    open_set = []
-    heappush(open_set, (0, next(c), source))
+    fringe = []
+    heappush(fringe, (f_score[source], next(c), source))
 
-    g_score = {source: 0}
-    f_score = {source: h(source)}
-
-    while open_set:
-        (_, _, n) = heappop(open_set)
-        if n == target:
-            return g_score[target]
-
-        for m, m_len in get_neighbor_fn(n):
-            tentative_g_score = g_score[n] + m_len
-            if m not in g_score or tentative_g_score < g_score[m]:
-                g_score[m] = tentative_g_score
-                f_score[m] = g_score[m] + h(m)
-                heappush(open_set, (f_score[m], next(c), m))
+    while fringe:
+        (_, _, v) = heappop(fringe)
+        if v == target:
+            return g_score[v]
+        for u, cost in weighted_successors(v):
+            vu_g_score = g_score[v] + cost
+            if u not in g_score or vu_g_score < g_score[u]:
+                g_score[u] = vu_g_score
+                f_score[u] = g_score[u] + heuristic(u)
+                heappush(fringe, (f_score[u], next(c), u))
 
     raise ValueError(f'No path between {source} and {target}')
