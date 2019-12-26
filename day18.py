@@ -63,7 +63,6 @@ def compute_shortest_steps(input):
                         G.add_edge(n, last_node, weight=dist)
                     last_node = n
                     dist = 0
-                
 
     def weighted_neighbors(state):
         pos, inventory = state
