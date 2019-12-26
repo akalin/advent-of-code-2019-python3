@@ -132,7 +132,7 @@ def compute_part2(walkables, start_pos, end_pos, portals):
     def heuristic(n3):
         return 0
 
-    return bidirectional_dijkstra_path_length(start_pos3, end_pos3, weighted_neighbors, weighted_neighbors)
+    return astar_path_length(start_pos3, end_pos3, weighted_neighbors, heuristic)
 
 if __name__ == '__main__':
     with open('day20.input', 'r') as input_file:
