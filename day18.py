@@ -88,12 +88,35 @@ def compute_shortest_steps(input, start_count):
 
     raise
 
+def change_to_part2(lines):
+    rows = len(lines)
+    cols = len(lines[0])
+    for y in range(rows):
+        for x in range(cols):
+            c = lines[y][x]
+            if c == '@':
+                lines[y][x] = '#'
+                lines[y-1][x] = '#'
+                lines[y+1][x] = '#'
+                lines[y][x-1] = '#'
+                lines[y][x+1] = '#'
+                lines[y-1][x-1] = '@'
+                lines[y-1][x+1] = '@'
+                lines[y+1][x-1] = '@'
+                lines[y+1][x+1] = '@'
+                return
+
 def compute_day18(input):
+    part1 = None
     part1 = compute_shortest_steps(input, 1)
-    return part1, None
+    print(f'part1: {part1}')
+    lines = [[c for c in line.strip()] for line in input.strip().split('\n')]
+    change_to_part2(lines)
+    input_part2 = '\n'.join(''.join(line) for line in lines)
+    part2 = compute_shortest_steps(input_part2, 4)
+    print(f'part2: {part2}')
 
 if __name__ == '__main__':
     with open('day18.input', 'r') as input_file:
         input = input_file.read()
-        part1, part2 = compute_day18(input)
-        print(f'part1: {part1}, part2: {part2}')
+        compute_day18(input)
