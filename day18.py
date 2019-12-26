@@ -51,17 +51,27 @@ def compute_shortest_steps(input):
 
     labeled_nodes = [ start_pos ] + list(pos_to_key.keys())
     for source in labeled_nodes:
-        local_lengths = nx.shortest_path_length(local, source)
+        paths = nx.single_source_shortest_path(local, source)
         for target in labeled_nodes:
-            if target != source and target in local_lengths:
-                G.add_edge(source, target, weight=local_lengths[target])
+            path = paths[target]
+            last_node = None
+            dist = 0
+            for n in reversed(path):
+                dist += 1
+                if n in labeled_nodes:
+                    if last_node is not None:
+                        G.add_edge(n, last_node, weight=dist)
+                    last_node = n
+                    dist = 0
+                
 
     def weighted_neighbors(state):
         pos, inventory = state
         for new_pos, attributes in G[pos].items():
             if new_pos == start_pos:
-                continue
-            if inventory.issuperset(blockers[new_pos]):
+                new_state = (new_pos, inventory)
+                yield (new_state, attributes['weight'])
+            elif inventory.issuperset(blockers[new_pos]):
                 new_inventory = inventory | frozenset([pos_to_key[new_pos]])
                 new_state = (new_pos, new_inventory)
                 yield (new_state, attributes['weight'])
