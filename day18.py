@@ -49,11 +49,12 @@ def compute_shortest_steps(input, start_count):
         paths = nx.single_source_shortest_path(local, source)
         blockers[source] = {}
         for target in labeled_nodes:
+            if target not in paths:
+                continue
             blockers[source][target] = set()
-            path = paths[target]
             last_node = None
             dist = 0
-            for n in reversed(path):
+            for n in reversed(paths[target]):
                 dist += 1
                 if n in labeled_nodes:
                     if last_node is not None:
