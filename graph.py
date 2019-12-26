@@ -167,4 +167,4 @@ def astar(source, target, get_neighbor_fn, h):
                 f_score[m] = g_score[m] + h(m)
                 heappush(open_set, (f_score[m], next(c), m))
 
-    raise
+    raise ValueError(f'No path between {source} and {target}')
