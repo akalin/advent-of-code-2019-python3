@@ -40,19 +40,16 @@ def compute_shortest_steps(input):
 
     local = nx.Graph([(n, m) for n in walkables for m in dir_neighbors(n) if m in walkables])
 
-    blockers = {start_pos: frozenset()}
-    for parent, child in nx.bfs_edges(local, start_pos):
-        new_blockers = blockers[parent]
-        if child in pos_to_door:
-            new_blockers |= frozenset(pos_to_door[child].lower())
-        blockers[child] = new_blockers
-
     G = nx.Graph()
+    blockers = {}
 
     labeled_nodes = [ start_pos ] + list(pos_to_key.keys())
     for source in labeled_nodes:
+        # Assumes there's only one shortest path to every node.
         paths = nx.single_source_shortest_path(local, source)
+        blockers[source] = {}
         for target in labeled_nodes:
+            blockers[source][target] = set()
             path = paths[target]
             last_node = None
             dist = 0
@@ -63,6 +60,8 @@ def compute_shortest_steps(input):
                         G.add_edge(n, last_node, weight=dist)
                     last_node = n
                     dist = 0
+                elif n in pos_to_door:
+                    blockers[source][target].add(pos_to_door[n].lower())
 
     def weighted_neighbors(state):
         pos, inventory = state
@@ -70,7 +69,7 @@ def compute_shortest_steps(input):
             if new_pos == start_pos:
                 new_state = (new_pos, inventory)
                 yield (new_state, attributes['weight'])
-            elif inventory.issuperset(blockers[new_pos]):
+            elif inventory.issuperset(blockers[pos][new_pos]):
                 new_inventory = inventory | frozenset([pos_to_key[new_pos]])
                 new_state = (new_pos, new_inventory)
                 yield (new_state, attributes['weight'])
