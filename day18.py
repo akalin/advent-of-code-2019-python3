@@ -29,12 +29,7 @@ def dijkstra_path_length_fn(source, is_target, weighted_successors):
 
     raise ValueError(f'No path between {source} and {target}')
 
-def compute_day18(input):
-    input = '''
-#########
-#b.A.@.a#
-#########
-'''
+def compute_shortest_steps(input):
     lines = [x.strip() for x in input.strip().split('\n')]
     rows = len(lines)
     cols = len(lines[0])
@@ -84,8 +79,6 @@ def compute_day18(input):
             if target != source and target in local_lengths:
                 G.add_edge(source, target, weight=local_lengths[target])
 
-    print(labeled_nodes, G.nodes, G.edges)
-
     def weighted_neighbors(state):
         pos, inventory = state
         for new_pos, attributes in G[pos].items():
@@ -100,8 +93,10 @@ def compute_day18(input):
         return state[1] == all_keys
 
     start_state = (start_pos, frozenset())
-    part1 = dijkstra_path_length_fn(start_state, is_target, weighted_neighbors)
+    return dijkstra_path_length_fn(start_state, is_target, weighted_neighbors)
 
+def compute_day18(input):
+    part1 = compute_shortest_steps(input)
     return part1, None
 
 if __name__ == '__main__':
