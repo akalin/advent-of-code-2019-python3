@@ -28,6 +28,14 @@ class TestDay18(unittest.TestCase):
             #l.F..d...h..C.m#
             #################
             ''', 136),
+            ('''
+            ########################
+            #@..............ac.GI.b#
+            ###d#e#f################
+            ###A#B#C################
+            ###g#h#i################
+            ########################
+            ''', 81),
         ]
         for input, expected_shortest_steps in cases:
             shortest_steps = compute_shortest_steps(input)
