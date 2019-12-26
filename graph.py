@@ -148,7 +148,6 @@ def astar_edges(source, weighted_successors, heuristic):
     c = count()
     fringe = []
     heappush(fringe, (0, next(c), source, None))
-
     while fringe:
         (_, _, child, parent) = heappop(fringe)
         if child in final_dist:
