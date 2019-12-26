@@ -149,9 +149,13 @@ def compute_part2(walkables, start_pos, end_pos, portals):
         if z == 0:
             if G.has_edge(n, end_pos):
                 return G.edges[n, end_pos]['weight']
-            min_down_to_down = 0
-            return min_to_up[n] + 1 + min_down_to_down + 1 + min_to_up[end_pos]
+            # If we're on the ground floor and we don't have a direct
+            # edge to end_pos, then we at least have to go up, go to
+            # another portal, come back down, and go to end_pos.
+            return min_to_up[n] + 1 + min_down_to_other_down + 1 + min_to_up[end_pos]
         else:
+            # Otherwise, we have at least have to go to a down portal,
+            # go to the ground floor, then go to end_pos.
             return min_to_down[n] + (1 + min_up_to_down) * (z - 1) + 1 + min_to_up[end_pos]
 
     return astar_path_length(start_pos3, end_pos3, weighted_neighbors, heuristic)
