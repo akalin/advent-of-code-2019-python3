@@ -136,7 +136,6 @@ def astar(source, target, get_neighbor_fn, h):
     c = count()
     open_set = []
     heappush(open_set, (0, next(c), source))
-    came_from = {source: None}
 
     g_score = {source: 0}
     f_score = {source: h(source)}
@@ -149,7 +148,6 @@ def astar(source, target, get_neighbor_fn, h):
         for m, m_len in get_neighbor_fn(n):
             tentative_g_score = g_score[n] + m_len
             if m not in g_score or tentative_g_score < g_score[m]:
-                came_from[m] = n
                 g_score[m] = tentative_g_score
                 f_score[m] = g_score[m] + h(m)
                 heappush(open_set, (f_score[m], next(c), m))
