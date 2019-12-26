@@ -69,9 +69,12 @@ def compute_shortest_steps(input):
                 new_state = (new_pos, new_inventory)
                 yield (new_state, attributes['weight'])
 
+    def heuristic(state):
+        return 0
+
     all_keys = frozenset(key_to_pos.keys())
     start_state = (start_pos, frozenset())
-    for state, length in dijkstra_path_lengths(start_state, weighted_neighbors):
+    for state, length in astar_path_lengths(start_state, weighted_neighbors, heuristic):
         if state[1] == all_keys:
             return length
 
