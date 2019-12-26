@@ -60,36 +60,40 @@ def bidirectional_shortest_path_length(source, target, successors, predecessors)
     raise Exception(f'No path between {source} and {target}')
 
 # Adapted from _dijkstra_multisource in
-# https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/shortest_paths/weighted.html .
+# https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/shortest_paths/weighted.html and
+# dijkstra_search in
+# https://www.redblobgames.com/pathfinding/a-star/implementation.html .
 def dijkstra_edges(source, weighted_successors):
-    final_cost = {}
-    seen = {source: 0}
+    final_dist = {}
+    dist_so_far = {source: 0}
     # Use a counter to avoid comparing the nodes themselves in the
     # heap.
     c = count()
     fringe = []
     heappush(fringe, (0, next(c), source, None))
     while fringe:
-        (d, _, v, parent) = heappop(fringe)
-        if v in final_cost:
+        (dist_to_child, _, child, parent) = heappop(fringe)
+        if child in final_dist:
             continue # already processed this node
-        final_cost[v] = d
-        yield v, d, parent
-        for u, cost in weighted_successors(v):
-            vu_dist = d + cost
-            if u in final_cost:
-                if vu_dist < final_cost[u]:
-                    raise ValueError(f'Contradictory paths found: negative weights? v={v} u={u} vu_dist={vu_dist} dist[u]={dist[u]}')
-            elif u not in seen or vu_dist < seen[u]:
-                seen[u] = vu_dist
-                heappush(fringe, (vu_dist, next(c), u, v))
+
+        final_dist[child] = dist_to_child
+        yield child, parent, dist_to_child
+
+        for grandchild, weight in weighted_successors(child):
+            dist_to_grandchild = dist_to_child + weight
+            if grandchild in final_dist:
+                if dist_to_grandchild < final_dist[grandchild]:
+                    raise ValueError(f'Contradictory paths found: negative weights? child={child} distance to {grandchild}={dist_to_grandchild} < final distance to {grandchild}={final_dist[grandchild]}')
+            elif grandchild not in dist_so_far or dist_to_grandchild < dist_so_far[grandchild]:
+                dist_so_far[grandchild] = dist_to_grandchild
+                heappush(fringe, (dist_to_grandchild, next(c), grandchild, child))
 
 # Adapted from _dijkstra_multisource in
 # https://networkx.github.io/documentation/stable/_modules/networkx/algorithms/shortest_paths/weighted.html .
 def dijkstra_path_length(source, target, weighted_successors):
-    for v, d, _ in dijkstra_edges(source, weighted_successors):
-        if v == target:
-            return d
+    for child, _, dist_to_child in dijkstra_edges(source, weighted_successors):
+        if child == target:
+            return dist_to_child
 
     raise ValueError(f'No path between {source} and {target}')
 

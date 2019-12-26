@@ -82,7 +82,7 @@ def compute_shortest_steps(input, start_count):
     all_keys = frozenset(key_to_pos.keys())
 
     start_state = (tuple(start_positions), frozenset())
-    for state, length, _ in dijkstra_edges(start_state, weighted_neighbors):
+    for state, _, length in dijkstra_edges(start_state, weighted_neighbors):
         if state[1] == all_keys:
             return length
 
