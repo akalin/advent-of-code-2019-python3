@@ -59,7 +59,7 @@ class TestGraph(unittest.TestCase):
 
     all_graphs = [ G, GG, DG, DG2, G3, G4, UWG ]
 
-    def test_dijkstra(self):
+    def _test_path_length(self, path_length):
         for G in TestGraph.all_graphs:
             def nodes_and_weights(it):
                 for w, attributes in it:
@@ -73,14 +73,9 @@ class TestGraph(unittest.TestCase):
 
             for source, target in itertools.product(G.nodes(), repeat=2):
                 try:
-                    length = dijkstra_path_length(source, target, weighted_successors=weighted_successors)
+                    length = path_length(source, target, weighted_successors, weighted_predecessors)
                 except ValueError:
                     length = None
-
-                try:
-                    bi_length = bidirectional_dijkstra_path_length(source, target, weighted_successors=weighted_successors, weighted_predecessors=weighted_predecessors)
-                except ValueError:
-                    bi_length = None
 
                 try:
                     expected_length = nx.dijkstra_path_length(G, source, target)
@@ -89,7 +84,14 @@ class TestGraph(unittest.TestCase):
 
                 desc = f'G={G}, source={source}, target={target}'
                 self.assertEqual(length, expected_length, desc)
-                self.assertEqual(bi_length, expected_length, desc)
+
+    def test_dijkstra(self):
+        def _dijkstra_path_length(source, target, weighted_successors, weighted_predecessors):
+            return dijkstra_path_length(source, target, weighted_successors)
+        self._test_path_length(_dijkstra_path_length)
+
+    def test_bidirectional_dijkstra(self):
+        self._test_path_length(bidirectional_dijkstra_path_length)
 
 if __name__ == '__main__':
     unittest.main()
