@@ -2,12 +2,12 @@ from graph import *
 from util import *
 import networkx as nx
 
-def compute_shortest_steps(input):
+def compute_shortest_steps(input, start_count):
     lines = [x.strip() for x in input.strip().split('\n')]
     rows = len(lines)
     cols = len(lines[0])
 
-    start_pos = None
+    start_positions = []
     pos_to_key = {}
     key_to_pos = {}
     pos_to_door = {}
@@ -21,7 +21,7 @@ def compute_shortest_steps(input):
                 continue
             p = (x, y)
             if c == '@':
-                start_pos = p
+                start_positions.append(p)
             elif c == '.':
                 pass
             elif 'a' <= c <= 'z':
@@ -35,7 +35,7 @@ def compute_shortest_steps(input):
 
             walkables.add(p)
 
-    if start_pos is None:
+    if len(start_positions) != start_count:
         raise
 
     local = nx.Graph([(n, m) for n in walkables for m in dir_neighbors(n) if m in walkables])
@@ -43,7 +43,7 @@ def compute_shortest_steps(input):
     G = nx.Graph()
     blockers = {}
 
-    labeled_nodes = [ start_pos ] + list(pos_to_key.keys())
+    labeled_nodes = start_positions + list(pos_to_key.keys())
     for source in labeled_nodes:
         # Assumes there's only one shortest path to every node.
         paths = nx.single_source_shortest_path(local, source)
@@ -64,19 +64,23 @@ def compute_shortest_steps(input):
                     blockers[source][target].add(pos_to_door[n].lower())
 
     def weighted_neighbors(state):
-        pos, inventory = state
-        for new_pos, attributes in G[pos].items():
-            if new_pos == start_pos:
-                new_state = (new_pos, inventory)
-                yield (new_state, attributes['weight'])
-            elif inventory.issuperset(blockers[pos][new_pos]):
-                new_inventory = inventory | frozenset([pos_to_key[new_pos]])
-                new_state = (new_pos, new_inventory)
-                yield (new_state, attributes['weight'])
+        positions, inventory = state
+        for i, pos in enumerate(positions):
+            for new_pos, attributes in G[pos].items():
+                _positions = list(positions)
+                _positions[i] = new_pos
+                new_positions = tuple(_positions)
+                if new_pos in start_positions:
+                    new_state = (new_positions, inventory)
+                    yield (new_state, attributes['weight'])
+                elif inventory.issuperset(blockers[pos][new_pos]):
+                    new_inventory = inventory | frozenset([pos_to_key[new_pos]])
+                    new_state = (new_positions, new_inventory)
+                    yield (new_state, attributes['weight'])
 
     all_keys = frozenset(key_to_pos.keys())
 
-    start_state = (start_pos, frozenset())
+    start_state = (tuple(start_positions), frozenset())
     for state, length in dijkstra_path_lengths(start_state, weighted_neighbors):
         if state[1] == all_keys:
             return length
@@ -84,7 +88,7 @@ def compute_shortest_steps(input):
     raise
 
 def compute_day18(input):
-    part1 = compute_shortest_steps(input)
+    part1 = compute_shortest_steps(input, 1)
     return part1, None
 
 if __name__ == '__main__':

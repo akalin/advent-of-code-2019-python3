@@ -9,14 +9,14 @@ class TestDay18(unittest.TestCase):
             #########
             #b.A.@.a#
             #########
-            ''', 8),
+            ''', 1, 8),
             ('''
             ########################
             #f.D.E.e.C.b.A.@.a.B.c.#
             ######################.#
             #d.....................#
             ########################
-            ''', 86),
+            ''', 1, 86),
             ('''
             #################
             #i.G..c...e..H.p#
@@ -27,7 +27,7 @@ class TestDay18(unittest.TestCase):
             ########.########
             #l.F..d...h..C.m#
             #################
-            ''', 136),
+            ''', 1, 136),
             ('''
             ########################
             #@..............ac.GI.b#
@@ -35,10 +35,10 @@ class TestDay18(unittest.TestCase):
             ###A#B#C################
             ###g#h#i################
             ########################
-            ''', 81),
+            ''', 1, 81),
         ]
-        for input, expected_shortest_steps in cases:
-            shortest_steps = compute_shortest_steps(input)
+        for input, start_count, expected_shortest_steps in cases:
+            shortest_steps = compute_shortest_steps(input, start_count)
             self.assertEqual(shortest_steps, expected_shortest_steps)
 
 if __name__ == '__main__':
