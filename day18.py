@@ -61,9 +61,9 @@ def parse_map(input, start_count):
             if key in key_distances[i]:
                 key_to_index[key] = i
 
-    return key_distances, blockers, all_keys, key_to_index
+    return start_count, key_distances, blockers, all_keys, key_to_index
 
-def compute_shortest_steps(key_distances, blockers, all_keys, key_to_index, start_count):
+def compute_shortest_steps(start_count, key_distances, blockers, all_keys, key_to_index):
     def weighted_successors(state):
         positions, inventory = state
         for key in all_keys:
@@ -127,7 +127,7 @@ def compute_day18(input):
     part1 = None
     def do_part1():
         nonlocal part1
-        part1 = compute_shortest_steps(*args1, 1)
+        part1 = compute_shortest_steps(*args1)
 
     part1_duration = timeit.timeit(do_part1, number=1)
     print(f'part1: {part1} ({part1_duration:.2f}s)')
@@ -135,7 +135,7 @@ def compute_day18(input):
     part2 = None
     def do_part2():
         nonlocal part2
-        part2 = compute_shortest_steps(*args2, 4)
+        part2 = compute_shortest_steps(*args2)
 
     part2_duration = timeit.timeit(do_part2, number=1)
 
