@@ -89,6 +89,21 @@ def compute_shortest_steps_bfs(start_count, key_distances, blockers, all_keys, k
 
     return min(curr_states.values())
 
+def compute_shortest_steps_dfs(start_count, key_distances, blockers, all_keys, key_to_index):
+    cache = {}
+    def do_dfs_cached(state):
+        if state in cache:
+            return cache[state]
+
+        res = do_dfs(state)
+        cache[state] = res
+        return res
+
+    def do_dfs(state):
+        return min((next_cost + do_dfs_cached(next_state) for next_state, next_cost in compute_next_states(key_distances, blockers, all_keys, key_to_index, state)), default=0)
+
+    return do_dfs((tuple(range(start_count)), frozenset()))
+
 def change_to_part2(input):
     def _make_change(lines):
         rows = len(lines)
@@ -127,10 +142,18 @@ def compute_day18(input):
     part1_bfs = None
     def do_part1_bfs():
         nonlocal part1_bfs
-        part1 = compute_shortest_steps_bfs(*args1)
+        part1_bfs = compute_shortest_steps_bfs(*args1)
 
     part1_bfs_duration = timeit.timeit(do_part1_bfs, number=1)
     print(f'part1 (bfs): {part1_bfs} ({part1_bfs_duration:.2f}s)')
+
+    part1_dfs = None
+    def do_part1_dfs():
+        nonlocal part1_dfs
+        part1_dfs = compute_shortest_steps_dfs(*args1)
+
+    part1_dfs_duration = timeit.timeit(do_part1_dfs, number=1)
+    print(f'part1 (dfs): {part1_dfs} ({part1_dfs_duration:.2f}s)')
 
     part2_bfs = None
     def do_part2_bfs():
@@ -140,6 +163,15 @@ def compute_day18(input):
     part2_bfs_duration = timeit.timeit(do_part2_bfs, number=1)
 
     print(f'part2 (bfs): {part2_bfs} ({part2_bfs_duration:.2f}s)')
+
+    part2_dfs = None
+    def do_part2_dfs():
+        nonlocal part2_dfs
+        part2_dfs = compute_shortest_steps_dfs(*args2)
+
+    part2_dfs_duration = timeit.timeit(do_part2_dfs, number=1)
+
+    print(f'part2 (dfs): {part2_dfs} ({part2_dfs_duration:.2f}s)')
 
 if __name__ == '__main__':
     with open('day18.input', 'r') as input_file:
