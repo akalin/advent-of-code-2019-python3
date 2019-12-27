@@ -55,19 +55,27 @@ def compute_shortest_steps(input, start_count):
             blockers[source][target] = set(pos_to_door[n].lower() for n in paths[target][1:] if n in pos_to_door)
             key_distances[source][target] = len(paths[target]) - 1
 
+    key_to_index = {}
+    for key_pos, key in pos_to_key.items():
+        for i, start_pos in enumerate(start_positions):
+            if key_pos in key_distances[start_pos]:
+                key_to_index[key] = i
+
+    all_keys = frozenset(key_to_pos.keys())
     def weighted_neighbors(state):
-        positions, inventory, remainings = state
-        for i, pos in enumerate(positions):
-            remaining = remainings[i]
-            for key in remaining:
-                new_pos = key_to_pos[key]
-                if inventory.issuperset(blockers[pos][new_pos]):
-                    new_positions = tuple(positions[:i] + (new_pos,) + positions[i+1:])
-                    delta = frozenset([key])
-                    new_inventory = inventory | delta
-                    new_remainings = tuple(remainings[:i] + (remaining - delta,) + remainings[i+1:])
-                    new_state = (new_positions, new_inventory, new_remainings)
-                    yield (new_state, key_distances[pos][new_pos])
+        positions, inventory = state
+        for key in all_keys:
+            if key in inventory:
+                continue
+            i = key_to_index[key]
+            pos = positions[i]
+            new_pos = key_to_pos[key]
+            if inventory.issuperset(blockers[pos][new_pos]):
+                new_positions = tuple(positions[:i] + (new_pos,) + positions[i+1:])
+                delta = frozenset([key])
+                new_inventory = inventory | delta
+                new_state = (new_positions, new_inventory)
+                yield (new_state, key_distances[pos][new_pos])
 
     cache = {}
     def compute_min_distance_to_goal(state):
@@ -79,15 +87,13 @@ def compute_shortest_steps(input, start_count):
         cache[key] = min_distance
         return min_distance
 
-    all_keys = frozenset(key_to_pos.keys())
     def _compute_min_distance_to_goal(state):
         if state[1] == all_keys:
             return 0
 
         return min(cost + compute_min_distance_to_goal(next_state) for next_state, cost in weighted_neighbors(state))
 
-    remainings = tuple(frozenset(pos_to_key[pos] for pos in blockers[start].keys()) for start in start_positions)
-    start_state = (tuple(start_positions), frozenset(), remainings)
+    start_state = (tuple(start_positions), frozenset())
     return compute_min_distance_to_goal(start_state)
 
 def change_to_part2(lines):
