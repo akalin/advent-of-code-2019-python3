@@ -3,7 +3,7 @@ from itertools import chain
 from util import *
 import networkx as nx
 
-def compute_shortest_steps(input, start_count):
+def parse_map(input, start_count):
     lines = [x.strip() for x in input.strip().split('\n')]
     rows = len(lines)
     cols = len(lines[0])
@@ -59,6 +59,11 @@ def compute_shortest_steps(input, start_count):
         for i in range(start_count):
             if key in key_distances[i]:
                 key_to_index[key] = i
+
+    return key_distances, blockers, all_keys, key_to_index
+
+def compute_shortest_steps(input, start_count):
+    key_distances, blockers, all_keys, key_to_index = parse_map(input, start_count)
 
     def weighted_successors(state):
         positions, inventory = state
