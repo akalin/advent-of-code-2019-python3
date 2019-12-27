@@ -40,45 +40,32 @@ def compute_shortest_steps(input, start_count):
 
     local = nx.Graph([(n, m) for n in walkables for m in dir_neighbors(n) if m in walkables])
 
-    trees = {}
+    key_distances = {}
     blockers = {}
 
-    labeled_nodes = start_positions + list(pos_to_key.keys())
-    for source in labeled_nodes:
-        # Assumes there's only one shortest path to every node.
+    for source in start_positions + list(pos_to_key.keys()):
+        # We assume there's only one shortest path to source (i.e.,
+        # not another one that may avoid doors).
         paths = nx.single_source_shortest_path(local, source)
-        trees[source] = nx.Graph()
+        key_distances[source] = {}
         blockers[source] = {}
-        for target in labeled_nodes:
+        for target in pos_to_key.keys():
             if target not in paths:
                 continue
-            blockers[source][target] = set()
-            last_node = None
-            dist = 0
-            for n in reversed(paths[target]):
-                dist += 1
-                if n in labeled_nodes:
-                    if last_node is not None:
-                        trees[source].add_edge(n, last_node, weight=dist)
-                    last_node = n
-                    dist = 0
-                elif n in pos_to_door:
-                    blockers[source][target].add(pos_to_door[n].lower())
+            blockers[source][target] = set(pos_to_door[n].lower() for n in paths[target][1:] if n in pos_to_door)
+            key_distances[source][target] = len(paths[target]) - 1
 
     def weighted_neighbors(state):
         positions, inventory = state
         for i, pos in enumerate(positions):
-            for new_pos, attributes in trees[pos][pos].items():
-                _positions = list(positions)
-                _positions[i] = new_pos
-                new_positions = tuple(_positions)
-                if new_pos in start_positions:
-                    new_state = (new_positions, inventory)
-                    yield (new_state, attributes['weight'])
-                elif inventory.issuperset(blockers[pos][new_pos]):
+            for new_pos, weight in key_distances[pos].items():
+                if pos_to_key[new_pos] not in inventory and inventory.issuperset(blockers[pos][new_pos]):
+                    _positions = list(positions)
+                    _positions[i] = new_pos
+                    new_positions = tuple(_positions)
                     new_inventory = inventory | frozenset([pos_to_key[new_pos]])
                     new_state = (new_positions, new_inventory)
-                    yield (new_state, attributes['weight'])
+                    yield (new_state, weight)
 
     all_keys = frozenset(key_to_pos.keys())
 
