@@ -74,6 +74,8 @@ def parse_map(input, start_count):
 
     # A state is a tuple of positions and an inventory of keys.
 
+    # The successors of a given state are the states where we acquire
+    # *exactly* one more key.
     def compute_next_states(state):
         positions, inventory = state
         for key in all_keys:
@@ -81,9 +83,6 @@ def parse_map(input, start_count):
                 continue
             i = key_to_index[key]
             pos = positions[i]
-            # We want to avoid routes which pick up extra keys, as we
-            # define a next state to be one where we pick up exactly one
-            # more key.
             if not inventory.issuperset(key_objects[pos][key]):
                 continue
             new_positions = tuple(positions[:i] + (key,) + positions[i+1:])
