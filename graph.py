@@ -112,13 +112,13 @@ def bidirectional_dijkstra_path_length(source, target, weighted_successors, weig
     fringe = [[], []]
     heappush(fringe[0], (0, next(c), source))
     heappush(fringe[1], (0, next(c), target))
-    dir = 0
     weighted_next = [weighted_successors, weighted_predecessors]
     # See slides 9 and 10 of
     # https://www.cs.princeton.edu/courses/archive/spr06/cos423/Handouts/EPP%20shortest%20path%20algorithms.pdf
     # for a discussion of the stopping condition.
     shortest_length = None
     while fringe[0] and fringe[1]:
+        dir = 0 if len(fringe[0]) <= len(fringe[1]) else 1
         (d, _, v) = heappop(fringe[dir])
         if shortest_length is not None and d + fringe[1 - dir][0][0] >= shortest_length:
             return shortest_length
@@ -137,7 +137,6 @@ def bidirectional_dijkstra_path_length(source, target, weighted_successors, weig
                     length = seen[0][u] + seen[1][u]
                     if shortest_length is None or length < shortest_length:
                         shortest_length = length
-        dir = 1 - dir
 
     raise ValueError(f'No path between {source} and {target}')
 
