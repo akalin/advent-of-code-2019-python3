@@ -76,7 +76,7 @@ def compute_next_states(key_distances, blockers, all_keys, key_to_index, state):
             new_state = (new_positions, new_inventory)
             yield (new_state, key_distances[pos][key])
 
-def compute_shortest_steps(start_count, key_distances, blockers, all_keys, key_to_index):
+def compute_shortest_steps_bfs(start_count, key_distances, blockers, all_keys, key_to_index):
     curr_states = {(tuple(range(start_count)), frozenset()): 0}
     for i in range(len(all_keys)):
         next_states = {}
@@ -124,22 +124,22 @@ def compute_day18(input):
     parse_input_duration = timeit.timeit(parse_input, number=1)
     print(f'input parsing ({parse_input_duration:.2f}s)')
 
-    part1 = None
-    def do_part1():
-        nonlocal part1
-        part1 = compute_shortest_steps(*args1)
+    part1_bfs = None
+    def do_part1_bfs():
+        nonlocal part1_bfs
+        part1 = compute_shortest_steps_bfs(*args1)
 
-    part1_duration = timeit.timeit(do_part1, number=1)
-    print(f'part1: {part1} ({part1_duration:.2f}s)')
+    part1_bfs_duration = timeit.timeit(do_part1_bfs, number=1)
+    print(f'part1 (bfs): {part1_bfs} ({part1_bfs_duration:.2f}s)')
 
-    part2 = None
-    def do_part2():
-        nonlocal part2
-        part2 = compute_shortest_steps(*args2)
+    part2_bfs = None
+    def do_part2_bfs():
+        nonlocal part2_bfs
+        part2_bfs = compute_shortest_steps_bfs(*args2)
 
-    part2_duration = timeit.timeit(do_part2, number=1)
+    part2_bfs_duration = timeit.timeit(do_part2_bfs, number=1)
 
-    print(f'part2: {part2} ({part2_duration:.2f}s)')
+    print(f'part2 (bfs): {part2_bfs} ({part2_bfs_duration:.2f}s)')
 
 if __name__ == '__main__':
     with open('day18.input', 'r') as input_file:

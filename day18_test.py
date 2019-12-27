@@ -1,6 +1,6 @@
 import unittest
 
-from day18 import parse_map, compute_shortest_steps
+from day18 import parse_map, compute_shortest_steps_bfs
 
 class TestDay18(unittest.TestCase):
     def test_compute_shortest_steps(self):
@@ -77,7 +77,7 @@ class TestDay18(unittest.TestCase):
         ]
         for input, start_count, expected_shortest_steps in cases:
             args = parse_map(input, start_count)
-            shortest_steps = compute_shortest_steps(*args)
+            shortest_steps = compute_shortest_steps_bfs(*args)
             self.assertEqual(shortest_steps, expected_shortest_steps)
 
 if __name__ == '__main__':
