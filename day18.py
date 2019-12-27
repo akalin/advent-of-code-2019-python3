@@ -60,7 +60,7 @@ def compute_shortest_steps(input, start_count):
             if key in key_distances[i]:
                 key_to_index[key] = i
 
-    def weighted_neighbors(state):
+    def weighted_successors(state):
         positions, inventory = state
         for key in all_keys:
             if key in inventory:
@@ -77,7 +77,7 @@ def compute_shortest_steps(input, start_count):
     for i in range(len(all_keys)):
         next_states = {}
         for state, cost in curr_states.items():
-            for next_state, next_cost in weighted_neighbors(state):
+            for next_state, next_cost in weighted_successors(state):
                 total_next_cost = cost + next_cost
                 if next_state not in next_states or total_next_cost < next_states[next_state]:
                     next_states[next_state] = total_next_cost
