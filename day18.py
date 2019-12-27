@@ -63,25 +63,28 @@ def parse_map(input, start_count):
 
     return start_count, key_distances, blockers, all_keys, key_to_index
 
+def _next_states(key_distances, blockers, all_keys, key_to_index, state):
+    positions, inventory = state
+    for key in all_keys:
+        if key in inventory:
+            continue
+        i = key_to_index[key]
+        pos = positions[i]
+        if inventory.issuperset(blockers[i][key]):
+            new_positions = tuple(positions[:i] + (key,) + positions[i+1:])
+            new_inventory = inventory | set((key,))
+            new_state = (new_positions, new_inventory)
+            yield (new_state, key_distances[pos][key])
+
 def compute_shortest_steps(start_count, key_distances, blockers, all_keys, key_to_index):
-    def weighted_successors(state):
-        positions, inventory = state
-        for key in all_keys:
-            if key in inventory:
-                continue
-            i = key_to_index[key]
-            pos = positions[i]
-            if inventory.issuperset(blockers[i][key]):
-                new_positions = tuple(positions[:i] + (key,) + positions[i+1:])
-                new_inventory = inventory | set((key,))
-                new_state = (new_positions, new_inventory)
-                yield (new_state, key_distances[pos][key])
+    def compute_next_states(state):
+        return _next_states(key_distances, blockers, all_keys, key_to_index, state)
 
     curr_states = {(tuple(range(start_count)), frozenset()): 0}
     for i in range(len(all_keys)):
         next_states = {}
         for state, cost in curr_states.items():
-            for next_state, next_cost in weighted_successors(state):
+            for next_state, next_cost in compute_next_states(state):
                 total_next_cost = cost + next_cost
                 if next_state not in next_states or total_next_cost < next_states[next_state]:
                     next_states[next_state] = total_next_cost
