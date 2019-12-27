@@ -9,10 +9,8 @@ def compute_shortest_steps(input, start_count):
     cols = len(lines[0])
 
     start_positions = []
-    pos_to_key = {}
     key_to_pos = {}
     pos_to_door = {}
-    door_to_pos = {}
     walkables = set()
 
     for y in range(rows):
@@ -26,11 +24,9 @@ def compute_shortest_steps(input, start_count):
             elif c == '.':
                 pass
             elif 'a' <= c <= 'z':
-                pos_to_key[p] = c
                 key_to_pos[c] = p
             elif 'A' <= c <= 'Z':
                 pos_to_door[p] = c
-                door_to_pos[c] = p
             else:
                 raise
 
@@ -56,13 +52,14 @@ def compute_shortest_steps(input, start_count):
             blockers[source][target] = frozenset(pos_to_door[n].lower() for n in paths[target_pos][1:] if n in pos_to_door)
             key_distances[source][target] = len(paths[target_pos]) - 1
 
+    all_keys = frozenset(key_to_pos.keys())
+
     key_to_index = {}
-    for key in key_to_pos.keys():
+    for key in all_keys:
         for i in range(start_count):
             if key in key_distances[i]:
                 key_to_index[key] = i
 
-    all_keys = frozenset(key_to_pos.keys())
     def weighted_neighbors(state):
         positions, inventory = state
         for key in all_keys:
