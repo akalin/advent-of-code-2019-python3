@@ -179,52 +179,53 @@ def astar(G, portals, start, end, succ, pred):
 
     return astar_path_length(start, end, succ, heuristic)
 
+def compute_day20(*args):
+    part1 = None
+    def do_part1():
+        nonlocal part1
+        part1 = compute_part1(*args)
+
+    part1_nx = None
+    def do_part1_nx():
+        nonlocal part1_nx
+        part1_nx = compute_part1_nx(*args)
+
+    part2_dijkstra = None
+    def do_part2_dijkstra():
+        nonlocal part2_dijkstra
+        part2_dijkstra = compute_part2(*args, dijkstra)
+
+    part2_bidir_dijkstra = None
+    def do_part2_bidir_dijkstra():
+        nonlocal part2_bidir_dijkstra
+        part2_bidir_dijkstra = compute_part2(*args, bidir_dijkstra)
+
+    part2_astar_zero = None
+    def do_part2_astar_zero():
+        nonlocal part2_astar_zero
+        part2_astar_zero = compute_part2(*args, astar_zero)
+
+    part2_astar = None
+    def do_part2_astar():
+        nonlocal part2_astar
+        part2_astar = compute_part2(*args, astar)
+
+    part1_duration = timeit.timeit(do_part1, number=1)
+    part1_nx_duration = timeit.timeit(do_part1_nx, number=1)
+    part2_dijkstra_duration = timeit.timeit(do_part2_dijkstra, number=1)
+    part2_bidir_dijkstra_duration = timeit.timeit(do_part2_bidir_dijkstra, number=1)
+    part2_astar_zero_duration = timeit.timeit(do_part2_astar_zero, number=1)
+    part2_astar_duration = timeit.timeit(do_part2_astar, number=1)
+    if part1 != part1_nx:
+        raise Exception(f'computed {part1} for part 1, but NetworkX computed {part1_nx}')
+    print(f'part1: {part1} ({part1_duration:.3f}s, nx={part1_nx_duration:.3f}s)')
+    print(f'part2 (dijkstra): {part2_dijkstra} ({part2_dijkstra_duration:.3f}s)')
+    print(f'part2 (bidir dijkstra): {part2_bidir_dijkstra} ({part2_bidir_dijkstra_duration:.3f}s)')
+    print(f'part2 (A* zero): {part2_astar_zero} ({part2_astar_zero_duration:.3f}s)')
+    print(f'part2 (A*): {part2_astar} ({part2_astar_duration:.3f}s)')
+
 if __name__ == '__main__':
     with open('day20.input', 'r') as input_file:
         input = input_file.read()
         args = parse_input(input)
-
-        part1 = None
-        def do_part1():
-            global part1
-            part1 = compute_part1(*args)
-
-        part1_nx = None
-        def do_part1_nx():
-            global part1_nx
-            part1_nx = compute_part1_nx(*args)
-
-        part2_dijkstra = None
-        def do_part2_dijkstra():
-            global part2_dijkstra
-            part2_dijkstra = compute_part2(*args, dijkstra)
-
-        part2_bidir_dijkstra = None
-        def do_part2_bidir_dijkstra():
-            global part2_bidir_dijkstra
-            part2_bidir_dijkstra = compute_part2(*args, bidir_dijkstra)
-
-        part2_astar_zero = None
-        def do_part2_astar_zero():
-            global part2_astar_zero
-            part2_astar_zero = compute_part2(*args, astar_zero)
-
-        part2_astar = None
-        def do_part2_astar():
-            global part2_astar
-            part2_astar = compute_part2(*args, astar)
-
-        part1_duration = timeit.timeit(do_part1, number=1)
-        part1_nx_duration = timeit.timeit(do_part1_nx, number=1)
-        part2_dijkstra_duration = timeit.timeit(do_part2_dijkstra, number=1)
-        part2_bidir_dijkstra_duration = timeit.timeit(do_part2_bidir_dijkstra, number=1)
-        part2_astar_zero_duration = timeit.timeit(do_part2_astar_zero, number=1)
-        part2_astar_duration = timeit.timeit(do_part2_astar, number=1)
-        if part1 != part1_nx:
-            raise Exception(f'computed {part1} for part 1, but NetworkX computed {part1_nx}')
-        print(f'part1: {part1} ({part1_duration:.3f}s, nx={part1_nx_duration:.3f}s)')
-        print(f'part2 (dijkstra): {part2_dijkstra} ({part2_dijkstra_duration:.3f}s)')
-        print(f'part2 (bidir dijkstra): {part2_bidir_dijkstra} ({part2_bidir_dijkstra_duration:.3f}s)')
-        print(f'part2 (A* zero): {part2_astar_zero} ({part2_astar_zero_duration:.3f}s)')
-        print(f'part2 (A*): {part2_astar} ({part2_astar_duration:.3f}s)')
-
+        compute_day20(*args)
