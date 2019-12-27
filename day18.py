@@ -67,46 +67,35 @@ def compute_shortest_steps(input, start_count):
                     new_state = (new_positions, new_inventory)
                     yield (new_state, weight)
 
+    cache = {}
+    def compute_min_distance_to_goal(state):
+        if state in cache:
+            return cache[state]
+
+#        print('what', state)
+
+        min_distance = _compute_min_distance_to_goal(state)
+        cache[state] = min_distance
+        return min_distance
+
+    def _compute_min_distance_to_goal(state):
+        if state[1] == all_keys:
+            return 0
+
+        min_distance = None
+#        for next_state, cost in weighted_neighbors(state):
+#            print(state, next_state, cost)
+#            next_to_goal = compute_min_distance_to_goal(next_state)
+#            print(next_state, next_to_goal)
+#            if min_distance is None or cost + next_to_goal < min_distance:
+#                min_distance = cost + next_to_goal
+#        return min_distance
+        return min(cost + compute_min_distance_to_goal(next_state) for next_state, cost in weighted_neighbors(state))
+
     all_keys = frozenset(key_to_pos.keys())
 
-    def heuristic(state):
-        positions, inventory = state
-        cost = 0
-        for pos in positions:
-            tree = trees[pos].copy()
-#            print('before', state, tree.edges, int(tree.size('weight')))
-            to_remove = [key_to_pos[k] for k in inventory if key_to_pos[k] != pos]
-            starts = set(start_positions)
-            starts.discard(pos)
-            to_remove += list(starts)
-            while True:
-                did_work = False
-                for pos_rem in to_remove:
-                    if tree.has_node(pos_rem) and tree.degree(pos_rem) == 1:
-                        did_work = True
-                        tree.remove_node(pos_rem)
-                if not did_work:
-                    break
-#            print('after', state, tree.edges, int(tree.size('weight')))
-            cost += int(tree.size('weight'))
-        return cost
-
-    def heuristic_check(state):
-        cost = heuristic(state)
-        for state2, _, length in dijkstra_edges(state, weighted_neighbors):
-            if state2[1] == all_keys:
-                real_cost = length
-                break
-        if cost > real_cost:
-            raise Exception(f'inadmissible heuristic: {state2} {cost} > {real_cost}')
-        return cost
-
     start_state = (tuple(start_positions), frozenset())
-    for state, _, length in dijkstra_edges(start_state, weighted_neighbors):
-        if state[1] == all_keys:
-            return length
-
-    raise
+    return compute_min_distance_to_goal(start_state)
 
 def change_to_part2(lines):
     rows = len(lines)
