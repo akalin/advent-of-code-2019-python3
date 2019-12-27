@@ -56,16 +56,19 @@ def compute_shortest_steps(input, start_count):
             key_distances[source][target] = len(paths[target]) - 1
 
     def weighted_neighbors(state):
-        positions, inventory = state
+        positions, inventory, remaining = state
         for i, pos in enumerate(positions):
-            for new_pos, weight in key_distances[pos].items():
-                if pos_to_key[new_pos] not in inventory and inventory.issuperset(blockers[pos][new_pos]):
-                    _positions = list(positions)
-                    _positions[i] = new_pos
-                    new_positions = tuple(_positions)
-                    new_inventory = inventory | frozenset([pos_to_key[new_pos]])
-                    new_state = (new_positions, new_inventory)
-                    yield (new_state, weight)
+            for key in remaining:
+                new_pos = key_to_pos[key]
+                if new_pos not in blockers[pos]:
+                    continue
+                if inventory.issuperset(blockers[pos][new_pos]):
+                    new_positions = tuple(positions[:i] + (new_pos,) + positions[i+1:])
+                    delta = frozenset([key])
+                    new_inventory = inventory | delta
+                    new_remaining = remaining - delta
+                    new_state = (new_positions, new_inventory, new_remaining)
+                    yield (new_state, key_distances[pos][new_pos])
 
     cache = {}
     def compute_min_distance_to_goal(state):
@@ -77,15 +80,14 @@ def compute_shortest_steps(input, start_count):
         return min_distance
 
     def _compute_min_distance_to_goal(state):
-        if state[1] == all_keys:
+        if len(state[2]) == 0:
             return 0
 
         min_distance = None
         return min(cost + compute_min_distance_to_goal(next_state) for next_state, cost in weighted_neighbors(state))
 
     all_keys = frozenset(key_to_pos.keys())
-
-    start_state = (tuple(start_positions), frozenset())
+    start_state = (tuple(start_positions), frozenset(), all_keys)
     return compute_min_distance_to_goal(start_state)
 
 def change_to_part2(lines):
