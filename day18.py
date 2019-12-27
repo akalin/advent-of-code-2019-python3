@@ -82,8 +82,29 @@ def compute_shortest_steps(input, start_count):
 
     all_keys = frozenset(key_to_pos.keys())
 
+    def heuristic(state):
+        positions, inventory = state
+        cost = 0
+        for pos in positions:
+            tree = trees[pos].copy()
+            for k in inventory:
+                if tree.has_node(key_to_pos[k]):
+                    tree.remove_node(key_to_pos[k])
+            cost += int(tree.size('weight'))
+        return cost
+
+    def heuristic_check(state):
+        cost = heuristic(state)
+        for state2, _, length in dijkstra_edges(state, weighted_neighbors):
+            if state2[1] == all_keys:
+                real_cost = length
+                break
+        if cost > real_cost:
+            raise Exception(f'inadmissible heuristic: {state2} {cost} > {real_cost}')
+        return cost
+
     start_state = (tuple(start_positions), frozenset())
-    for state, _, length in dijkstra_edges(start_state, weighted_neighbors):
+    for state, _, length in astar_edges(start_state, weighted_neighbors, heuristic):
         if state[1] == all_keys:
             return length
 
