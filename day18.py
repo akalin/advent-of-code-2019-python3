@@ -60,6 +60,8 @@ def parse_map(input, start_count):
                 pos_routes[child] += pos_to_key[child]
 
         key_distances[source] = {target: dists[target_pos] for target, target_pos in key_to_pos.items() if target_pos in dists}
+        # Keep track of both keys and doors on the route so that we
+        # avoid routes where we pick up extra keys.
         routes[source] = {target: frozenset(c.lower() for c in pos_routes[target_pos][:-1]) for target, target_pos in key_to_pos.items() if target_pos in pos_routes}
 
     all_keys = frozenset(key_to_pos.keys())
@@ -79,6 +81,9 @@ def compute_next_states(key_distances, routes, all_keys, key_to_index, state):
             continue
         i = key_to_index[key]
         pos = positions[i]
+        # We want to avoid routes which pick up extra keys, as we
+        # define a next state to be one where we pick up exactly one
+        # more key.
         reachable = inventory.issuperset(routes[pos][key])
         if reachable:
             new_positions = tuple(positions[:i] + (key,) + positions[i+1:])
