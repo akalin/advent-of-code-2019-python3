@@ -44,8 +44,8 @@ def parse_map(input, start_count):
     routes = {}
 
     for source, source_pos in chain(enumerate(start_positions), key_to_pos.items()):
-        # We assume there's only one shortest path to source (i.e.,
-        # not another one that may avoid doors).
+        # We assume there's only one shortest path to each target
+        # (i.e., not another one that may avoid doors).
         dists = {source_pos: 0}
         pos_routes = {source_pos: ''}
         for parent, child in bfs_edges(source_pos, neighbors):
