@@ -115,7 +115,7 @@ def compute_shortest_steps(input, start_count):
         return cost
 
     start_state = (tuple(start_positions), frozenset())
-    for state, _, length in astar_edges(start_state, weighted_neighbors, heuristic):
+    for state, _, length in dijkstra_edges(start_state, weighted_neighbors):
         if state[1] == all_keys:
             return length
 
