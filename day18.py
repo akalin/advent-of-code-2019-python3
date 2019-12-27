@@ -41,8 +41,6 @@ def parse_map(input, start_count):
     def neighbors(n):
         return [m for m in dir_neighbors(n) if m in walkables]
 
-    local = nx.Graph([(n, m) for n in walkables for m in dir_neighbors(n) if m in walkables])
-
     key_distances = {}
     routes = {}
 
@@ -72,6 +70,8 @@ def parse_map(input, start_count):
             if key in key_distances[i]:
                 key_to_index[key] = i
 
+    # A state is a tuple of positions and an inventory of keys.
+
     def compute_next_states(state):
         positions, inventory = state
         for key in all_keys:
@@ -93,9 +93,9 @@ def parse_map(input, start_count):
 
     return initial_state, compute_next_states, len(all_keys)
 
-def compute_shortest_steps_bfs(initial_state, compute_next_states, max_depth):
+def compute_shortest_steps_bfs(initial_state, compute_next_states, key_count):
     curr_states = {initial_state: 0}
-    for i in range(max_depth):
+    for i in range(key_count):
         next_states = {}
         for state, cost in curr_states.items():
             for next_state, next_cost in compute_next_states(state):
@@ -121,9 +121,9 @@ def compute_shortest_steps_dfs(initial_state, compute_next_states, _):
 
     return do_dfs(initial_state)
 
-def compute_shortest_steps_dijkstra(initial_state, compute_next_states, _):
+def compute_shortest_steps_dijkstra(initial_state, compute_next_states, key_count):
     for state, _, dist in dijkstra_edges(initial_state, compute_next_states):
-        if len(state[1]) == len(all_keys):
+        if len(state[1]) == key_count:
             return dist
 
 def change_to_part2(input):
