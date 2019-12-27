@@ -91,11 +91,11 @@ def parse_map(input, start_count):
 
     initial_state = (tuple(range(start_count)), frozenset())
 
-    return start_count, key_distances, routes, all_keys, key_to_index, initial_state, compute_next_states
+    return initial_state, compute_next_states, len(all_keys)
 
-def compute_shortest_steps_bfs(start_count, key_distances, routes, all_keys, key_to_index, initial_state, compute_next_states):
+def compute_shortest_steps_bfs(initial_state, compute_next_states, max_depth):
     curr_states = {initial_state: 0}
-    for i in range(len(all_keys)):
+    for i in range(max_depth):
         next_states = {}
         for state, cost in curr_states.items():
             for next_state, next_cost in compute_next_states(state):
@@ -106,7 +106,7 @@ def compute_shortest_steps_bfs(start_count, key_distances, routes, all_keys, key
 
     return min(curr_states.values())
 
-def compute_shortest_steps_dfs(start_count, key_distances, routes, all_keys, key_to_index, initial_state, compute_next_states):
+def compute_shortest_steps_dfs(initial_state, compute_next_states, _):
     cache = {}
     def do_dfs_cached(state):
         if state in cache:
@@ -121,7 +121,7 @@ def compute_shortest_steps_dfs(start_count, key_distances, routes, all_keys, key
 
     return do_dfs(initial_state)
 
-def compute_shortest_steps_dijkstra(start_count, key_distances, routes, all_keys, key_to_index, initial_state, compute_next_states):
+def compute_shortest_steps_dijkstra(initial_state, compute_next_states, _):
     for state, _, dist in dijkstra_edges(initial_state, compute_next_states):
         if len(state[1]) == len(all_keys):
             return dist
