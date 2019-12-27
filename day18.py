@@ -41,25 +41,28 @@ def parse_map(input, start_count):
         return [m for m in dir_neighbors(n) if m in walkables]
 
     key_distances = {}
-    routes = {}
+    key_objects = {}
 
+    # For each possible position, BFS over the walkable graph to
+    # compute distances to each key and intermediate doors/keys.
     for source, source_pos in chain(enumerate(start_positions), key_to_pos.items()):
         # We assume there's only one shortest path to each target
         # (i.e., not another one that may avoid doors).
         dists = {source_pos: 0}
-        pos_routes = {source_pos: ''}
+        objs = {source_pos: ''}
         for parent, child in bfs_edges(source_pos, neighbors):
             dists[child] = dists[parent] + 1
-            pos_routes[child] = pos_routes[parent]
+            objs[child] = objs[parent]
+            # Treat doors and keys equally, as we actually don't want
+            # to pick up extra keys on the way to another one.
             if child in pos_to_door:
-                pos_routes[child] += pos_to_door[child]
+                objs[child] += pos_to_door[child].lower()
             elif child in pos_to_key:
-                pos_routes[child] += pos_to_key[child]
+                objs[child] += pos_to_key[child]
 
         key_distances[source] = {target: dists[target_pos] for target, target_pos in key_to_pos.items() if target_pos in dists}
-        # Keep track of both keys and doors on the route so that we
-        # avoid routes where we pick up extra keys.
-        routes[source] = {target: frozenset(c.lower() for c in pos_routes[target_pos][:-1]) for target, target_pos in key_to_pos.items() if target_pos in pos_routes}
+        # The last entry in objs[target_pos] is target itself.
+        key_objects[source] = {target: frozenset(objs[target_pos][:-1]) for target, target_pos in key_to_pos.items() if target_pos in objs}
 
     all_keys = frozenset(key_to_pos.keys())
 
@@ -81,7 +84,7 @@ def parse_map(input, start_count):
             # We want to avoid routes which pick up extra keys, as we
             # define a next state to be one where we pick up exactly one
             # more key.
-            if not inventory.issuperset(routes[pos][key]):
+            if not inventory.issuperset(key_objects[pos][key]):
                 continue
             new_positions = tuple(positions[:i] + (key,) + positions[i+1:])
             new_inventory = inventory.union(key)
