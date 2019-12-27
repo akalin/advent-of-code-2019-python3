@@ -72,8 +72,7 @@ def compute_shortest_steps(input, start_count):
             new_pos = key_to_pos[key]
             if inventory.issuperset(blockers[pos][new_pos]):
                 new_positions = tuple(positions[:i] + (new_pos,) + positions[i+1:])
-                delta = frozenset([key])
-                new_inventory = inventory | delta
+                new_inventory = inventory | set((key,))
                 new_state = (new_positions, new_inventory)
                 yield (new_state, key_distances[pos][new_pos])
 
