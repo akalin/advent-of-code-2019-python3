@@ -87,9 +87,20 @@ def compute_shortest_steps(input, start_count):
         cost = 0
         for pos in positions:
             tree = trees[pos].copy()
-            for k in inventory:
-                if tree.has_node(key_to_pos[k]):
-                    tree.remove_node(key_to_pos[k])
+#            print('before', state, tree.edges, int(tree.size('weight')))
+            to_remove = [key_to_pos[k] for k in inventory if key_to_pos[k] != pos]
+            starts = set(start_positions)
+            starts.discard(pos)
+            to_remove += list(starts)
+            while True:
+                did_work = False
+                for pos_rem in to_remove:
+                    if tree.has_node(pos_rem) and tree.degree(pos_rem) == 1:
+                        did_work = True
+                        tree.remove_node(pos_rem)
+                if not did_work:
+                    break
+#            print('after', state, tree.edges, int(tree.size('weight')))
             cost += int(tree.size('weight'))
         return cost
 
