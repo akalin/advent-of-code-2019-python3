@@ -72,31 +72,33 @@ def parse_map(input, start_count):
             if key in key_distances[i]:
                 key_to_index[key] = i
 
-    return start_count, key_distances, routes, all_keys, key_to_index
-
-def compute_next_states(key_distances, routes, all_keys, key_to_index, state):
-    positions, inventory = state
-    for key in all_keys:
-        if key in inventory:
-            continue
-        i = key_to_index[key]
-        pos = positions[i]
-        # We want to avoid routes which pick up extra keys, as we
-        # define a next state to be one where we pick up exactly one
-        # more key.
-        reachable = inventory.issuperset(routes[pos][key])
-        if reachable:
+    def compute_next_states(state):
+        positions, inventory = state
+        for key in all_keys:
+            if key in inventory:
+                continue
+            i = key_to_index[key]
+            pos = positions[i]
+            # We want to avoid routes which pick up extra keys, as we
+            # define a next state to be one where we pick up exactly one
+            # more key.
+            if not inventory.issuperset(routes[pos][key]):
+                continue
             new_positions = tuple(positions[:i] + (key,) + positions[i+1:])
             new_inventory = inventory.union(key)
             new_state = (new_positions, new_inventory)
             yield (new_state, key_distances[pos][key])
 
-def compute_shortest_steps_bfs(start_count, key_distances, routes, all_keys, key_to_index):
-    curr_states = {(tuple(range(start_count)), frozenset()): 0}
+    initial_state = (tuple(range(start_count)), frozenset())
+
+    return start_count, key_distances, routes, all_keys, key_to_index, initial_state, compute_next_states
+
+def compute_shortest_steps_bfs(start_count, key_distances, routes, all_keys, key_to_index, initial_state, compute_next_states):
+    curr_states = {initial_state: 0}
     for i in range(len(all_keys)):
         next_states = {}
         for state, cost in curr_states.items():
-            for next_state, next_cost in compute_next_states(key_distances, routes, all_keys, key_to_index, state):
+            for next_state, next_cost in compute_next_states(state):
                 total_next_cost = cost + next_cost
                 if next_state not in next_states or total_next_cost < next_states[next_state]:
                     next_states[next_state] = total_next_cost
@@ -104,7 +106,7 @@ def compute_shortest_steps_bfs(start_count, key_distances, routes, all_keys, key
 
     return min(curr_states.values())
 
-def compute_shortest_steps_dfs(start_count, key_distances, routes, all_keys, key_to_index):
+def compute_shortest_steps_dfs(start_count, key_distances, routes, all_keys, key_to_index, initial_state, compute_next_states):
     cache = {}
     def do_dfs_cached(state):
         if state in cache:
@@ -115,16 +117,12 @@ def compute_shortest_steps_dfs(start_count, key_distances, routes, all_keys, key
         return res
 
     def do_dfs(state):
-        return min((next_cost + do_dfs_cached(next_state) for next_state, next_cost in compute_next_states(key_distances, routes, all_keys, key_to_index, state)), default=0)
+        return min((next_cost + do_dfs_cached(next_state) for next_state, next_cost in compute_next_states(state)), default=0)
 
-    return do_dfs((tuple(range(start_count)), frozenset()))
+    return do_dfs(initial_state)
 
-def compute_shortest_steps_dijkstra(start_count, key_distances, routes, all_keys, key_to_index):
-    start_state = (tuple(range(start_count)), frozenset())
-    def weighted_successors(state):
-        return compute_next_states(key_distances, routes, all_keys, key_to_index, state)
-
-    for state, _, dist in dijkstra_edges(start_state, weighted_successors):
+def compute_shortest_steps_dijkstra(start_count, key_distances, routes, all_keys, key_to_index, initial_state, compute_next_states):
+    for state, _, dist in dijkstra_edges(initial_state, compute_next_states):
         if len(state[1]) == len(all_keys):
             return dist
 
