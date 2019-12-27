@@ -153,15 +153,12 @@ def change_to_part2(input):
 
 def compute_day18(input):
     args1 = None
-    args2 = None
-    def parse_input():
-        nonlocal args1, args2
+    def parse_input_part1():
+        nonlocal args1
         args1 = parse_map(input, 1)
-        input_part2 = change_to_part2(input)
-        args2 = parse_map(input_part2, 4)
 
-    parse_input_duration = timeit.timeit(parse_input, number=1)
-    print(f'input parsing ({parse_input_duration:.2f}s)')
+    parse_input1_duration = timeit.timeit(parse_input_part1, number=1)
+    print(f'input parsing (part1) ({parse_input1_duration:.2f}s)')
 
     part1_bfs = None
     def do_part1_bfs():
@@ -186,6 +183,15 @@ def compute_day18(input):
 
     part1_dijkstra_duration = timeit.timeit(do_part1_dijkstra, number=1)
     print(f'part1 (dijkstra): {part1_dijkstra} ({part1_dijkstra_duration:.2f}s)')
+
+    args2 = None
+    def parse_input_part2():
+        nonlocal args2
+        input_part2 = change_to_part2(input)
+        args2 = parse_map(input_part2, 4)
+
+    parse_input2_duration = timeit.timeit(parse_input_part2, number=1)
+    print(f'input parsing (part2) ({parse_input2_duration:.2f}s)')
 
     part2_bfs = None
     def do_part2_bfs():
