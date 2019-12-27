@@ -70,15 +70,13 @@ def compute_shortest_steps(input, start_count):
                 continue
             i = key_to_index[key]
             pos = positions[i]
-            dist_key = pos_to_key[pos] if pos in pos_to_key else i
-            new_pos = key_to_pos[key]
             if inventory.issuperset(blockers[i][key]):
-                new_positions = tuple(positions[:i] + (new_pos,) + positions[i+1:])
+                new_positions = tuple(positions[:i] + (key,) + positions[i+1:])
                 new_inventory = inventory | set((key,))
                 new_state = (new_positions, new_inventory)
-                yield (new_state, key_distances[dist_key][key])
+                yield (new_state, key_distances[pos][key])
 
-    curr_states = {(tuple(start_positions), frozenset()): 0}
+    curr_states = {(tuple(range(start_count)), frozenset()): 0}
     for i in range(len(all_keys)):
         next_states = {}
         for state, cost in curr_states.items():
