@@ -77,24 +77,17 @@ def compute_shortest_steps(input, start_count):
                 new_state = (new_positions, new_inventory)
                 yield (new_state, key_distances[pos][new_pos])
 
-    cache = {}
-    def compute_min_distance_to_goal(state):
-        key = state[0], state[1]
-        if key in cache:
-            return cache[key]
+    curr_states = {(tuple(start_positions), frozenset()): 0}
+    for i in range(len(all_keys)):
+        next_states = {}
+        for state, cost in curr_states.items():
+            for next_state, next_cost in weighted_neighbors(state):
+                total_next_cost = cost + next_cost
+                if next_state not in next_states or total_next_cost < next_states[next_state]:
+                    next_states[next_state] = total_next_cost
+        curr_states = next_states
 
-        min_distance = _compute_min_distance_to_goal(state)
-        cache[key] = min_distance
-        return min_distance
-
-    def _compute_min_distance_to_goal(state):
-        if state[1] == all_keys:
-            return 0
-
-        return min(cost + compute_min_distance_to_goal(next_state) for next_state, cost in weighted_neighbors(state))
-
-    start_state = (tuple(start_positions), frozenset())
-    return compute_min_distance_to_goal(start_state)
+    return min(curr_states.values())
 
 def change_to_part2(lines):
     rows = len(lines)
