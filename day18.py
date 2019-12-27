@@ -63,9 +63,7 @@ def parse_map(input, start_count):
 
     return key_distances, blockers, all_keys, key_to_index
 
-def compute_shortest_steps(input, start_count):
-    key_distances, blockers, all_keys, key_to_index = parse_map(input, start_count)
-
+def compute_shortest_steps(key_distances, blockers, all_keys, key_to_index, start_count):
     def weighted_successors(state):
         positions, inventory = state
         for key in all_keys:
@@ -91,41 +89,53 @@ def compute_shortest_steps(input, start_count):
 
     return min(curr_states.values())
 
-def change_to_part2(lines):
-    rows = len(lines)
-    cols = len(lines[0])
-    for y in range(rows):
-        for x in range(cols):
-            c = lines[y][x]
-            if c == '@':
-                lines[y][x] = '#'
-                lines[y-1][x] = '#'
-                lines[y+1][x] = '#'
-                lines[y][x-1] = '#'
-                lines[y][x+1] = '#'
-                lines[y-1][x-1] = '@'
-                lines[y-1][x+1] = '@'
-                lines[y+1][x-1] = '@'
-                lines[y+1][x+1] = '@'
-                return
+def change_to_part2(input):
+    def _make_change(lines):
+        rows = len(lines)
+        cols = len(lines[0])
+        for y in range(rows):
+            for x in range(cols):
+                c = lines[y][x]
+                if c == '@':
+                    lines[y][x] = '#'
+                    lines[y-1][x] = '#'
+                    lines[y+1][x] = '#'
+                    lines[y][x-1] = '#'
+                    lines[y][x+1] = '#'
+                    lines[y-1][x-1] = '@'
+                    lines[y-1][x+1] = '@'
+                    lines[y+1][x-1] = '@'
+                    lines[y+1][x+1] = '@'
+                    return
+
+    lines = [[c for c in line.strip()] for line in input.strip().split('\n')]
+    _make_change(lines)
+    return '\n'.join(''.join(line) for line in lines)
 
 def compute_day18(input):
+    args1 = None
+    args2 = None
+    def parse_input():
+        nonlocal args1, args2
+        args1 = parse_map(input, 1)
+        input_part2 = change_to_part2(input)
+        args2 = parse_map(input_part2, 4)
+
+    parse_input_duration = timeit.timeit(parse_input, number=1)
+    print(f'input parsing ({parse_input_duration:.2f}s)')
+
     part1 = None
     def do_part1():
         nonlocal part1
-        part1 = compute_shortest_steps(input, 1)
+        part1 = compute_shortest_steps(*args1, 1)
 
     part1_duration = timeit.timeit(do_part1, number=1)
     print(f'part1: {part1} ({part1_duration:.2f}s)')
 
-    lines = [[c for c in line.strip()] for line in input.strip().split('\n')]
-    change_to_part2(lines)
-    input_part2 = '\n'.join(''.join(line) for line in lines)
-
     part2 = None
     def do_part2():
         nonlocal part2
-        part2 = compute_shortest_steps(input_part2, 4)
+        part2 = compute_shortest_steps(*args2, 4)
 
     part2_duration = timeit.timeit(do_part2, number=1)
 
