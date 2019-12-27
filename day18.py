@@ -2,7 +2,6 @@ from graph import *
 from itertools import chain
 from util import *
 import timeit
-import networkx as nx
 
 def parse_map(input, start_count):
     lines = [x.strip() for x in input.strip().split('\n')]
