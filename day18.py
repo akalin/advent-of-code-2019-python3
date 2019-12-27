@@ -60,7 +60,7 @@ def parse_map(input, start_count):
                 pos_routes[child] += pos_to_key[child]
 
         key_distances[source] = {target: dists[target_pos] for target, target_pos in key_to_pos.items() if target_pos in dists}
-        routes[source] = {target: pos_routes[target_pos][:-1] for target, target_pos in key_to_pos.items() if target_pos in pos_routes}
+        routes[source] = {target: frozenset(c.lower() for c in pos_routes[target_pos][:-1]) for target, target_pos in key_to_pos.items() if target_pos in pos_routes}
 
     all_keys = frozenset(key_to_pos.keys())
 
@@ -79,7 +79,7 @@ def compute_next_states(key_distances, routes, all_keys, key_to_index, state):
             continue
         i = key_to_index[key]
         pos = positions[i]
-        reachable = all(c in inventory or c.lower() in inventory for c in routes[pos][key])
+        reachable = inventory.issuperset(routes[pos][key])
         if reachable:
             new_positions = tuple(positions[:i] + (key,) + positions[i+1:])
             new_inventory = inventory | frozenset((key,))
