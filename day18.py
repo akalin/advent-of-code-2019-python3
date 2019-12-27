@@ -36,6 +36,9 @@ def parse_map(input, start_count):
     if len(start_positions) != start_count:
         raise
 
+    def neighbors(n):
+        return [m for m in dir_neighbors(n) if m in walkables]
+
     local = nx.Graph([(n, m) for n in walkables for m in dir_neighbors(n) if m in walkables])
 
     key_distances = {}
@@ -44,14 +47,14 @@ def parse_map(input, start_count):
     for source, source_pos in chain(enumerate(start_positions), key_to_pos.items()):
         # We assume there's only one shortest path to source (i.e.,
         # not another one that may avoid doors).
-        paths = nx.single_source_shortest_path(local, source_pos)
-        key_distances[source] = {}
-        blockers[source] = {}
-        for target, target_pos in key_to_pos.items():
-            if target_pos not in paths:
-                continue
-            blockers[source][target] = frozenset(pos_to_door[n].lower() for n in paths[target_pos][1:] if n in pos_to_door)
-            key_distances[source][target] = len(paths[target_pos]) - 1
+        dists = {source_pos: 0}
+        pos_blockers = {source_pos: frozenset()}
+        for parent, child in bfs_edges(source_pos, neighbors):
+            dists[child] = dists[parent] + 1
+            pos_blockers[child] = pos_blockers[parent] | frozenset((pos_to_door[child].lower(),)) if child in pos_to_door else pos_blockers[parent]
+
+        key_distances[source] = {target: dists[target_pos] for target, target_pos in key_to_pos.items() if target_pos in dists}
+        blockers[source] = {target: pos_blockers[target_pos] for target, target_pos in key_to_pos.items() if target_pos in pos_blockers}
 
     all_keys = frozenset(key_to_pos.keys())
 
