@@ -40,13 +40,14 @@ def compute_shortest_steps(input, start_count):
 
     local = nx.Graph([(n, m) for n in walkables for m in dir_neighbors(n) if m in walkables])
 
-    G = nx.Graph()
+    trees = {}
     blockers = {}
 
     labeled_nodes = start_positions + list(pos_to_key.keys())
     for source in labeled_nodes:
         # Assumes there's only one shortest path to every node.
         paths = nx.single_source_shortest_path(local, source)
+        trees[source] = nx.Graph()
         blockers[source] = {}
         for target in labeled_nodes:
             if target not in paths:
@@ -58,7 +59,7 @@ def compute_shortest_steps(input, start_count):
                 dist += 1
                 if n in labeled_nodes:
                     if last_node is not None:
-                        G.add_edge(n, last_node, weight=dist)
+                        trees[source].add_edge(n, last_node, weight=dist)
                     last_node = n
                     dist = 0
                 elif n in pos_to_door:
@@ -67,7 +68,7 @@ def compute_shortest_steps(input, start_count):
     def weighted_neighbors(state):
         positions, inventory = state
         for i, pos in enumerate(positions):
-            for new_pos, attributes in G[pos].items():
+            for new_pos, attributes in trees[pos][pos].items():
                 _positions = list(positions)
                 _positions[i] = new_pos
                 new_positions = tuple(_positions)
