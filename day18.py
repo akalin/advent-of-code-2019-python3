@@ -1,4 +1,5 @@
 from graph import *
+from itertools import chain
 from util import *
 import networkx as nx
 
@@ -43,22 +44,22 @@ def compute_shortest_steps(input, start_count):
     key_distances = {}
     blockers = {}
 
-    for source in start_positions + list(pos_to_key.keys()):
+    for source, source_pos in chain(enumerate(start_positions), key_to_pos.items()):
         # We assume there's only one shortest path to source (i.e.,
         # not another one that may avoid doors).
-        paths = nx.single_source_shortest_path(local, source)
+        paths = nx.single_source_shortest_path(local, source_pos)
         key_distances[source] = {}
         blockers[source] = {}
-        for target in pos_to_key.keys():
-            if target not in paths:
+        for target, target_pos in key_to_pos.items():
+            if target_pos not in paths:
                 continue
-            blockers[source][target] = set(pos_to_door[n].lower() for n in paths[target][1:] if n in pos_to_door)
-            key_distances[source][target] = len(paths[target]) - 1
+            blockers[source][target] = set(pos_to_door[n].lower() for n in paths[target_pos][1:] if n in pos_to_door)
+            key_distances[source][target] = len(paths[target_pos]) - 1
 
     key_to_index = {}
-    for key_pos, key in pos_to_key.items():
-        for i, start_pos in enumerate(start_positions):
-            if key_pos in key_distances[start_pos]:
+    for key in key_to_pos.keys():
+        for i in range(start_count):
+            if key in key_distances[i]:
                 key_to_index[key] = i
 
     all_keys = frozenset(key_to_pos.keys())
@@ -69,12 +70,13 @@ def compute_shortest_steps(input, start_count):
                 continue
             i = key_to_index[key]
             pos = positions[i]
+            dist_key = pos_to_key[pos] if pos in pos_to_key else i
             new_pos = key_to_pos[key]
-            if inventory.issuperset(blockers[pos][new_pos]):
+            if inventory.issuperset(blockers[i][key]):
                 new_positions = tuple(positions[:i] + (new_pos,) + positions[i+1:])
                 new_inventory = inventory | set((key,))
                 new_state = (new_positions, new_inventory)
-                yield (new_state, key_distances[pos][new_pos])
+                yield (new_state, key_distances[dist_key][key])
 
     curr_states = {(tuple(start_positions), frozenset()): 0}
     for i in range(len(all_keys)):
