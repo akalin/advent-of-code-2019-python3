@@ -107,6 +107,15 @@ def compute_shortest_steps_dfs(start_count, key_distances, blockers, all_keys, k
 
     return do_dfs((tuple(range(start_count)), frozenset()))
 
+def compute_shortest_steps_dijkstra(start_count, key_distances, blockers, all_keys, key_to_index):
+    start_state = (tuple(range(start_count)), frozenset())
+    def weighted_successors(state):
+        return compute_next_states(key_distances, blockers, all_keys, key_to_index, state)
+
+    for state, _, dist in dijkstra_edges(start_state, weighted_successors):
+        if len(state[1]) == len(all_keys):
+            return dist
+
 def change_to_part2(input):
     def _make_change(lines):
         rows = len(lines)
@@ -158,6 +167,14 @@ def compute_day18(input):
     part1_dfs_duration = timeit.timeit(do_part1_dfs, number=1)
     print(f'part1 (dfs): {part1_dfs} ({part1_dfs_duration:.2f}s)')
 
+    part1_dijkstra = None
+    def do_part1_dijkstra():
+        nonlocal part1_dijkstra
+        part1_dijkstra = compute_shortest_steps_dijkstra(*args1)
+
+    part1_dijkstra_duration = timeit.timeit(do_part1_dijkstra, number=1)
+    print(f'part1 (dijkstra): {part1_dijkstra} ({part1_dijkstra_duration:.2f}s)')
+
     part2_bfs = None
     def do_part2_bfs():
         nonlocal part2_bfs
@@ -175,6 +192,15 @@ def compute_day18(input):
     part2_dfs_duration = timeit.timeit(do_part2_dfs, number=1)
 
     print(f'part2 (dfs): {part2_dfs} ({part2_dfs_duration:.2f}s)')
+
+    part2_dijkstra = None
+    def do_part2_dijkstra():
+        nonlocal part2_dijkstra
+        part2_dijkstra = compute_shortest_steps_dijkstra(*args2)
+
+    part2_dijkstra_duration = timeit.timeit(do_part2_dijkstra, number=1)
+
+    print(f'part2 (dijkstra): {part2_dijkstra} ({part2_dijkstra_duration:.2f}s)')
 
 if __name__ == '__main__':
     with open('day18.input', 'r') as input_file:
