@@ -194,7 +194,6 @@ if __name__ == '__main__':
             global part1_nx
             part1_nx = compute_part1_nx(*args)
 
-
         part2_dijkstra = None
         def do_part2_dijkstra():
             global part2_dijkstra
