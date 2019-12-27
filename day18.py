@@ -71,11 +71,12 @@ def compute_shortest_steps(input, start_count):
 
     cache = {}
     def compute_min_distance_to_goal(state):
-        if state in cache:
-            return cache[state]
+        key = state[0], state[1]
+        if key in cache:
+            return cache[key]
 
         min_distance = _compute_min_distance_to_goal(state)
-        cache[state] = min_distance
+        cache[key] = min_distance
         return min_distance
 
     all_keys = frozenset(key_to_pos.keys())
@@ -83,7 +84,6 @@ def compute_shortest_steps(input, start_count):
         if state[1] == all_keys:
             return 0
 
-        min_distance = None
         return min(cost + compute_min_distance_to_goal(next_state) for next_state, cost in weighted_neighbors(state))
 
     remainings = tuple(frozenset(pos_to_key[pos] for pos in blockers[start].keys()) for start in start_positions)
