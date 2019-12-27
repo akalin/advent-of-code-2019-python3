@@ -53,7 +53,7 @@ def compute_shortest_steps(input, start_count):
         for target, target_pos in key_to_pos.items():
             if target_pos not in paths:
                 continue
-            blockers[source][target] = set(pos_to_door[n].lower() for n in paths[target_pos][1:] if n in pos_to_door)
+            blockers[source][target] = frozenset(pos_to_door[n].lower() for n in paths[target_pos][1:] if n in pos_to_door)
             key_distances[source][target] = len(paths[target_pos]) - 1
 
     key_to_index = {}
