@@ -142,7 +142,6 @@ def bidirectional_dijkstra_path_length(source, target, weighted_successors, weig
     raise ValueError(f'No path between {source} and {target}')
 
 def astar_edges(source, weighted_successors, heuristic):
-    final_dist = {}
     dist_so_far = {source: 0}
     # Use a counter to avoid comparing the nodes themselves in the
     # heap.
@@ -151,19 +150,15 @@ def astar_edges(source, weighted_successors, heuristic):
     heappush(fringe, (0, next(c), source, None))
     while fringe:
         (_, _, child, parent) = heappop(fringe)
-        if child in final_dist:
-            continue # already processed this node
 
         dist_to_child = dist_so_far[child]
-        final_dist[child] = dist_to_child
+        # The yielded edges aren't necessarily optimal for child unless
+        # child is the target of the heuristic
         yield child, parent, dist_to_child
 
         for grandchild, weight in weighted_successors(child):
             dist_to_grandchild = dist_to_child + weight
-            if grandchild in final_dist:
-                if dist_to_grandchild < final_dist[grandchild]:
-                    raise ValueError(f'Contradictory paths found: negative weights? child={child} distance to {grandchild}={dist_to_child} + {weight} = {dist_to_grandchild} < final distance to {grandchild}={final_dist[grandchild]}')
-            elif grandchild not in dist_so_far or dist_to_grandchild < dist_so_far[grandchild]:
+            if grandchild not in dist_so_far or dist_to_grandchild < dist_so_far[grandchild]:
                 dist_so_far[grandchild] = dist_to_grandchild
                 heappush(fringe, (dist_to_grandchild + heuristic(grandchild), next(c), grandchild, child))
 
