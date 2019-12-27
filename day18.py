@@ -72,7 +72,7 @@ def compute_next_states(key_distances, blockers, all_keys, key_to_index, state):
         pos = positions[i]
         if inventory.issuperset(blockers[i][key]):
             new_positions = tuple(positions[:i] + (key,) + positions[i+1:])
-            new_inventory = inventory | set((key,))
+            new_inventory = inventory | frozenset((key,))
             new_state = (new_positions, new_inventory)
             yield (new_state, key_distances[pos][key])
 
