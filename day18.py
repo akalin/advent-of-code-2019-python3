@@ -87,7 +87,7 @@ def compute_next_states(key_distances, routes, all_keys, key_to_index, state):
         reachable = inventory.issuperset(routes[pos][key])
         if reachable:
             new_positions = tuple(positions[:i] + (key,) + positions[i+1:])
-            new_inventory = inventory | frozenset((key,))
+            new_inventory = inventory.union(key)
             new_state = (new_positions, new_inventory)
             yield (new_state, key_distances[pos][key])
 
