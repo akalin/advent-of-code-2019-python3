@@ -1,6 +1,7 @@
 from graph import *
 from itertools import chain
 from util import *
+import timeit
 import networkx as nx
 
 def parse_map(input, start_count):
@@ -110,13 +111,25 @@ def change_to_part2(lines):
 
 def compute_day18(input):
     part1 = None
-    part1 = compute_shortest_steps(input, 1)
-    print(f'part1: {part1}')
+    def do_part1():
+        nonlocal part1
+        part1 = compute_shortest_steps(input, 1)
+
+    part1_duration = timeit.timeit(do_part1, number=1)
+    print(f'part1: {part1} ({part1_duration:.2f}s)')
+
     lines = [[c for c in line.strip()] for line in input.strip().split('\n')]
     change_to_part2(lines)
     input_part2 = '\n'.join(''.join(line) for line in lines)
-    part2 = compute_shortest_steps(input_part2, 4)
-    print(f'part2: {part2}')
+
+    part2 = None
+    def do_part2():
+        nonlocal part2
+        part2 = compute_shortest_steps(input_part2, 4)
+
+    part2_duration = timeit.timeit(do_part2, number=1)
+
+    print(f'part2: {part2} ({part2_duration:.2f}s)')
 
 if __name__ == '__main__':
     with open('day18.input', 'r') as input_file:
