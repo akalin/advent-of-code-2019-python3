@@ -64,10 +64,8 @@ def parse_map(input, start_count):
         # The last entry in objs[target_pos] is target itself.
         key_objects[source] = {target: frozenset(objs[target_pos][:-1]) for target, target_pos in key_to_pos.items() if target_pos in objs}
 
-    all_keys = frozenset(key_to_pos.keys())
-
     key_to_index = {}
-    for key in all_keys:
+    for key in key_to_pos.keys():
         for i in range(start_count):
             if key in key_distances[i]:
                 key_to_index[key] = i
@@ -78,10 +76,9 @@ def parse_map(input, start_count):
     # *exactly* one more key.
     def compute_next_states(state):
         positions, inventory = state
-        for key in all_keys:
+        for key, i in key_to_index.items():
             if key in inventory:
                 continue
-            i = key_to_index[key]
             pos = positions[i]
             if not inventory.issuperset(key_objects[pos][key]):
                 continue
@@ -92,7 +89,7 @@ def parse_map(input, start_count):
 
     initial_state = (tuple(range(start_count)), frozenset())
 
-    return initial_state, compute_next_states, len(all_keys)
+    return initial_state, compute_next_states, len(key_to_index)
 
 def compute_shortest_steps_bfs(initial_state, compute_next_states, key_count):
     curr_states = {initial_state: 0}
