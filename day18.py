@@ -69,7 +69,9 @@ def parse_map(input, start_count):
         for key in key_distances[i].keys():
             key_to_index[key] = i
 
-    # A state is a tuple of positions and an inventory of keys.
+    # A state is a tuple of positions and an inventory of keys. A
+    # position is either a number (representing one of the starting
+    # positions) or a key.
 
     # The successors of a given state are the states where we acquire
     # *exactly* one more key.
@@ -86,6 +88,7 @@ def parse_map(input, start_count):
             new_state = (new_positions, new_inventory)
             yield (new_state, key_distances[pos][key])
 
+    # Initial state is the starting positions and an empty inventory.
     initial_state = (tuple(range(start_count)), frozenset())
 
     return initial_state, compute_next_states, len(key_to_index)
