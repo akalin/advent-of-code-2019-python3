@@ -133,24 +133,33 @@ def compute_part2(walkables, start_pos, end_pos, portals, path_length):
 
     def weighted_successors(n3):
         n, z = tuple3to2(n3)
+        # If we're at the end state, nothing to do.
         if n == end_pos and z == 0:
             return
 
+        # If we're on the ground floor, go directly to the end if possible.
+        if z == 0 and end_pos in G[n]:
+            w = G.edges[n, end_pos]['weight']
+            yield tuple2to3(end_pos, 0), w
+
+        # Otherwise, go to a portal and pass through it.
         for m in G[n]:
+            if m not in portals:
+                continue
             w = G.edges[n, m]['weight']
-            if z == 0 and m == end_pos:
-                yield tuple2to3(m, z), w
-            elif m in portals:
-                other_side, dz = portals[m]
-                new_z = z + dz
-                if new_z >= 0:
-                    yield tuple2to3(other_side, new_z), w + 1
+            other_side, dz = portals[m]
+            new_z = z + dz
+            if new_z >= 0:
+                yield tuple2to3(other_side, new_z), w + 1
 
     def weighted_predecessors(n3):
         n, z = tuple3to2(n3)
+        # If we're at the start state, nothing to do.
         if z == 0 and n == start_pos:
             return
 
+        # If we're at the end state, then we must have gotten here
+        # from a portal leading up, or directly from the start.
         if z == 0 and n == end_pos:
             if start_pos in G[n]:
                 w = G.edges[other_side, start_pos]['weight']
@@ -163,6 +172,7 @@ def compute_part2(walkables, start_pos, end_pos, portals, path_length):
                 yield tuple2to3(m, 0), w
             return
 
+        # Otherwise, we must have just traversed a portal.
         if n not in portals:
             raise
         other_side, dz = portals[n]
@@ -170,16 +180,23 @@ def compute_part2(walkables, start_pos, end_pos, portals, path_length):
         if new_z < 0:
             raise
 
-        if new_z == 0:
-            if start_pos in G[other_side]:
-                w = G.edges[other_side, start_pos]['weight']
-                yield start_pos, 0, w + 1
-        else:
-            for m in G[other_side]:
-                if m not in portals:
-                    continue
-                w = G.edges[other_side, m]['weight']
-                yield tuple2to3(m, new_z), w + 1
+        # If the other side is on the ground floor, we might have come
+        # from the start.
+        if new_z == 0 and start_pos in G[other_side]:
+            w = G.edges[other_side, start_pos]['weight']
+            yield start_pos, 0, w + 1
+
+        # Otherwise, or if we're not on the ground floor, we must have
+        # come from another traversable portal.
+        for m in G[other_side]:
+            if m not in portals:
+                continue
+            _, dz2 = portals[m]
+            new_z2 = new_z + dz2
+            if new_z2 < 0:
+                continue
+            w = G.edges[other_side, m]['weight']
+            yield tuple2to3(m, new_z), w + 1
 
     return path_length(G, portals, start_pos3, end_pos3, weighted_neighbors, weighted_successors, weighted_predecessors)
 
