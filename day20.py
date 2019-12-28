@@ -183,13 +183,16 @@ def compute_part2(walkables, start_pos, end_pos, portals, path_length):
 
     return path_length(G, portals, start_pos3, end_pos3, weighted_neighbors, weighted_successors, weighted_predecessors)
 
-def dijkstra_neigh(G, portals, start, end, neigh, succ, pred):
+def dijkstra_neigh(G, portals, start, end, neigh, _, __):
     return dijkstra_path_length(start, end, neigh)
 
-def dijkstra_succ(G, portals, start, end, neigh, succ, pred):
+def dijkstra_succ(G, portals, start, end, _, succ, __):
     return dijkstra_path_length(start, end, succ)
 
-def bidir_dijkstra(G, portals, start, end, neigh, succ, pred):
+def bidir_dijkstra_neigh(G, portals, start, end, neigh, _, __):
+    return bidirectional_dijkstra_path_length(start, end, neigh, neigh)
+
+def bidir_dijkstra_succ_pred(G, portals, start, end, _, succ, pred):
     return bidirectional_dijkstra_path_length(start, end, succ, pred)
 
 def zero_heuristic(n):
@@ -271,14 +274,23 @@ def compute_day20(*args):
 
     print(f'part2 (dijkstra - successor): {part2_dijkstra_succ} ({part2_dijkstra_succ_duration:.3f}s)')
 
-    part2_bidir_dijkstra = None
-    def do_part2_bidir_dijkstra():
-        nonlocal part2_bidir_dijkstra
-        part2_bidir_dijkstra = compute_part2(*args, bidir_dijkstra)
+    part2_bidir_dijkstra_neigh = None
+    def do_part2_bidir_dijkstra_neigh():
+        nonlocal part2_bidir_dijkstra_neigh
+        part2_bidir_dijkstra_neigh = compute_part2(*args, bidir_dijkstra_neigh)
 
-    part2_bidir_dijkstra_duration = timeit.timeit(do_part2_bidir_dijkstra, number=1)
+    part2_bidir_dijkstra_neigh_duration = timeit.timeit(do_part2_bidir_dijkstra_neigh, number=1)
 
-    print(f'part2 (bidir dijkstra): {part2_bidir_dijkstra} ({part2_bidir_dijkstra_duration:.3f}s)')
+    print(f'part2 (bidir dijkstra - neighbor): {part2_bidir_dijkstra_neigh} ({part2_bidir_dijkstra_neigh_duration:.3f}s)')
+
+    part2_bidir_dijkstra_succ_pred = None
+    def do_part2_bidir_dijkstra_succ_pred():
+        nonlocal part2_bidir_dijkstra_succ_pred
+        part2_bidir_dijkstra_succ_pred = compute_part2(*args, bidir_dijkstra_succ_pred)
+
+    part2_bidir_dijkstra_succ_pred_duration = timeit.timeit(do_part2_bidir_dijkstra_succ_pred, number=1)
+
+    print(f'part2 (bidir dijkstra - successor/predecessor): {part2_bidir_dijkstra_succ_pred} ({part2_bidir_dijkstra_succ_pred_duration:.3f}s)')
 
     part2_astar_zero = None
     def do_part2_astar_zero():
