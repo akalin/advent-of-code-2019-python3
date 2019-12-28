@@ -184,6 +184,9 @@ def compute_part2(walkables, start_pos, end_pos, portals, path_length):
     return path_length(G, portals, start_pos3, end_pos3, weighted_neighbors, weighted_successors, weighted_predecessors)
 
 def dijkstra_neigh(G, portals, start, end, neigh, succ, pred):
+    return dijkstra_path_length(start, end, neigh)
+
+def dijkstra_succ(G, portals, start, end, neigh, succ, pred):
     return dijkstra_path_length(start, end, succ)
 
 def bidir_dijkstra(G, portals, start, end, neigh, succ, pred):
@@ -257,7 +260,16 @@ def compute_day20(*args):
 
     part2_dijkstra_neigh_duration = timeit.timeit(do_part2_dijkstra_neigh, number=1)
 
-    print(f'part2 (dijkstra): {part2_dijkstra_neigh} ({part2_dijkstra_neigh_duration:.3f}s)')
+    print(f'part2 (dijkstra - neighbor): {part2_dijkstra_neigh} ({part2_dijkstra_neigh_duration:.3f}s)')
+
+    part2_dijkstra_succ = None
+    def do_part2_dijkstra_succ():
+        nonlocal part2_dijkstra_succ
+        part2_dijkstra_succ = compute_part2(*args, dijkstra_succ)
+
+    part2_dijkstra_succ_duration = timeit.timeit(do_part2_dijkstra_succ, number=1)
+
+    print(f'part2 (dijkstra - successor): {part2_dijkstra_succ} ({part2_dijkstra_succ_duration:.3f}s)')
 
     part2_bidir_dijkstra = None
     def do_part2_bidir_dijkstra():
