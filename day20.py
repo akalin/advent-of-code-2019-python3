@@ -119,6 +119,8 @@ def compute_part2(walkables, start_pos, end_pos, portals, path_length):
     start_pos3 = tuple2to3(start_pos, 0)
     end_pos3 = tuple2to3(end_pos, 0)
 
+    # Simple symmetrical neighbor generator that returns local edges
+    # and possibly traverses a portal.
     def weighted_neighbors(n3):
         n, z = tuple3to2(n3)
         for m in G[n]:
@@ -129,21 +131,71 @@ def compute_part2(walkables, start_pos, end_pos, portals, path_length):
             if new_z >= 0:
                 yield tuple2to3(other_side, new_z), 1
 
-    return path_length(G, portals, start_pos3, end_pos3, weighted_neighbors, weighted_neighbors)
+    def weighted_successors(n3):
+        n, z = tuple3to2(n3)
+        if n == end_pos and z == 0:
+            return
 
-def dijkstra(G, portals, start, end, succ, pred):
+        for m in G[n]:
+            w = G.edges[n, m]['weight']
+            if z == 0 and m == end_pos:
+                yield tuple2to3(m, z), w
+            elif m in portals:
+                other_side, dz = portals[m]
+                new_z = z + dz
+                if new_z >= 0:
+                    yield tuple2to3(other_side, new_z), w + 1
+
+    def weighted_predecessors(n3):
+        n, z = tuple3to2(n3)
+        if z == 0 and n == start_pos:
+            return
+
+        if z == 0 and n == end_pos:
+            if start_pos in G[n]:
+                w = G.edges[other_side, start_pos]['weight']
+                yield tuple2to3(start_pos, 0), w
+
+            for m in G[n]:
+                if m not in portals or portals[m][1] < 0:
+                    continue
+                w = G.edges[n, m]['weight']
+                yield tuple2to3(m, 0), w
+            return
+
+        if n not in portals:
+            raise
+        other_side, dz = portals[n]
+        new_z = z + dz
+        if new_z < 0:
+            raise
+
+        if new_z == 0:
+            if start_pos in G[other_side]:
+                w = G.edges[other_side, start_pos]['weight']
+                yield start_pos, 0, w + 1
+        else:
+            for m in G[other_side]:
+                if m not in portals:
+                    continue
+                w = G.edges[other_side, m]['weight']
+                yield tuple2to3(m, new_z), w + 1
+
+    return path_length(G, portals, start_pos3, end_pos3, weighted_neighbors, weighted_successors, weighted_predecessors)
+
+def dijkstra_neigh(G, portals, start, end, neigh, succ, pred):
     return dijkstra_path_length(start, end, succ)
 
-def bidir_dijkstra(G, portals, start, end, succ, pred):
+def bidir_dijkstra(G, portals, start, end, neigh, succ, pred):
     return bidirectional_dijkstra_path_length(start, end, succ, pred)
 
 def zero_heuristic(n):
     return 0
 
-def astar_zero(G, portals, start, end, succ, pred):
+def astar_zero(G, portals, start, end, neigh, succ, pred):
     return astar_path_length(start, end, succ, zero_heuristic)
 
-def astar(G, portals, start, end, succ, pred):
+def astar(G, portals, start, end, neigh, succ, pred):
     up_nodes = [p for p, (_, dz) in portals.items() if dz > 0]
     down_nodes = [p for p, (_, dz) in portals.items() if dz < 0]
 
@@ -185,43 +237,53 @@ def compute_day20(*args):
         nonlocal part1
         part1 = compute_part1(*args)
 
+    part1_duration = timeit.timeit(do_part1, number=1)
+
     part1_nx = None
     def do_part1_nx():
         nonlocal part1_nx
         part1_nx = compute_part1_nx(*args)
 
-    part2_dijkstra = None
-    def do_part2_dijkstra():
-        nonlocal part2_dijkstra
-        part2_dijkstra = compute_part2(*args, dijkstra)
+    part1_nx_duration = timeit.timeit(do_part1_nx, number=1)
+
+    if part1 != part1_nx:
+        raise Exception(f'computed {part1} for part 1, but NetworkX computed {part1_nx}')
+    print(f'part1: {part1} ({part1_duration:.3f}s, nx={part1_nx_duration:.3f}s)')
+
+    part2_dijkstra_neigh = None
+    def do_part2_dijkstra_neigh():
+        nonlocal part2_dijkstra_neigh
+        part2_dijkstra_neigh = compute_part2(*args, dijkstra_neigh)
+
+    part2_dijkstra_neigh_duration = timeit.timeit(do_part2_dijkstra_neigh, number=1)
+
+    print(f'part2 (dijkstra): {part2_dijkstra_neigh} ({part2_dijkstra_neigh_duration:.3f}s)')
 
     part2_bidir_dijkstra = None
     def do_part2_bidir_dijkstra():
         nonlocal part2_bidir_dijkstra
         part2_bidir_dijkstra = compute_part2(*args, bidir_dijkstra)
 
+    part2_bidir_dijkstra_duration = timeit.timeit(do_part2_bidir_dijkstra, number=1)
+
+    print(f'part2 (bidir dijkstra): {part2_bidir_dijkstra} ({part2_bidir_dijkstra_duration:.3f}s)')
+
     part2_astar_zero = None
     def do_part2_astar_zero():
         nonlocal part2_astar_zero
         part2_astar_zero = compute_part2(*args, astar_zero)
+
+    part2_astar_zero_duration = timeit.timeit(do_part2_astar_zero, number=1)
+
+    print(f'part2 (A* zero): {part2_astar_zero} ({part2_astar_zero_duration:.3f}s)')
 
     part2_astar = None
     def do_part2_astar():
         nonlocal part2_astar
         part2_astar = compute_part2(*args, astar)
 
-    part1_duration = timeit.timeit(do_part1, number=1)
-    part1_nx_duration = timeit.timeit(do_part1_nx, number=1)
-    part2_dijkstra_duration = timeit.timeit(do_part2_dijkstra, number=1)
-    part2_bidir_dijkstra_duration = timeit.timeit(do_part2_bidir_dijkstra, number=1)
-    part2_astar_zero_duration = timeit.timeit(do_part2_astar_zero, number=1)
     part2_astar_duration = timeit.timeit(do_part2_astar, number=1)
-    if part1 != part1_nx:
-        raise Exception(f'computed {part1} for part 1, but NetworkX computed {part1_nx}')
-    print(f'part1: {part1} ({part1_duration:.3f}s, nx={part1_nx_duration:.3f}s)')
-    print(f'part2 (dijkstra): {part2_dijkstra} ({part2_dijkstra_duration:.3f}s)')
-    print(f'part2 (bidir dijkstra): {part2_bidir_dijkstra} ({part2_bidir_dijkstra_duration:.3f}s)')
-    print(f'part2 (A* zero): {part2_astar_zero} ({part2_astar_zero_duration:.3f}s)')
+
     print(f'part2 (A*): {part2_astar} ({part2_astar_duration:.3f}s)')
 
 if __name__ == '__main__':
