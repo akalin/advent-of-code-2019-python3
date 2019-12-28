@@ -65,10 +65,9 @@ def parse_map(input, start_count):
         key_objects[source] = {target: frozenset(objs[target_pos][:-1]) for target, target_pos in key_to_pos.items() if target_pos in objs}
 
     key_to_index = {}
-    for key in key_to_pos.keys():
-        for i in range(start_count):
-            if key in key_distances[i]:
-                key_to_index[key] = i
+    for i in range(start_count):
+        for key in key_distances[i].keys():
+            key_to_index[key] = i
 
     # A state is a tuple of positions and an inventory of keys.
 
