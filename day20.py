@@ -198,10 +198,13 @@ def bidir_dijkstra_succ_pred(G, portals, start, end, _, succ, pred):
 def zero_heuristic(n):
     return 0
 
-def astar_zero(G, portals, start, end, neigh, succ, pred):
+def astar_zero_neigh(G, portals, start, end, neigh, _, __):
+    return astar_path_length(start, end, neigh, zero_heuristic)
+
+def astar_zero_succ(G, portals, start, end, _, succ, __):
     return astar_path_length(start, end, succ, zero_heuristic)
 
-def astar(G, portals, start, end, neigh, succ, pred):
+def astar(G, portals, start, end, neigh, _, __):
     up_nodes = [p for p, (_, dz) in portals.items() if dz > 0]
     down_nodes = [p for p, (_, dz) in portals.items() if dz < 0]
 
@@ -235,7 +238,7 @@ def astar(G, portals, start, end, neigh, succ, pred):
             # go to the ground floor, then go to end.
             return min_to_down[n] + (1 + min_up_to_down) * (z - 1) + 1 + min_to_up[end2]
 
-    return astar_path_length(start, end, succ, heuristic)
+    return astar_path_length(start, end, neigh, heuristic)
 
 def compute_day20(*args):
     part1 = None
@@ -292,14 +295,23 @@ def compute_day20(*args):
 
     print(f'part2 (bidir dijkstra - successor/predecessor): {part2_bidir_dijkstra_succ_pred} ({part2_bidir_dijkstra_succ_pred_duration:.3f}s)')
 
-    part2_astar_zero = None
-    def do_part2_astar_zero():
-        nonlocal part2_astar_zero
-        part2_astar_zero = compute_part2(*args, astar_zero)
+    part2_astar_zero_neigh = None
+    def do_part2_astar_zero_neigh():
+        nonlocal part2_astar_zero_neigh
+        part2_astar_zero_neigh = compute_part2(*args, astar_zero_neigh)
 
-    part2_astar_zero_duration = timeit.timeit(do_part2_astar_zero, number=1)
+    part2_astar_zero_neigh_duration = timeit.timeit(do_part2_astar_zero_neigh, number=1)
 
-    print(f'part2 (A* zero): {part2_astar_zero} ({part2_astar_zero_duration:.3f}s)')
+    print(f'part2 (A* zero - neighbor): {part2_astar_zero_neigh} ({part2_astar_zero_neigh_duration:.3f}s)')
+
+    part2_astar_zero_succ = None
+    def do_part2_astar_zero_succ():
+        nonlocal part2_astar_zero_succ
+        part2_astar_zero_succ = compute_part2(*args, astar_zero_succ)
+
+    part2_astar_zero_succ_duration = timeit.timeit(do_part2_astar_zero_succ, number=1)
+
+    print(f'part2 (A* zero - successor): {part2_astar_zero_succ} ({part2_astar_zero_succ_duration:.3f}s)')
 
     part2_astar = None
     def do_part2_astar():
@@ -308,7 +320,7 @@ def compute_day20(*args):
 
     part2_astar_duration = timeit.timeit(do_part2_astar, number=1)
 
-    print(f'part2 (A*): {part2_astar} ({part2_astar_duration:.3f}s)')
+    print(f'part2 (A* - neighbor): {part2_astar} ({part2_astar_duration:.3f}s)')
 
 if __name__ == '__main__':
     with open('day20.input', 'r') as input_file:
