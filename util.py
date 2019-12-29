@@ -137,7 +137,7 @@ def modinv(a, b):
     """return x such that (x * a) % b == 1"""
     g, x, _ = xgcd(a, b)
     if g != 1:
-        raise Exception(f'gcd(a, b) = {g} != 1')
+        raise Exception(f'gcd({a}, {b}) = {g} != 1')
     return x % b
 
 def fastpow(x, n, one):
