@@ -3,7 +3,7 @@ from vec2 import *
 
 def parse_asteroids(input):
     rows = input.strip().split('\n')
-    return set(Vec2(x, y) for y, row in enumerate(rows) for x, cell in enumerate(row.strip()) if cell == '#')
+    return {Vec2(x, y) for y, row in enumerate(rows) for x, cell in enumerate(row.strip()) if cell == '#'}
 
 def can_detect(asteroids, a1, a2):
     dx, dy = a2 - a1
@@ -19,7 +19,7 @@ def can_detect(asteroids, a1, a2):
     return True
 
 def count_detectable(a1, asteroids):
-    return sum(1 for a2 in asteroids - set([a1]) if can_detect(asteroids, a1, a2))
+    return sum(1 for a2 in asteroids - {a1} if can_detect(asteroids, a1, a2))
 
 def compute_best_location(asteroids):
     detected_counts = ((a, count_detectable(a, asteroids)) for a in asteroids)
@@ -42,7 +42,7 @@ def compute_angle(a1, a2):
     return (4, dy/dx)
 
 def vaporize_asteroids(asteroids, p):
-    angles = [(a, compute_angle(p, a)) for a in asteroids - set([p])]
+    angles = [(a, compute_angle(p, a)) for a in asteroids - {p}]
     sorted_angles = sorted(angles, key=lambda x: x[1])
 
     asteroids_left = asteroids.copy()
