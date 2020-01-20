@@ -11,7 +11,7 @@ def parse_input(input):
     return [tuple(int(x) for x in line.strip().split(',')) for line in lines]
 
 def get_constellation_count(points):
-    constellations = [set([p]) for p in points]
+    constellations = [{p} for p in points]
 
     for i1, c1 in enumerate(constellations):
         if len(c1) == 0:
