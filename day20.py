@@ -61,7 +61,7 @@ def parse_input(input):
                             raise Exception(f'too many {label} {label_to_portals[label]}')
                         label_to_portals[label].add(p)
                     else:
-                        label_to_portals[label] = set([p])
+                        label_to_portals[label] = {p}
 
     if start_pos is None or end_pos is None:
         raise
